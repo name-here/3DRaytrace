@@ -17,7 +17,7 @@ void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha){
 	g = green*alpha*a/65025+g*(65025-alpha*a)/65025;
 	b = blue*alpha*a/65025+b*(65025-alpha*a)/65025;
 	a = a*(255-alpha)/255;
-	if(alpha==255){escape = false;}
+	if(a==0){escape = false;}
 }
 
 Ray::Ray(float setX1, float setY1, float setZ1, float setX2, float setY2, float setZ2){
