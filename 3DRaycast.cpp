@@ -145,7 +145,7 @@ void renderPixel(int x, int y){
 void draw(){
 	for(int x = 0; x<displayWidth; x ++){
 		for(int y = 0; y<displayHeight; y ++){
-			renderPixel(x-displayWidth/2, -y+displayHeight/2);
+			renderPixel(x-displayWidth/2, -y+displayHeight/2-1);
 			//set(x, y, 255, 0, 255);
 		}
 	}
@@ -209,8 +209,8 @@ int main(int argc, char* args[]){
 void set(int x, int y, uint8_t r, uint8_t g, uint8_t b){
 	//SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
 	//SDL_RenderDrawPoint(renderer, x, y);This line and the previous line were used for an inefficient way of setting pixels.  This function previously got the renderer passed down to it.
-	if(x>=0 && x<=displayWidth && y>=0 && y<=displayHeight){pixels[y*displayWidth+x] = (r<<16)+(g<<8)+b;}
-	else{printf("Tried to draw pixel out of bounds at (%i, %i)", x, y);}
+	if(x>=0 && x<displayWidth && y>=0 && y<displayHeight){pixels[y*displayWidth+x] = (r<<16)+(g<<8)+b;}
+	else{printf("Tried to draw pixel out of bounds at (%i, %i)\n", x, y);}
 }
 float square(float num){
 	return num*num;
