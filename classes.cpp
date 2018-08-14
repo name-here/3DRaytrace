@@ -12,11 +12,26 @@ CRay::CRay(float setX1, float setY1, float setZ1, float setX2, float setY2, floa
 	a = 255;
 	escape = true;
 }
-void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha){
-	r = red*alpha*a/65025+r*(65025-alpha*a)/65025;
-	g = green*alpha*a/65025+g*(65025-alpha*a)/65025;
-	b = blue*alpha*a/65025+b*(65025-alpha*a)/65025;
-	a = a*(255-alpha)/255;
+void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, float hitX, float hitY, float hitZ, float dist, bool ignoreDirection){
+	if((ignoreDirection || (x2>x1^hitX>x1 && y2>y1^hitY>y1 && z2>z1^hitZ>z1)) && dist<setDist){
+		setDist = dist;
+		setX = hitX;
+		setY = hitY;
+		setZ = hitZ;
+		setR = red;
+		setG = green;
+		setB = blue;
+		setA = alpha;
+	}
+}
+void CRay::finishCast(){
+	x1 = setX;
+	y1 = setY;
+	z1 = setZ;
+	r = setR*setA*a/65025+r*(65025-setA*a)/65025;
+	g = setG*setA*a/65025+g*(65025-setA*a)/65025;
+	b = setB*setA*a/65025+b*(65025-setA*a)/65025;
+	a = a*(255-setA)/255;
 	if(a==0){escape = false;}
 }
 
