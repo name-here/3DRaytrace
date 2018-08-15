@@ -13,7 +13,7 @@ CRay::CRay(float setX1, float setY1, float setZ1, float setX2, float setY2, floa
 	escape = true;
 }
 void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, float hitX, float hitY, float hitZ, float dist, bool ignoreDirection){
-	if((ignoreDirection || (x2>x1^hitX>x1 && y2>y1^hitY>y1 && z2>z1^hitZ>z1)) && dist<setDist){
+	if((ignoreDirection || (x2>x1^hitX>x1 && y2>y1^hitY>y1 && z2>z1^hitZ>z1)) && dist<=setDist){
 		setDist = dist;
 		setX = hitX;
 		setY = hitY;

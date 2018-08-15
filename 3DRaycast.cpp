@@ -1,6 +1,8 @@
 /*
 TODO: 
 	-Line 64: add position
+	-Figure out mouseX and mouseY polarity
+	-Avoid drawing spheres that are behind the camera
 */
 
 #include <SDL2/SDL.h>
@@ -24,11 +26,11 @@ int mouseX;
 int mouseY;
 int lightX = 0;
 int lightY = displayHeight*3/5;
-int lightZ = displayWidth*4;
+int lightZ = displayWidth*1.25;
 bool print;
 CRay cRay(0, 0, 0, 0, 0, displayWidth);
 Tri testTri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100);
-Ball testBall(0, 0, displayWidth*4, displayHeight/2, 0, 255, 100, 200);
+Ball testBall(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
 Ball lightBall(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255);
 
 
@@ -56,7 +58,7 @@ CRay castBall(CRay ray, Ball ball, bool isShadow){
 	float lineX1 = dist3D(ray.x1, ray.y1, ray.z1, ball.x, ball.y, ball.z);
 	float dist1Sq = square(ball.x-ray.x2)+square(ball.y-ray.y2)+square(ball.z-ray.z2);
 	float dist2 = dist3D(ray.x2, ray.y2, ray.z2, ray.x1, ray.y1, ray.z1);
-	float lineX2 = (dist1Sq-square(dist2)+square(lineX1))/(2*lineX1); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	float lineX2 = abs((dist1Sq-square(dist2)+square(lineX1))/(2*lineX1)); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
 	float lineY2 = sqrt(dist1Sq-square(lineX2));
 	float num1;
 	float num2;
@@ -80,15 +82,16 @@ CRay castBall(CRay ray, Ball ball, bool isShadow){
 			else{num4 = (-lineX1*num1-sqrt(num3))/(num2);}
 			float distance = sqrt(square(lineX1-sqrt(ball.radiusSq-num4*num4))+num4*num4);
 			float scale = distance/dist3D(ray.x1, ray.y1, ray.z1, ray.x2, ray.y2, ray.z2);// could also be "/ray.length" if ray.length gets implemented;
-			ray.setColor(ball.r, ball.g, ball.b, ball.a, ray.x1+(ray.x2-ray.x1)*scale, ray.y1+(ray.y2-ray.y1)*scale, ray.z1+(ray.z2-ray.z1)*scale, distance, true);
+			if(ray.z1+(ray.z2-ray.z1)*scale<-mouseX*3){ray.setColor(ball.r, ball.g, ball.b, ball.a, ray.x1+(ray.x2-ray.x1)*scale, ray.y1+(ray.y2-ray.y1)*scale, ray.z1+(ray.z2-ray.z1)*scale, distance, true);}
+			else{ray.setColor(150, 0, 200, ball.a, ray.x1+(ray.x2-ray.x1)*scale, ray.y1+(ray.y2-ray.y1)*scale, ray.z1+(ray.z2-ray.z1)*scale, distance, true);}
 		}
 	}
 	else if(lineY2<0.1){printf("lineY2=%f\n", lineY2);}
 	return ray;
 }
 CRay castYPlane(CRay ray, float y, int r1, int g1, int b1, int r2, int g2, int b2, int a){
-	if(!(ray.y2-ray.y1>0)^(y-ray.y1<0)){
-		float planeX = (ray.x2-ray.x1)*(y-ray.y1)/(ray.y2-ray.y1)+ray.x1;//should maybe be "...+ray.x1" at end instead on this line and next line
+	if((ray.y2<ray.y1)==(y<ray.y1)){
+		float planeX = (ray.x2-ray.x1)*(y-ray.y1)/(ray.y2-ray.y1)+ray.x1;//potential problem area with positivity of "...+ray.x1" at end instead on this line and next line
 		float planeZ = (ray.z2-ray.z1)*(y-ray.y1)/(ray.y2-ray.y1)+ray.z1;
 		//ray.x1 = planeX;
 		//ray.y1 = y;
@@ -96,10 +99,10 @@ CRay castYPlane(CRay ray, float y, int r1, int g1, int b1, int r2, int g2, int b
 		//if(print){printf("b:X:%f, Y:%f, z:%f\n", ray.x1/displayWidth, ray.y1/displayHeight, ray.z1/displayWidth);}
 		//if(square(ray.x1-testBall.x)+square(ray.y1-testBall.y)+square(ray.z1-testBall.z)<=testBall.radiusSq){ray.setColor(255, 0, 0, 255);}
 		if(/*(int)dist3D(ray.x1, ray.y1, ray.z1, testBall.x, testBall.y, testBall.z)%(int)(displayWidth/2)<displayWidth/4){*/abs((int)planeX)%(int)displayWidth<displayWidth/2^abs((int)planeZ)%(int)displayWidth<displayWidth/2^planeX>0^planeZ>0){ 
-			ray.setColor(r1, g1, b1, a, planeX, y, planeZ, dist3D(ray.x1, ray.y1, ray.z1, planeX, y, planeZ), false);
+			ray.setColor(r1, g1, b1, a, planeX, y, planeZ, dist3D(ray.x1, ray.y1, ray.z1, planeX, y, planeZ), true);
 		}
 		else{
-			ray.setColor(r2, g2, b2, a, planeX, y, planeZ, dist3D(ray.x1, ray.y1, ray.z1, planeX, y, planeZ), false);
+			ray.setColor(r2, g2, b2, a, planeX, y, planeZ, dist3D(ray.x1, ray.y1, ray.z1, planeX, y, planeZ), true);
 		}
 		ray.escape = false;
 	}
@@ -147,35 +150,39 @@ CRay setCRay(CRay ray, float x1, float y1, float z1, float x2, float y2, float z
 
 void renderPixel(int x, int y){
 	print = y==0 && frameCount==15;
-	cRay = setCRay(cRay, /*frameCount*displayWidth/50*/0, 0, 0, x/*+frameCount*displayWidth/50*/, y, -displayWidth);
+	//cRay = setCRay(cRay, /*frameCount*displayWidth/50*/0, 0, 0, x/*+frameCount*displayWidth/50*/, y, displayWidth);
+	cRay = setCRay(cRay, /*frameCount*displayWidth/50*/0, displayWidth*3, 0, y/*+frameCount*displayWidth/50*/, displayWidth*2, x-mouseX);
 	//cRay = castTri(cRay, testTri);
 	cRay = castBall(cRay, lightBall, false);
 	cRay = castBall(cRay, testBall, false);
 	if(cRay.escape){cRay = castYPlane(cRay, mouseY/*frameCount*displayWidth/50-displayWidth*/, 0, 0, 0, 150, 0, 150, 255);}
+	cRay.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);
 	cRay.finishCast();
 	cRay.x2 = lightX;
 	cRay.y2 = lightY;
 	cRay.z2 = lightZ;
 	//if(x==0 && (y==0||y==2) && frameCount==15){printf("R:%i,G:%i,B:%i,A:%i\n", cRay.r, cRay.g, cRay.b, cRay.a);}
-	if(!cRay.escape){cRay = castBall(cRay, testBall, true);}
-	/*if(x==0 && y==-displayHeight/2 && frameCount==15){
+	cRay = castBall(cRay, testBall, true);
+	/*if(x==1 && y==-displayHeight/4 && frameCount==15){
 		lightBall.x = cRay.x1;
 		lightBall.y = cRay.y1;
 		lightBall.z = cRay.z1;
-		//printf("a:X:%f, Y:%f, z:%f\n", cRay.x1/displayWidth, cRay.y1/displayHeight, cRay.z1/displayWidth);
+		printf("a:X:%f, Y:%f, z:%f\n", cRay.x1/displayWidth, cRay.y1/displayHeight, cRay.z1/displayWidth);
 	}*/
-	if(cRay.escape){cRay.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);}
-	set(x+displayWidth/2, y+displayHeight/2, cRay.r, cRay.g, cRay.b);
+	/*if(cRay.escape){
+		cRay.finishCast();
+	}*/
+	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomization could cause an off-by-one error with some display sizes*/, cRay.r, cRay.g, cRay.b);
 }
 
 void draw(){
-	lightBall.x = lightX;
-	lightBall.y = lightY;
-	lightBall.z = lightZ;
-	testBall.z = mouseX*10;
-	for(int x = 0; x<displayWidth; x ++){
-		for(int y = 0; y<displayHeight; y ++){
-			renderPixel(x-displayWidth/2, -y+displayHeight/2-1);
+	//lightBall.x = lightX;
+	//lightBall.y = lightY;
+	//lightBall.z = lightZ;
+	//testBall.z = (mouseX)*10;
+	for(int y = displayHeight; y>0; y --){
+		for(int x = 0; x<displayWidth; x ++){
+			renderPixel(x-displayWidth/2, y-displayHeight/2);
 			//set(x, y, 255, 0, 255);
 		}
 	}
@@ -220,8 +227,9 @@ int main(int argc, char* args[]){
 							quit = true;
 							break;
 						case SDL_MOUSEMOTION:
-							mouseX = -event.motion.x+displayWidth/2;
+							mouseX = event.motion.x-displayWidth/2;
 							mouseY = -event.motion.y+displayHeight/2;
+							printf("mouseX%f\n", mouseX*1.0/displayWidth);
 					}
 				}
 			}
