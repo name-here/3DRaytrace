@@ -80,7 +80,7 @@ void renderPixel(int x, int y){
 }
 
 void draw(){
-	-camera.z = mouseX*4;
+	camera.z = -mouseX*4;
 	//lightBall.x = lightX;
 	//lightBall.y = lightY;
 	//lightBall.z = lightZ;
