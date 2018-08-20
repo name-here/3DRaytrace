@@ -1,13 +1,16 @@
 /*
-TODO:                                                                                    |Doneness|
-	-Line 64: add position                                                               |????????|
-	-Figure out mouseX and mouseY polarity                                               |MabyDone|
+TODO:                                                                                    |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
+	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
+	-Find the normal of a triangle when it is created                                    |StilToDo|
+	-Finish triangle.cast                                                                |StilToDo|
+	-Find the required vectors for the camera when it is created                         |StilToDo|
+	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |StilToDo|
+	-Fix shadows!                                                                        |StilToDo|
+	-                                                                                    |_-_-_-_-|
+	-                                                                                    |_-_-_-_-|
 	-Avoid drawing spheres that are behind the camera                                    |ProbDone|
-	-Find the normal of a triangle when it is created                                    |Not Done|
-	-Finish triangle.cast                                                                |Not Done|
-	-Find the required vectors for the camera when it is created                         |Not Done|
-	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |Not Done|
-	-Make the plane cast actually get what axis it is on from the variable               |_-_-_-_-|
+	-Figure out mouseX and mouseY polarity                                               |  Done  |
+	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
 */
 
 #include <SDL2/SDL.h>
@@ -34,12 +37,12 @@ float lightY = displayHeight;
 float lightZ = 0;
 bool print;
 Object test = Ball(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
-Camera camera(0, displayWidth*3, 0, displayWidth, 0, 0);
+Camera camera(0, displayWidth*3, 0, displayWidth, 0, -90);
 CRay cRay(0, 0, 0, 0, 0, displayWidth);
-Tri testTri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100);
-Ball testBall(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
-Ball lightBall(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255);
-Plane testPlane(1, 0, displayWidth/2, 0, 0, 0, 255, 150, 0, 150, 255);
+Object* testTri = new Tri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100);
+Object* testBall = new Ball(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
+Object* lightBall = new Ball(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255);
+Object* testPlane = new Plane(1, 0, displayWidth/2, 0, 150, 150, 255, 150, 0, 150, 255);
 
 
 /*CRay test2D(CRay ray){
@@ -64,15 +67,15 @@ void renderPixel(int x, int y){
 	print = y==0 && frameCount==15;
 	camera.getRay(cRay, x, y);
 	//testTri.cast(cRay, false);
-	lightBall.cast(cRay, false);
-	testBall.cast(cRay, false);
-	testPlane.cast(cRay, false);
+	lightBall->cast(cRay, false);
+	testBall->cast(cRay, false);
+	testPlane->cast(cRay, false);
 	cRay.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);
 	cRay.finishCast(true);
 	cRay.x2 = lightX;
 	cRay.y2 = lightY;
 	cRay.z2 = lightZ;
-	testBall.cast(cRay, true);
+	testBall->cast(cRay, true);
 	/*if(cRay.escape){
 		cRay.finishCast();
 	}*/
@@ -81,6 +84,7 @@ void renderPixel(int x, int y){
 
 void draw(){
 	camera.z = -mouseX*4;
+	//testPlane->dist = mouseY*4;
 	//lightBall.x = lightX;
 	//lightBall.y = lightY;
 	//lightBall.z = lightZ;
@@ -116,7 +120,7 @@ int main(int argc, char* args[]){
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		}
 		else{
-			renderer = SDL_CreateRenderer(window, -1, 0);//last "0" is for flags, and was previously "SDL_RENDERER_PRESENTVSYNC"
+			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 			buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, displayWidth, displayHeight);
 			while(!quit){
 				draw();
@@ -134,12 +138,16 @@ int main(int argc, char* args[]){
 						case SDL_MOUSEMOTION:
 							mouseX = event.motion.x-displayWidth/2;
 							mouseY = -event.motion.y+displayHeight/2;
-							printf("mouseX%f\n", mouseX*1.0/displayWidth);
+							//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/displayWidth, mouseY*1.0/displayHeight);
 					}
 				}
 			}
 		}
 	}
+	delete testTri;
+	delete testBall;
+	delete lightBall;
+	delete testPlane;
 	delete[] pixels;
 	SDL_DestroyTexture(buffer);
 	SDL_DestroyRenderer(renderer);

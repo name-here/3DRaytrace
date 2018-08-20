@@ -42,7 +42,7 @@ void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, flo
 		setR = red;
 		setG = green;
 		setB = blue;
-		setA = alpha;
+		setA = 255;//alpha;
 	}
 }
 
@@ -58,10 +58,16 @@ Ray::Ray(float setX1, float setY1, float setZ1, float setX2, float setY2, float 
 
 
 Camera::Camera(float setX, float setY, float setZ, float setPlaneDist, float setAngleX, float setAngleY){
+	planeDist = setPlaneDist;
+	move(setX, setY, setZ);
+	rotate(setAngleX, setAngleY);
+}
+void Camera::move(float setX, float setY, float setZ){
 	x = setX;
 	y = setY;
-	z = setZ;
-	planeDist = setPlaneDist;
+	x = setZ;
+}
+void Camera::rotate(float setAngleX, float setAngleY){//This should set the front, up, and right vectors.
 	xFront = 0;//xyzFront is a unit vector pointing in the direction that the camera is facing.
 	yFront = 0;
 	zFront = 0;
@@ -70,15 +76,7 @@ Camera::Camera(float setX, float setY, float setZ, float setPlaneDist, float set
 	zUp = 0;
 	xRight = 0;//xyzRight is a unit vector pointing directly to the right the camera.
 	yRight = 0;
-	zRight = 0;//These should be found instead of being set to 0.
-}
-void Camera::move(float setX, float setY, float setZ){
-	x = setX;
-	y = setY;
-	x = setZ;
-}
-void Camera::rotate(float setAngleX, float setAngleY){
-	//This should set the front, up, and right vectors.
+	zRight = 0;//These should all be found instead of being set to 0.
 }
 void Camera::getRay(CRay& ray, float screenX, float screenY){
 	ray.x1 = x;
@@ -241,14 +239,14 @@ void Plane::cast(CRay& ray, bool isShadow){//This assumes the plane is along the
 		float planeY = (dim2dist2-dim2dist1)*(dist-dim1dist1)/(dim1dist2-dim1dist1)+dim2dist1;
 		//if(square(ray.x1-testBall.x)+square(ray.y1-testBall.y)+square(ray.z1-testBall.z)<=testBall.radiusSq){ray.setColor(255, 0, 0, 255);}
 		if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){ 
-			if(axis==0){ray.setColor(r1, g1, b1, a1, dist, planeY, planeX, dist3D(dim3dist1, dim1dist1, dim2dist1, dist, planeY, planeX), false);}
+			if(axis==0){ray.setColor(r1, g1, b1, a1, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);}
 			else if(axis==1){ray.setColor(r1, g1, b1, a1, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);}
-			else{ray.setColor(r1, g1, b1, a1, planeY, planeX, dist, dist3D(dim3dist1, dim1dist1, dim2dist1, planeY, planeX, dist), false);}
+			else{ray.setColor(r1, g1, b1, a1, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);}
 		}
 		else{
-			if(axis==0){ray.setColor(r2, g2, b2, a2, dist, planeY, planeX, dist3D(dim3dist1, dim1dist1, dim2dist1, dist, planeY, planeX), false);}
+			if(axis==0){ray.setColor(r2, g2, b2, a2, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);}
 			else if(axis==1){ray.setColor(r2, g2, b2, a2, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);}
-			else{ray.setColor(r2, g2, b2, a2, planeY, planeX, dist, dist3D(dim3dist1, dim1dist1, dim2dist1, planeY, planeX, dist), false);}
+			else{ray.setColor(r2, g2, b2, a2, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);}
 		}
 		ray.escape = false;
 	}
