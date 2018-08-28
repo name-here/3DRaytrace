@@ -3,12 +3,16 @@ TODO:                                                                           
 	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
 	-Find the normal of a triangle when it is created                                    |StilToDo|
 	-Finish triangle.cast                                                                |StilToDo|
+	-Make triangle.cast work for shadows                                                 |StilToDo|
 	-Find the required vectors for the camera when it is created                         |StilToDo|
 	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |StilToDo|
 	-Fix shadows!                                                                        |StilToDo|
+	-Add shadows for plane.cast                                                          |StilToDo|
+	-Restructure so that world object contains all objects to be cast                    |StilToDo|
+	-Add reflections to all objects                                                      |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
-	-Avoid drawing spheres that are behind the camera                                    |ProbDone|
+	-Avoid drawing spheres that are behind the camera                                    |PartDone|
 	-Figure out mouseX and mouseY polarity                                               |  Done  |
 	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
 */
@@ -16,9 +20,11 @@ TODO:                                                                           
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <cmath>
-#include <limits>//This library is used to get the float max value.
 #include <iostream>
-#include "classes.h"
+#include <limits>//This library is used to get the float max value.
+#include "rays.h"
+#include "camera.h"
+#include "objects.h"
 
 #define F_INFINITY std::numeric_limits<float>::infinity()
 
@@ -36,13 +42,12 @@ float lightX = 0;
 float lightY = displayHeight;
 float lightZ = 0;
 bool print;
-Object test = Ball(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
-Camera camera(0, displayWidth*3, 0, displayWidth, 0, -90);
+Camera camera(0, 0, 0, displayWidth, 0, -90);
 CRay cRay(0, 0, 0, 0, 0, displayWidth);
-Object* testTri = new Tri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100);
-Object* testBall = new Ball(0, 0, -displayWidth, displayHeight/2, 0, 255, 100, 255);
-Object* lightBall = new Ball(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255);
-Object* testPlane = new Plane(1, 0, displayWidth/2, 0, 150, 150, 255, 150, 0, 150, 255);
+Object* testTri = new Tri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100, 255);
+Object* testBall = new Ball(0, 0, -displayWidth, displayHeight/2, 255, 255, 255, 255, 0);
+Object* lightBall = new Ball(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255, 0);
+Object* testPlane = new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 127);
 
 
 /*CRay test2D(CRay ray){
@@ -72,9 +77,9 @@ void renderPixel(int x, int y){
 	testPlane->cast(cRay, false);
 	cRay.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);
 	cRay.finishCast(true);
-	cRay.x2 = lightX;
-	cRay.y2 = lightY;
-	cRay.z2 = lightZ;
+	cRay.ray.x1 = lightX;
+	cRay.ray.y1 = lightY;
+	cRay.ray.z1 = lightZ;
 	testBall->cast(cRay, true);
 	/*if(cRay.escape){
 		cRay.finishCast();
@@ -83,8 +88,8 @@ void renderPixel(int x, int y){
 }
 
 void draw(){
-	camera.z = -mouseX*4;
-	//testPlane->dist = mouseY*4;
+	camera.z = (mouseX+displayWidth/2)*4;
+	static_cast<Plane*>(testPlane)->dist = mouseY*4;
 	//lightBall.x = lightX;
 	//lightBall.y = lightY;
 	//lightBall.z = lightZ;
@@ -99,11 +104,11 @@ void draw(){
 
 
 
-int main(int argc, char* args[]){
+int main(/*int argc, char* args[]*/){
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 	SDL_DisplayMode DM;
-	SDL_Texture* buffer;
+	SDL_Texture* buffer = nullptr;
 	bool quit = false;
     SDL_Event event;
 	SDL_GetCurrentDisplayMode(0, &DM);
@@ -118,6 +123,7 @@ int main(int argc, char* args[]){
 		window = SDL_CreateWindow("3D Raycaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, displayWidth, displayHeight, 0);//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0"
 		if(window==NULL){
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+
 		}
 		else{
 			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
