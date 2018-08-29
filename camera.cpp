@@ -1,5 +1,4 @@
-#include <cmath>
-#include <iostream>
+//#include <cmath>
 #include <limits>//This library is used to get the float max value.
 #include "rays.h"
 #include "camera.h"

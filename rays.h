@@ -1,3 +1,6 @@
+#include <cstdint>
+
+
 class Ray{
 	public:
 		float x1;

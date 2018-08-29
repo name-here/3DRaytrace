@@ -1,7 +1,9 @@
 #include <cmath>
-#include <iostream>
+#include <limits>//This library is used to get the float max value.
 #include "rays.h"
 #include "objects.h"
+
+#define F_INFINITY std::numeric_limits<float>::infinity()
 
 
 float square(float num){
@@ -12,17 +14,33 @@ float dist3D(float x1, float y1, float z1, float x2, float y2, float z2){
 }
 
 
-World::World(CRay* setObjList[]){
-	//objList = setObjList;
+/*World::World(std::vector<Object*>&& setObjList)
+	: objList(setObjList)
+{
+	lightX = 0;
+	lightY = 0;
+	lightZ = 0;
+}*/
+World::World(){
+	lightX = 0;
+	lightY = 1000;
+	lightZ = 0;
 }
+
 void World::cast(CRay& ray){
-
+	for(auto i = objList.begin(); i!=objList.end(); ++i){
+		(*i)->cast(ray, false);
+	}
+	ray.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);
+	ray.finishCast(true);
+	ray.ray.x1 = lightX;
+	ray.ray.y1 = lightY;
+	ray.ray.z1 = lightZ;
+	for(auto i = objList.begin(); i!=objList.end(); ++i){
+		(*i)->cast(ray, true);
+	}
 }
 
-
-void Object::cast(CRay& ray, bool isShadow){
-	printf("Error in \"cast\" function implimentation(default was used).\n");
-}
 
 Tri::Tri(float setX1, float setY1, float setZ1, float setX2, float setY2, float setZ2, float setX3, float setY3, float setZ3, uint8_t setR, uint8_t setG, uint8_t setB, uint8_t setA){
 	x1 = setX1;
@@ -52,10 +70,15 @@ void Tri::cast(CRay& ray, bool isShadow){
 	float triX3 = x3;
 	float triY3 = y3;
 	if(!(pointY-triY1<(triY2-triY1)*(pointX-triX1)/(triX2-triX1)^triX2<triX1) && !(pointY-triY2<(triY3-triY2)*(pointX-triX2)/(triX3-triX2)^triX3<triX2) && !(pointY-triY3<(triY1-triY3)*(pointX-triX3)/(triX1-triX3)^triX1<triX3)){
-		ray.r = r;
-		ray.g = g;
-		ray.b = b;
-		ray.escape = false;
+		if(isShadow){
+
+		}
+		else{
+			ray.r = r;
+			ray.g = g;
+			ray.b = b;
+			ray.escape = false;
+		}
 	}
 }
 
@@ -174,26 +197,31 @@ void Plane::cast(CRay& ray, bool isShadow){//This assumes the plane is along the
 		float planeX = (dim3dist2-dim3dist1)*(dist-dim1dist1)/(dim1dist2-dim1dist1)+dim3dist1;//potential problem area with positivity of "...+ray.ray.x1" at end instead on this line and next line
 		float planeY = (dim2dist2-dim2dist1)*(dist-dim1dist1)/(dim1dist2-dim1dist1)+dim2dist1;
 		//if(square(ray.ray.x1-testBall.x)+square(ray.ray.y1-testBall.y)+square(ray.ray.z1-testBall.z)<=testBall.radiusSq){ray.setColor(255, 0, 0, 255);}
-		if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){ 
-			if(axis==0){
-				ray.setColor(r1, g1, b1, a1*(255-reflect)/255, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);
-			}
-			else if(axis==1){
-				ray.setColor(r1, g1, b1, a1*(255-reflect)/255, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);
-			}
-			else{
-				ray.setColor(r1, g1, b1, a1*(255-reflect)/255, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);
-			}
+		if(isShadow){
+
 		}
 		else{
-			if(axis==0){
-				ray.setColor(r2, g2, b2, a2*(255-reflect)/255, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);
-			}
-			else if(axis==1){
-				ray.setColor(r2, g2, b2, a2*(255-reflect)/255, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);
+			if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){ 
+				if(axis==0){
+					ray.setColor(r1, g1, b1, a1*(255-reflect)/255, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);
+				}
+				else if(axis==1){
+					ray.setColor(r1, g1, b1, a1*(255-reflect)/255, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);
+				}
+				else{
+					ray.setColor(r1, g1, b1, a1*(255-reflect)/255, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);
+				}
 			}
 			else{
-				ray.setColor(r2, g2, b2, a2*(255-reflect)/255, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);
+				if(axis==0){
+					ray.setColor(r2, g2, b2, a2*(255-reflect)/255, dist, planeY, planeX, dist3D(dim1dist1, dim2dist1, dim3dist1, dist, planeY, planeX), false);
+				}
+				else if(axis==1){
+					ray.setColor(r2, g2, b2, a2*(255-reflect)/255, planeX, dist, planeY, dist3D(dim3dist1, dim1dist1, dim2dist1, planeX, dist, planeY), false);
+				}
+				else{
+					ray.setColor(r2, g2, b2, a2*(255-reflect)/255, planeY, planeX, dist, dist3D(dim2dist1, dim3dist1, dim1dist1, planeY, planeX, dist), false);
+				}
 			}
 		}
 		ray.escape = false;

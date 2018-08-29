@@ -1,14 +1,22 @@
-class World{
-	public:
-		CRay* objList[];
-		World(CRay* setObjList[]);
-		void cast(CRay& ray);
-};
+#include <cstdint>
+#include <vector>
+
 
 class Object{
 	public:
 		virtual ~Object() = default;
-		virtual void cast(CRay& ray, bool isShadow);
+		virtual void cast(CRay& ray, bool isShadow) = 0;
+};
+
+class World{
+	public:
+		float lightX;
+		float lightY;
+		float lightZ;
+		std::vector<Object*> objList;
+		//World(std::vector<Object*>&& setObjList);
+		World();
+		void cast(CRay& ray);
 };
 
 class Tri: public Object{

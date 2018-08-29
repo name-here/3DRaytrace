@@ -8,19 +8,20 @@ TODO:                                                                           
 	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |StilToDo|
 	-Fix shadows!                                                                        |StilToDo|
 	-Add shadows for plane.cast                                                          |StilToDo|
-	-Restructure so that world object contains all objects to be cast                    |StilToDo|
 	-Add reflections to all objects                                                      |StilToDo|
+	-Properly clean up World object on exit                                              |StilToDo
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+	-Restructure so that world object contains all objects to be cast                    |  Done  |
 	-Figure out mouseX and mouseY polarity                                               |  Done  |
 	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
 */
 
 #include <SDL2/SDL.h>
-#include <stdio.h>
+#include <cstdio>
 #include <cmath>
-#include <iostream>
+#include <cstdint>
 #include <limits>//This library is used to get the float max value.
 #include "rays.h"
 #include "camera.h"
@@ -38,17 +39,19 @@ Uint32* pixels = new Uint32[displayWidth*displayHeight];
 int frameCount = 0;
 int mouseX;
 int mouseY;
-float lightX = 0;
-float lightY = displayHeight;
-float lightZ = 0;
 bool print;
+
+World world;
 Camera camera(0, 0, 0, displayWidth, 0, -90);
 CRay cRay(0, 0, 0, 0, 0, displayWidth);
 Object* testTri = new Tri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100, 255);
-Object* testBall = new Ball(0, 0, -displayWidth, displayHeight/2, 255, 255, 255, 255, 0);
-Object* lightBall = new Ball(lightX, lightY, lightZ, displayHeight/10, 255, 0, 0, 255, 0);
-Object* testPlane = new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 127);
 
+
+void setup(){
+	world.objList.emplace_back(new Ball(0, 0, -displayWidth, displayHeight/2, 255, 255, 255, 255, 0));//testBall
+	world.objList.emplace_back(new Ball(world.lightX, world.lightY, world.lightZ, displayHeight/10, 255, 0, 0, 255, 0));//lightBall
+	world.objList.emplace_back(new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 127));//testPlane
+}
 
 /*CRay test2D(CRay ray){
 	if(square(ray.x2)+square(ray.y2)<square(displayHeight/2)){
@@ -71,25 +74,13 @@ Object* testPlane = new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 15
 void renderPixel(int x, int y){
 	print = y==0 && frameCount==15;
 	camera.getRay(cRay, x, y);
-	//testTri.cast(cRay, false);
-	lightBall->cast(cRay, false);
-	testBall->cast(cRay, false);
-	testPlane->cast(cRay, false);
-	cRay.setColor(150, 200, 255, 255, F_INFINITY, F_INFINITY, F_INFINITY, F_INFINITY, true);
-	cRay.finishCast(true);
-	cRay.ray.x1 = lightX;
-	cRay.ray.y1 = lightY;
-	cRay.ray.z1 = lightZ;
-	testBall->cast(cRay, true);
-	/*if(cRay.escape){
-		cRay.finishCast();
-	}*/
+	world.cast(cRay);
 	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomization could cause an off-by-one error with some display sizes*/, cRay.r, cRay.g, cRay.b);
 }
 
 void draw(){
 	camera.z = (mouseX+displayWidth/2)*4;
-	static_cast<Plane*>(testPlane)->dist = mouseY*4;
+	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
 	//lightBall.x = lightX;
 	//lightBall.y = lightY;
 	//lightBall.z = lightZ;
@@ -128,6 +119,7 @@ int main(/*int argc, char* args[]*/){
 		else{
 			renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 			buffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, displayWidth, displayHeight);
+			setup();
 			while(!quit){
 				draw();
 				//memset(pixels, 255, displayWidth*displayHeight*sizeof(Uint32));
@@ -151,9 +143,9 @@ int main(/*int argc, char* args[]*/){
 		}
 	}
 	delete testTri;
-	delete testBall;
-	delete lightBall;
-	delete testPlane;
+	//delete testBall;
+	//delete lightBall;
+	//delete testPlane;
 	delete[] pixels;
 	SDL_DestroyTexture(buffer);
 	SDL_DestroyRenderer(renderer);
