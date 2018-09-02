@@ -1,24 +1,22 @@
 #include "rays.h"
 
 
-Ray::Ray(float setX1, float setY1, float setZ1, float setX2, float setY2, float setZ2){
-	x1 = setX1;
-	y1 = setY1;
-	z1 = setZ1;
-	x2 = setX2;
-	y2 = setY2;
-	z2 = setZ2;
+Point::Point(float setX, float setY, float setZ){
+	x = setX;
+	y = setY;
+	z = setZ;
+}
+
+
+Ray::Ray(Point setP1, Point setP2){
+	p1 = setP1;
+	p2 = setP2;
 	//length = dist3D(x1, y1, z1, x2, y2, z2);
 }
 
-CRay::CRay(float setX1, float setY1, float setZ1, float setX2, float setY2, float setZ2){
-	/*x1 = setX1;
-	y1 = setY1;
-	z1 = setZ1;
-	x2 = setX2;
-	y2 = setY2;
-	z2 = setZ2;*/
-	ray = Ray(setX1, setY1, setZ1, setX2, setY2, setZ2);
+CRay::CRay(Ray setRay){
+	//ray = Ray(Point(setX1, setY1, setZ1), Point(setX2, setY2, setZ2));
+	ray = setRay;
 	//length = dist3D(x1, y1, z1, x2, y2, z2);
 	r = 255;
 	g = 255;
@@ -26,12 +24,10 @@ CRay::CRay(float setX1, float setY1, float setZ1, float setX2, float setY2, floa
 	a = 255;
 	escape = true;
 }
-void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, float hitX, float hitY, float hitZ, float dist, bool ignoreDirection){
-	if((ignoreDirection || (ray.x2>ray.x1==hitX>ray.x1 && ray.y2>ray.y1==hitY>ray.y1 && ray.z2>ray.z1==hitZ>ray.z1)) && dist<=setDist){
+void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, Point hit, float dist, bool ignoreDirection){
+	if((ignoreDirection || (ray.p2.x>ray.p1.x==hit.x>ray.p1.x && ray.p2.y>ray.p1.y==hit.y>ray.p1.y && ray.p2.z>ray.p1.z==hit.z>ray.p1.z)) && dist<=setDist){
 		setDist = dist;
-		setX = hitX;
-		setY = hitY;
-		setZ = hitZ;
+		setPos = hit;
 		if(alpha>0){
 			setR = red;
 			setG = green;
@@ -42,9 +38,7 @@ void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, flo
 }
 void CRay::finishCast(bool setPos){
 	if(setPos){
-		ray.x2 = setX;
-		ray.y2 = setY;
-		ray.z2 = setZ;
+		ray.p2 = setPos;
 	}
 	r = setR*setA*a/65025+r*(65025-setA*a)/65025;
 	g = setG*setA*a/65025+g*(65025-setA*a)/65025;

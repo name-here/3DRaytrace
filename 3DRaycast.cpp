@@ -6,12 +6,15 @@ TODO:                                                                           
 	-Make triangle.cast work for shadows                                                 |StilToDo|
 	-Find the required vectors for the camera when it is created                         |StilToDo|
 	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |StilToDo|
-	-Fix shadows!                                                                        |StilToDo|
 	-Add shadows for plane.cast                                                          |StilToDo|
 	-Add reflections to all objects                                                      |StilToDo|
-	-Properly clean up World object on exit                                              |StilToDo
+	-Properly clean up World objects on exit                                             |StilToDo|
+	-Redefine operators and such to work with points (and rays?)                         |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
+	-                                                                                    |_-_-_-_-|
+	-Make use of Point object universal                                                  |PartDone|
+	-Fix shadows!                                                                        |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
 	-Restructure so that world object contains all objects to be cast                    |  Done  |
 	-Figure out mouseX and mouseY polarity                                               |  Done  |
@@ -42,20 +45,20 @@ int mouseY;
 bool print;
 
 World world;
-Camera camera(0, 0, 0, displayWidth, 0, -90);
-CRay cRay(0, 0, 0, 0, 0, displayWidth);
-Object* testTri = new Tri(0, 0, displayWidth*2, displayWidth, 0, displayWidth*2, displayWidth/2, displayWidth/2, displayWidth*5/2, 100, 100, 100, 255);
+Camera camera(Point(0, 0, 0), displayWidth, 0, -90);
+CRay cRay(Ray(Point(0, 0, 0), Point(0, 0, displayWidth)));
+Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, displayWidth*2), Point(displayWidth/2, displayWidth/2, displayWidth*5/2), 100, 100, 100, 255);
 
 
 void setup(){
-	world.objList.emplace_back(new Ball(0, 0, -displayWidth, displayHeight/2, 255, 255, 255, 255, 0));//testBall
-	world.objList.emplace_back(new Ball(world.lightX, world.lightY, world.lightZ, displayHeight/10, 255, 0, 0, 255, 0));//lightBall
-	world.objList.emplace_back(new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 127));//testPlane
+	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, 255, 255, 255, 255, 0));//testBall
+	world.objList.emplace_back(new Ball(world.light, displayHeight/10, 255, 0, 0, 255, 0));//lightBall
+	world.objList.emplace_back(new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 0));//testPlane
 }
 
 /*CRay test2D(CRay ray){
-	if(square(ray.x2)+square(ray.y2)<square(displayHeight/2)){
-		if(ray.y2<sin(ray.x2*15.7079632679/displayWidth-frameCount*displayWidth/50)*displayHeight/4){
+	if(square(ray.p2.x)+square(ray.p2.y)<square(displayHeight/2)){
+		if(ray.p2.y<sin(ray.p2.x*15.7079632679/displayWidth-frameCount*displayWidth/50)*displayHeight/4){
 			ray.r = 50;
 			ray.g = 200;
 			ray.b = 20;
@@ -79,12 +82,8 @@ void renderPixel(int x, int y){
 }
 
 void draw(){
-	camera.z = (mouseX+displayWidth/2)*4;
+	camera.pos.z = (mouseX+displayWidth/2)*4;
 	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
-	//lightBall.x = lightX;
-	//lightBall.y = lightY;
-	//lightBall.z = lightZ;
-	//testBall.z = (mouseX)*10;
 	for(int y = displayHeight; y>0; y --){
 		for(int x = 0; x<displayWidth; x ++){
 			renderPixel(x-displayWidth/2, y-displayHeight/2);
