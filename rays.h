@@ -31,6 +31,7 @@ class CRay{
 		//float length;
 		float setDist;
 		bool escape;
+		uint32_t bounceCount;
 		CRay(Ray setRay = Ray());
 		void setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, Point hit, float dist, bool ignoreDirection);
 		void finishCast(bool setPos);

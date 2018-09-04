@@ -40,8 +40,8 @@ int displayWidth = 1000;
 int displayHeight = 700;
 Uint32* pixels = new Uint32[displayWidth*displayHeight];
 int frameCount = 0;
-int mouseX;
-int mouseY;
+int mouseX = 0;
+int mouseY = -displayHeight/2;
 bool print;
 
 World world;
@@ -75,7 +75,7 @@ void setup(){
 
 
 void renderPixel(int x, int y){
-	print = y==0 && frameCount==15;
+	//print = x==0 && y==0 && frameCount==15;
 	camera.getRay(cRay, x, y);
 	world.cast(cRay);
 	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomization could cause an off-by-one error with some display sizes*/, cRay.r, cRay.g, cRay.b);

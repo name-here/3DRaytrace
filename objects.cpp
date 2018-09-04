@@ -1,10 +1,10 @@
 #include <cmath>
+#include <cstdio>
 #include <limits>//This library is used to get the float max value.
 #include "rays.h"
 #include "objects.h"
 
 #define F_INFINITY std::numeric_limits<float>::infinity()
-
 
 float square(float num){
 	return num*num;
@@ -28,17 +28,17 @@ World::World(){
 }
 
 void World::cast(CRay& ray){
-	for(int bounces = 0; bounces<5 && ray.escape==true; bounces++){
-		for(auto i = objList.begin(); i!=objList.end(); ++i){
-			(*i)->cast(ray, false);
-		}
-		ray.setColor(150, 200, 255, 255, Point(F_INFINITY, F_INFINITY, F_INFINITY), F_INFINITY, true);
-		ray.finishCast(true);
-		ray.setDist = F_INFINITY;
-	}
-	ray.ray.p1 = light;
+	ray.bounceCount ++;
 	for(auto i = objList.begin(); i!=objList.end(); ++i){
-		(*i)->cast(ray, true);
+		(*i)->cast(ray, false, *this);
+	}
+	ray.setColor(150, 200, 255, 255, Point(F_INFINITY, F_INFINITY, F_INFINITY), F_INFINITY, true);
+	ray.finishCast(true);
+	ray.setDist = F_INFINITY;
+	ray.ray.p1 = light;
+	ray.ray.p2 = Point(0, 0, -1000);
+	for(auto i = objList.begin(); i!=objList.end(); ++i){
+		(*i)->cast(ray, true, *this);
 	}
 	ray.finishCast(false);
 }
@@ -56,7 +56,7 @@ Tri::Tri(Point setP1, Point setP2, Point setP3, uint8_t setR, uint8_t setG, uint
 	b = setB;
 	a = setA;
 }
-void Tri::cast(CRay& ray, bool isShadow){
+void Tri::cast(CRay& ray, bool isShadow, World& world){
 	float pointX = ray.ray.p2.x;
 	float pointY = ray.ray.p2.y;
 	float triX1 = p1.x;
@@ -88,7 +88,7 @@ Ball::Ball(Point setPos, float setRadius, uint8_t setR, uint8_t setG, uint8_t se
 	a = setA;
 	reflect = setReflect;
 }
-void Ball::cast(CRay& ray, bool isShadow){
+void Ball::cast(CRay& ray, bool isShadow, World& world){
 	float lineX1 = dist3D(ray.ray.p1, pos);
 	float dist1Sq = square(pos.x-ray.ray.p2.x)+square(pos.y-ray.ray.p2.y)+square(pos.z-ray.ray.p2.z);
 	float dist2 = dist3D(ray.ray.p1, ray.ray.p2);
@@ -104,6 +104,7 @@ void Ball::cast(CRay& ray, bool isShadow){
 	}
 	//if(print){printf("lineX2:%f, ray z:%f, lineY2:%f\n",lineX2,ray.ray.p2.z,lineY2);}
 	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
+	//if(print){printf("Working");}
 		float num4;
 		if(lineY2==0){num4 = radius;}
 		else{num4 = (-lineX1*num1-sqrt(num3))/(num2);}
@@ -119,8 +120,9 @@ void Ball::cast(CRay& ray, bool isShadow){
 					(hit.y>ray.ray.p1.y!=hit.y>ray.ray.p2.y) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
 					(hit.z>ray.ray.p1.z!=hit.z>ray.ray.p2.z) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
 					dist3D(hit, ray.ray.p2)>1){
-				//ray.setColor(0, 0, 0, 255, Point(F_INFINITY, F_INFINITY, F_INFINITY), F_INFINITY, true);//The position for this should actually be set, but isn't yet
-				ray.r *= 0.5;
+				//if(true){printf("Working Shadow\n");}
+				//ray.setColor(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
+				ray.r = (hit.x>ray.ray.p1.x!=hit.x>ray.ray.p2.x)*255;
 				ray.g *= 0.5;
 				ray.b *= 0.5;
 			}
@@ -153,7 +155,7 @@ Plane::Plane(uint8_t setAxis, float setDist, float setGridSize, uint8_t setR1, u
 	a2 = setA2;
 	reflect = setReflect;
 }
-void Plane::cast(CRay& ray, bool isShadow){
+void Plane::cast(CRay& ray, bool isShadow, World& world){
 	/*float dim1dist1;
 	float dim1dist2;
 	float dim2dist1;
@@ -222,7 +224,7 @@ void Plane::cast(CRay& ray, bool isShadow){
 					ray.setColor(r2, g2, b2, a2*(255-reflect)/255, Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
 				}
 			}
-			if(reflect>0){
+			if(reflect>0 && ray.bounceCount<2){
 				//ray.ray.p1.x = ray.ray.p2.x;
 				//ray.ray.p1.y = ray.ray.p2.y;
 				//ray.ray.p1.z = ray.ray.p2.z;
@@ -250,6 +252,7 @@ void Plane::cast(CRay& ray, bool isShadow){
 					ray.ray.p2.y = rotateRay.p2.z*2-rotateRay.p1.z;
 					ray.ray.p2.z = rotateRay.p1.x;
 				}
+				world.cast(ray);
 			}
 		}
 		//ray.escape = false;
