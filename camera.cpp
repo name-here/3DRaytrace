@@ -34,6 +34,9 @@ void Camera::getRay(CRay& ray, float screenX, float screenY){
 	ray.g = 0;
 	ray.b = 0;
 	ray.a = 255;
+	ray.setPos.x = F_INFINITY;
+	ray.setPos.y = F_INFINITY;
+	ray.setPos.z = F_INFINITY;
 	ray.setDist = F_INFINITY;
 	ray.escape = true;
 	ray.bounceCount = 0;

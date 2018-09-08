@@ -1,5 +1,6 @@
 /*
 TODO:                                                                                    |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
+	-Add and impliment/use ray.length                                                    |Maybe Do|
 	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
 	-Find the normal of a triangle when it is created                                    |StilToDo|
 	-Finish triangle.cast                                                                |StilToDo|
@@ -9,28 +10,26 @@ TODO:                                                                           
 	-Add shadows for plane.cast                                                          |StilToDo|
 	-Add reflections to all objects                                                      |StilToDo|
 	-Properly clean up World objects on exit                                             |StilToDo|
-	-Redefine operators and such to work with points (and rays?)                         |StilToDo|
+	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |StilToDo|
+	-Fix shadows!                                                                        |StilToDo|
+	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
-	-                                                                                    |_-_-_-_-|
-	-Make use of Point object universal                                                  |PartDone|
-	-Fix shadows!                                                                        |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+	-Make use of Point object universal                                                  |  Done  |
 	-Restructure so that world object contains all objects to be cast                    |  Done  |
 	-Figure out mouseX and mouseY polarity                                               |  Done  |
 	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
 */
 
+
 #include <SDL2/SDL.h>
 #include <cstdio>
-#include <cmath>
 #include <cstdint>
-#include <limits>//This library is used to get the float max value.
+#include <string>
 #include "rays.h"
 #include "camera.h"
 #include "objects.h"
-
-#define F_INFINITY std::numeric_limits<float>::infinity()
 
 void set(int, int, uint8_t, uint8_t, uint8_t);
 //float square(float num);
@@ -53,7 +52,7 @@ Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, di
 void setup(){
 	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, 255, 255, 255, 255, 0));//testBall
 	world.objList.emplace_back(new Ball(world.light, displayHeight/10, 255, 0, 0, 255, 0));//lightBall
-	world.objList.emplace_back(new Plane(1, 0, displayWidth/8, 0, 150, 150, 255, 150, 0, 150, 255, 0));//testPlane
+	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, 0, 150, 150, 255, 150, 0, 150, 255, 0));//testPlane
 }
 
 /*CRay test2D(CRay ray){
@@ -76,12 +75,25 @@ void setup(){
 
 void renderPixel(int x, int y){
 	//print = x==0 && y==0 && frameCount==15;
-	camera.getRay(cRay, x, y);
-	world.cast(cRay);
-	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomization could cause an off-by-one error with some display sizes*/, cRay.r, cRay.g, cRay.b);
+	int detail = 1;
+	int detailSq = detail*detail;
+	uint32_t rTotal = 0;
+	uint32_t gTotal = 0;
+	uint32_t bTotal = 0;
+	for(int subX = 0; subX<detail; subX ++){
+		for(int subY = 0; subY<detail; subY ++){
+			camera.getRay(cRay, x+subX*1.0/detail, y+subY*1.0/detail);
+			world.cast(cRay);
+			rTotal += cRay.r;
+			gTotal += cRay.g;
+			bTotal += cRay.b;
+		}
+	}
+	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomizing here could cause an off-by-one error with some display sizes*/, (int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq));
 }
 
 void draw(){
+	//camera.pos.z = (displayWidth*frameCount/5);
 	camera.pos.z = (mouseX+displayWidth/2)*4;
 	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
 	for(int y = displayHeight; y>0; y --){
@@ -126,7 +138,17 @@ int main(/*int argc, char* args[]*/){
 				SDL_RenderClear(renderer);
 				SDL_RenderCopy(renderer, buffer, NULL, NULL);
 				SDL_RenderPresent(renderer);
+
 				frameCount ++;
+
+				/*if(frameCount<=20){
+					const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
+					SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, displayWidth, displayHeight, 32, displayWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
+					printf("Saved file %s\n", name);
+				}
+				else{quit = true;}*/
+
+				//if(frameCount==30){quit = true;}
 				while(SDL_PollEvent(&event)!=0){
 					switch(event.type){
 						case SDL_QUIT:

@@ -34,13 +34,13 @@ void World::cast(CRay& ray){
 	}
 	ray.setColor(150, 200, 255, 255, Point(F_INFINITY, F_INFINITY, F_INFINITY), F_INFINITY, true);
 	ray.finishCast(true);
-	ray.setDist = F_INFINITY;
 	ray.ray.p1 = light;
-	ray.ray.p2 = Point(0, 0, -1000);
+	//ray.ray.p2 = Point(0, 0, -1000);
+	//ray.setDist = F_INFINITY;
 	for(auto i = objList.begin(); i!=objList.end(); ++i){
 		(*i)->cast(ray, true, *this);
 	}
-	ray.finishCast(false);
+	//ray.finishCast(false);
 }
 
 
@@ -104,25 +104,22 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 	}
 	//if(print){printf("lineX2:%f, ray z:%f, lineY2:%f\n",lineX2,ray.ray.p2.z,lineY2);}
 	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
-	//if(print){printf("Working");}
 		float num4;
 		if(lineY2==0){num4 = radius;}
 		else{num4 = (-lineX1*num1-sqrt(num3))/(num2);}
 		float distance = sqrt(square(lineX1-sqrt(radiusSq-num4*num4))+num4*num4);
-		float scale = distance/dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.length" if ray.length gets implemented.
-		Point hit(ray.ray.p1.x+(ray.ray.p2.x-ray.ray.p1.x)*scale, ray.ray.p1.y+(ray.ray.p2.y-ray.ray.p1.y)*scale, ray.ray.p1.z+(ray.ray.p2.z-ray.ray.p1.z)*scale);
-		//float hitX = ray.ray.p1.x+(ray.ray.p2.x-ray.ray.p1.x)*scale;
-		//float hitY = ray.ray.p1.y+(ray.ray.p2.y-ray.ray.p1.y)*scale;
-		//float hitZ = ray.ray.p1.z+(ray.ray.p2.z-ray.ray.p1.z)*scale;
+		float scale = distance/dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.ray.length" if ray.length gets implemented.
+		Point hit(  ray.ray.p1.x+(ray.ray.p2.x-ray.ray.p1.x)*scale,
+					ray.ray.p1.y+(ray.ray.p2.y-ray.ray.p1.y)*scale,
+					ray.ray.p1.z+(ray.ray.p2.z-ray.ray.p1.z)*scale  );
 		if(isShadow){
 			/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
 			if( 	(hit.x>ray.ray.p1.x!=hit.x>ray.ray.p2.x) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
 					(hit.y>ray.ray.p1.y!=hit.y>ray.ray.p2.y) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
 					(hit.z>ray.ray.p1.z!=hit.z>ray.ray.p2.z) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
 					dist3D(hit, ray.ray.p2)>1){
-				//if(true){printf("Working Shadow\n");}
 				//ray.setColor(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
-				ray.r = (hit.x>ray.ray.p1.x!=hit.x>ray.ray.p2.x)*255;
+				ray.r *= 0.5;
 				ray.g *= 0.5;
 				ray.b *= 0.5;
 			}
@@ -134,7 +131,7 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 
 			}
 			else{
-				ray.setColor(r, g, b, a, Point(ray.ray.p1.x+(ray.ray.p2.x-ray.ray.p1.x)*scale, ray.ray.p1.y+(ray.ray.p2.y-ray.ray.p1.y)*scale, ray.ray.p1.z+(ray.ray.p2.z-ray.ray.p1.z)*scale), distance, false);
+				ray.setColor(r, g, b, a, hit, distance, false);
 			}
 		}
 	}

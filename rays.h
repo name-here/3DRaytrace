@@ -17,7 +17,6 @@ struct Ray{
 };
 
 class CRay{
-	Point setPos;
 	uint8_t setR;
 	uint8_t setG;
 	uint8_t setB;
@@ -29,6 +28,7 @@ class CRay{
 		uint8_t b;
 		uint8_t a;
 		//float length;
+		Point setPos;
 		float setDist;
 		bool escape;
 		uint32_t bounceCount;

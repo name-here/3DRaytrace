@@ -36,8 +36,8 @@ void CRay::setColor(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha, Poi
 		setA = alpha;
 	}
 }
-void CRay::finishCast(bool setPos){
-	if(setPos){
+void CRay::finishCast(bool doSetPos){
+	if(doSetPos){
 		ray.p2 = setPos;
 	}
 	r = setR*setA*a/65025+r*(65025-setA*a)/65025;
