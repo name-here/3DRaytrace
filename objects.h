@@ -25,11 +25,9 @@ class Tri: public Object{
 		Point p2;
 		Point p3;
 		Point normal;
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-		uint8_t a;
-		Tri(Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), uint8_t setR = 0, uint8_t setG = 0, uint8_t setB = 0, uint8_t setA = 0);
+		Color color;
+		uint16_t reflect;
+		Tri(Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
 
@@ -38,12 +36,9 @@ class Ball: public Object{
 		Point pos;
 		float radius;
 		float radiusSq;
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-		uint8_t a;
-		uint8_t reflect;
-		Ball(Point setPos = Point(), float setRadius = 0, uint8_t setR = 0, uint8_t setG = 0, uint8_t setB = 0, uint8_t setA = 0, uint8_t setReflect = 0);
+		Color color;
+		uint16_t reflect;
+		Ball(Point setPos = Point(), float setRadius = 0, Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
 
@@ -52,16 +47,10 @@ class Plane: public Object{
 		uint8_t axis;
 		float dist;
 		float gridSize;
-		uint8_t r1;
-		uint8_t g1;
-		uint8_t b1;
-		uint8_t a1;
-		uint8_t r2;
-		uint8_t g2;
-		uint8_t b2;
-		uint8_t a2;
-		uint8_t reflect;
-		Plane(uint8_t setAxis = 0, float setDist = 0, float setGridSize = 1, uint8_t setR1 = 0, uint8_t setG1 = 0, uint8_t setB1 = 0, uint8_t setA1 = 0, uint8_t setR2 = 0, uint8_t setG2 = 0, uint8_t setB2 = 0, uint8_t setA2 = 0, uint8_t setReflect = 0);
+		Color color1;
+		Color color2;
+		uint16_t reflect;
+		Plane(uint8_t setAxis = 0, float setDist = 0, float setGridSize = 1, Color setColor1 = Color(), Color setColor2 = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
 

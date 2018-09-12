@@ -30,10 +30,10 @@ void Camera::getRay(CRay& ray, float screenX, float screenY){
 	ray.ray.p2.x = pos.x+screenX;
 	ray.ray.p2.y = pos.y+screenY;
 	ray.ray.p2.z = pos.z-planeDist;
-	ray.r = 0;
-	ray.g = 0;
-	ray.b = 0;
-	ray.a = 255;
+	ray.color.r = 0;
+	ray.color.g = 0;
+	ray.color.b = 0;
+	ray.color.a = 65535;
 	ray.setPos.x = F_INFINITY;
 	ray.setPos.y = F_INFINITY;
 	ray.setPos.z = F_INFINITY;

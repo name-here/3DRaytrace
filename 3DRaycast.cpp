@@ -10,12 +10,15 @@ TODO:                                                                           
 	-Add shadows for plane.cast                                                          |StilToDo|
 	-Add reflections to all objects                                                      |StilToDo|
 	-Properly clean up World objects on exit                                             |StilToDo|
-	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |StilToDo|
-	-Fix shadows!                                                                        |StilToDo|
 	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
+	-Fix issue of no shadows on line of x=0                                              |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
+	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |PartDone|
+	-Fix color issues caused by non-linear association of RGB values and brightness      |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+	-Make use of Color objects universal                                                 |  Done  |
+	-Fix shadows!                                                                        |  Done  |
 	-Make use of Point object universal                                                  |  Done  |
 	-Restructure so that world object contains all objects to be cast                    |  Done  |
 	-Figure out mouseX and mouseY polarity                                               |  Done  |
@@ -26,12 +29,13 @@ TODO:                                                                           
 #include <SDL2/SDL.h>
 #include <cstdio>
 #include <cstdint>
+#include <cmath>
 #include <string>
 #include "rays.h"
 #include "camera.h"
 #include "objects.h"
 
-void set(int, int, uint8_t, uint8_t, uint8_t);
+void set(int, int, Color);
 //float square(float num);
 //float dist3D(float x1, float y1, float z1, float x2, float y2, float z2);
 
@@ -46,13 +50,13 @@ bool print;
 World world;
 Camera camera(Point(0, 0, 0), displayWidth, 0, -90);
 CRay cRay(Ray(Point(0, 0, 0), Point(0, 0, displayWidth)));
-Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, displayWidth*2), Point(displayWidth/2, displayWidth/2, displayWidth*5/2), 100, 100, 100, 255);
+Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, displayWidth*2), Point(displayWidth/2, displayWidth/2, displayWidth*5/2), Color(25600, 25600, 25600, 65535));
 
 
 void setup(){
-	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, 255, 255, 255, 255, 0));//testBall
-	world.objList.emplace_back(new Ball(world.light, displayHeight/10, 255, 0, 0, 255, 0));//lightBall
-	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, 0, 150, 150, 255, 150, 0, 150, 255, 0));//testPlane
+	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, Color(65535, 65535, 65535, 65535), 0));//testBall
+	world.objList.emplace_back(new Ball(world.light, displayHeight/10, Color(65535, 0, 0, 65535), 0));//lightBall
+	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, Color(0, 38400, 38400, 65535), Color(38400, 0, 38400, 65535), 0));//testPlane
 }
 
 /*CRay test2D(CRay ray){
@@ -84,22 +88,22 @@ void renderPixel(int x, int y){
 		for(int subY = 0; subY<detail; subY ++){
 			camera.getRay(cRay, x+subX*1.0/detail, y+subY*1.0/detail);
 			world.cast(cRay);
-			rTotal += cRay.r;
-			gTotal += cRay.g;
-			bTotal += cRay.b;
+			rTotal += cRay.color.r;
+			gTotal += cRay.color.g;
+			bTotal += cRay.color.b;
 		}
 	}
-	set(x+displayWidth/2, displayHeight-(y+displayHeight/2)/*optomizing here could cause an off-by-one error with some display sizes*/, (int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq));
+	set(x+displayWidth/2, displayHeight-1-(y+displayHeight/2)/*optomizing here could cause an off-by-one error with some display sizes*/, Color((int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq)));
 }
 
 void draw(){
 	//camera.pos.z = (displayWidth*frameCount/5);
 	camera.pos.z = (mouseX+displayWidth/2)*4;
 	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
-	for(int y = displayHeight; y>0; y --){
+	for(int y = displayHeight-1; y>=0; y --){
 		for(int x = 0; x<displayWidth; x ++){
 			renderPixel(x-displayWidth/2, y-displayHeight/2);
-			//set(x, y, 255, 0, 255);
+			//set(x, y, Color(65535*x/displayWidth/2, 0, 0));
 		}
 	}
 }
@@ -176,8 +180,8 @@ int main(/*int argc, char* args[]*/){
 	return 0;
 }
 
-void set(int x, int y, uint8_t r, uint8_t g, uint8_t b){
-	if(x>=0 && x<displayWidth && y>=0 && y<displayHeight){pixels[y*displayWidth+x] = (r<<16)+(g<<8)+b;}
+void set(int x, int y, Color color){
+	if(x>=0 && x<displayWidth && y>=0 && y<displayHeight){pixels[y*displayWidth+x] = (((int)sqrt(color.r))<<16)+(((int)sqrt(color.g))<<8)+((int)sqrt(color.b));}
 	else{printf("Tried to draw pixel out of bounds at (%i, %i)\n", x, y);}
 }
 /*float square(float num){
