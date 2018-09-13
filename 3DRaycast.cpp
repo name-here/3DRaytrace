@@ -15,8 +15,8 @@ TODO:                                                                           
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
 	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |PartDone|
-	-Fix color issues caused by non-linear association of RGB values and brightness      |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+	-Fix color issues caused by non-linear association of RGB values and brightness      |  Done  |
 	-Make use of Color objects universal                                                 |  Done  |
 	-Fix shadows!                                                                        |  Done  |
 	-Make use of Point object universal                                                  |  Done  |
@@ -46,6 +46,8 @@ int frameCount = 0;
 int mouseX = 0;
 int mouseY = -displayHeight/2;
 bool print;
+int detail = 1;
+int detailSq = detail*detail;
 
 World world;
 Camera camera(Point(0, 0, 0), displayWidth, 0, -90);
@@ -56,7 +58,7 @@ Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, di
 void setup(){
 	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, Color(65535, 65535, 65535, 65535), 0));//testBall
 	world.objList.emplace_back(new Ball(world.light, displayHeight/10, Color(65535, 0, 0, 65535), 0));//lightBall
-	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, Color(0, 38400, 38400, 65535), Color(38400, 0, 38400, 65535), 0));//testPlane
+	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, Color(0, 38400, 38400, 65535), Color(0, 10000, 20000, 65535), 0));//testPlane
 }
 
 /*CRay test2D(CRay ray){
@@ -79,8 +81,6 @@ void setup(){
 
 void renderPixel(int x, int y){
 	//print = x==0 && y==0 && frameCount==15;
-	int detail = 1;
-	int detailSq = detail*detail;
 	uint32_t rTotal = 0;
 	uint32_t gTotal = 0;
 	uint32_t bTotal = 0;
