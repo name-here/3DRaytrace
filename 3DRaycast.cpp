@@ -39,8 +39,8 @@ void set(int, int, Color);
 //float square(float num);
 //float dist3D(float x1, float y1, float z1, float x2, float y2, float z2);
 
-int displayWidth = 1000;
-int displayHeight = 700;
+int displayWidth = 600;
+int displayHeight = 600;
 Uint32* pixels = new Uint32[displayWidth*displayHeight];
 int frameCount = 0;
 int mouseX = 0;
@@ -118,8 +118,8 @@ int main(/*int argc, char* args[]*/){
 	bool quit = false;
     SDL_Event event;
 	SDL_GetCurrentDisplayMode(0, &DM);
-	printf("width: %i, ", DM.w);
-	printf("height: %i\n", DM.h);
+	//printf("width: %i, ", DM.w);
+	//printf("height: %i\n", DM.h);
 	//displayWidth = DM.w;
 	//displayHeight = DM.h;
 	if(SDL_Init(SDL_INIT_VIDEO)<0){

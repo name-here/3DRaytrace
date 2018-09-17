@@ -23,7 +23,7 @@ float dist3D(Point p1, Point p2){
 }*/
 World::World(){
 	light.x = 0;
-	light.y = 1000;
+	light.y = 600;
 	light.z = 0;
 }
 
@@ -144,10 +144,6 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 	float dim2dist2;
 	float dim3dist1;
 	float dim3dist2;*/
-	/*CRay bounceRay;
-	if(reflect>0){
-		bounceRay = ray;
-	}*/
 	Ray rotateRay;
 	if(axis==0){
 		rotateRay = Ray(Point(ray.ray.p1.x, ray.ray.p1.y, ray.ray.p1.z), Point(ray.ray.p2.x, ray.ray.p2.y, ray.ray.p2.z));
@@ -206,36 +202,48 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
 				}
 			}
-			if(reflect>0 && ray.bounceCount<1){
+			if(reflect>0 && ray.bounceCount<2){
 				ray.finishCast(false);
+				CRay copyRay;
+				//copyRay.ray = ray.ray;
+				copyRay.bounceCount = ray.bounceCount;
 				//ray.ray.p1.x = ray.ray.p2.x;
 				//ray.ray.p1.y = ray.ray.p2.y;
 				//ray.ray.p1.z = ray.ray.p2.z;
 				if(axis==0){
-					ray.ray.p1.x = rotateRay.p2.x;
-					ray.ray.p1.y = rotateRay.p2.y;
-					ray.ray.p1.z = rotateRay.p2.z;
-					ray.ray.p2.x = rotateRay.p1.x;
-					ray.ray.p2.y = rotateRay.p2.y*2-rotateRay.p1.y;
-					ray.ray.p2.z = rotateRay.p2.z*2-rotateRay.p1.z;
+					copyRay.ray.p1.x = rotateRay.p2.x;
+					copyRay.ray.p1.y = rotateRay.p2.y;
+					copyRay.ray.p1.z = rotateRay.p2.z;
+					copyRay.ray.p2.x = rotateRay.p1.x;
+					copyRay.ray.p2.y = rotateRay.p2.y*2-rotateRay.p1.y;
+					copyRay.ray.p2.z = rotateRay.p2.z*2-rotateRay.p1.z;
 				}
 				if(axis==1){
-					ray.ray.p1.x = rotateRay.p2.z;
-					ray.ray.p1.y = rotateRay.p2.x;
-					ray.ray.p1.z = rotateRay.p2.y;
-					ray.ray.p2.x = rotateRay.p2.z*2-rotateRay.p1.z;
-					ray.ray.p2.y = rotateRay.p1.x;
-					ray.ray.p2.z = rotateRay.p2.y*2-rotateRay.p1.y;
+					copyRay.ray.p1.x = rotateRay.p2.z;
+					copyRay.ray.p1.y = rotateRay.p2.x;
+					copyRay.ray.p1.z = rotateRay.p2.y;
+					copyRay.ray.p2.x = rotateRay.p2.z*2-rotateRay.p1.z;
+					copyRay.ray.p2.y = rotateRay.p1.x;
+					copyRay.ray.p2.z = rotateRay.p2.y*2-rotateRay.p1.y;
 				}
 				if(axis==2){
-					ray.ray.p1.x = rotateRay.p2.y;
-					ray.ray.p1.y = rotateRay.p2.z;
-					ray.ray.p1.z = rotateRay.p2.x;
-					ray.ray.p2.x = rotateRay.p2.y*2-rotateRay.p1.y;
-					ray.ray.p2.y = rotateRay.p2.z*2-rotateRay.p1.z;
-					ray.ray.p2.z = rotateRay.p1.x;
+					copyRay.ray.p1.x = rotateRay.p2.y;
+					copyRay.ray.p1.y = rotateRay.p2.z;
+					copyRay.ray.p1.z = rotateRay.p2.x;
+					copyRay.ray.p2.x = rotateRay.p2.y*2-rotateRay.p1.y;
+					copyRay.ray.p2.y = rotateRay.p2.z*2-rotateRay.p1.z;
+					copyRay.ray.p2.z = rotateRay.p1.x;
 				}
-				world.cast(ray);
+				world.cast(copyRay);
+				if(axis==0){
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
+				}
+				else if(axis==1){
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(planeX, dist, planeY), dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
+				}
+				else{
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
+				}
 			}
 		}
 		//ray.escape = false;
