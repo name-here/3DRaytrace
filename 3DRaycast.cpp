@@ -50,15 +50,15 @@ int detail = 1;
 int detailSq = detail*detail;
 
 World world;
-Camera camera(Point(0, 0, 0), displayWidth, 0, -90);
+Camera camera(Point(0, 0, -displayWidth*3), displayWidth, 10, 80);
 CRay cRay(Ray(Point(0, 0, 0), Point(0, 0, displayWidth)));
 Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, displayWidth*2), Point(displayWidth/2, displayWidth/2, displayWidth*5/2), Color(25600, 25600, 25600, 65535));
 
 
 void setup(){
-	world.objList.emplace_back(new Ball(Point(0, 0, -displayWidth), displayHeight/2, Color(65535, 65535, 65535, 65535), 0));//testBall
 	world.objList.emplace_back(new Ball(world.light, displayHeight/10, Color(65535, 0, 0, 65535), 0));//lightBall
-	world.objList.emplace_back(new Plane(1, -displayWidth/5, displayWidth/3, Color(0, 38400, 38400, 65535), Color(0, 10000, 20000, 65535), 0));//testPlane
+	world.objList.emplace_back(new Ball(Point(0, 0, displayWidth), displayHeight/2, Color(65535, 65535, 65535, 65535), 0));//testBall
+	world.objList.emplace_back(new Plane(1, -displayWidth*11/20, displayWidth/3, Color(0, 38400, 38400, 65535), Color(0, 10000, 20000, 65535), 20000));//testPlane
 }
 
 /*CRay test2D(CRay ray){
@@ -97,9 +97,10 @@ void renderPixel(int x, int y){
 }
 
 void draw(){
-	//camera.pos.z = (displayWidth*frameCount/5);
-	camera.pos.z = (mouseX+displayWidth/2)*4;
+	camera.pos.z = -(mouseX+displayWidth/2)*4;
 	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
+	//camera.pos.z = (displayWidth*frameCount/5);
+	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*displayHeight/20;
 	for(int y = displayHeight-1; y>=0; y --){
 		for(int x = 0; x<displayWidth; x ++){
 			renderPixel(x-displayWidth/2, y-displayHeight/2);

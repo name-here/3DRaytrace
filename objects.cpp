@@ -22,9 +22,9 @@ float dist3D(Point p1, Point p2){
 	light.z = 0;
 }*/
 World::World(){
-	light.x = 0;
+	light.x = 600;
 	light.y = 600;
-	light.z = 0;
+	light.z = 600;
 }
 
 void World::cast(CRay& ray){
@@ -118,8 +118,15 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 		else /*if(	(ray.ray.p2.x>ray.ray.p1.x==hit.x>ray.ray.p1.x) &&
 					(ray.ray.p2.y>ray.ray.p1.x==hit.y>ray.ray.p1.y) &&
 					(ray.ray.p2.z>ray.ray.p1.x==hit.z>ray.ray.p1.z) )*/{
-			if(reflect>0){
+			if(reflect>0 && ray.bounceCount<2){
+				ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), hit, distance, false);
+				ray.finishCast(true);
+				CRay copyRay;
+				copyRay.bounceCount = ray.bounceCount;
+				copyRay.ray.p1 = ray.ray.p2;
 
+				world.cast(copyRay);
+				ray.setColor(copyRay.color, hit, distance, false);
 			}
 			else{
 				ray.setColor(color, hit, distance, false);
@@ -138,44 +145,19 @@ Plane::Plane(uint8_t setAxis, float setDist, float setGridSize, Color setColor1,
 	reflect = setReflect;
 }
 void Plane::cast(CRay& ray, bool isShadow, World& world){
-	/*float dim1dist1;
-	float dim1dist2;
-	float dim2dist1;
-	float dim2dist2;
-	float dim3dist1;
-	float dim3dist2;*/
 	Ray rotateRay;
 	if(axis==0){
 		rotateRay = Ray(Point(ray.ray.p1.x, ray.ray.p1.y, ray.ray.p1.z), Point(ray.ray.p2.x, ray.ray.p2.y, ray.ray.p2.z));
-		/*dim1dist1 = ray.ray.p1.x;
-		dim1dist2 = ray.ray.p2.x;
-		dim2dist1 = ray.ray.p1.y;
-		dim2dist2 = ray.ray.p2.y;
-		dim3dist1 = ray.ray.p1.z;
-		dim3dist2 = ray.ray.p2.z;*/
 	}
 	else if(axis==1){
 		rotateRay = Ray(Point(ray.ray.p1.y, ray.ray.p1.z, ray.ray.p1.x), Point(ray.ray.p2.y, ray.ray.p2.z, ray.ray.p2.x));
-		/*dim1dist1 = ray.ray.p1.y;
-		dim1dist2 = ray.ray.p2.y;
-		dim2dist1 = ray.ray.p1.z;
-		dim2dist2 = ray.ray.p2.z;
-		dim3dist1 = ray.ray.p1.x;
-		dim3dist2 = ray.ray.p2.x;*/
 	}
 	else{
 		rotateRay = Ray(Point(ray.ray.p1.z, ray.ray.p1.x, ray.ray.p1.y), Point(ray.ray.p2.z, ray.ray.p2.x, ray.ray.p2.y));
-		/*dim1dist1 = ray.ray.p1.z;
-		dim1dist2 = ray.ray.p2.z;
-		dim2dist1 = ray.ray.p1.x;
-		dim2dist2 = ray.ray.p2.x;
-		dim3dist1 = ray.ray.p1.y;
-		dim3dist2 = ray.ray.p2.y;*/
 	}
 	if(((rotateRay.p2.x<rotateRay.p1.x)==(dist<rotateRay.p1.x)) && abs(dist-rotateRay.p1.x)>0.5){
 		float planeX = (rotateRay.p2.z-rotateRay.p1.z)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.z;//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
 		float planeY = (rotateRay.p2.y-rotateRay.p1.y)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.y;
-		//if(square(ray.ray.p1.x-testBall.x)+square(ray.ray.p1.y-testBall.y)+square(ray.ray.p1.z-testBall.z)<=testBall.radiusSq){ray.setColor(255, 0, 0, 255);}
 		if(isShadow){
 
 		}
@@ -203,14 +185,13 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 				}
 			}
 			if(reflect>0 && ray.bounceCount<2){
-				ray.finishCast(false);
+				ray.finishCast(true);
 				CRay copyRay;
-				//copyRay.ray = ray.ray;
 				copyRay.bounceCount = ray.bounceCount;
 				//ray.ray.p1.x = ray.ray.p2.x;
 				//ray.ray.p1.y = ray.ray.p2.y;
 				//ray.ray.p1.z = ray.ray.p2.z;
-				if(axis==0){
+				/*if(axis==0){
 					copyRay.ray.p1.x = rotateRay.p2.x;
 					copyRay.ray.p1.y = rotateRay.p2.y;
 					copyRay.ray.p1.z = rotateRay.p2.z;
@@ -233,8 +214,25 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 					copyRay.ray.p2.x = rotateRay.p2.y*2-rotateRay.p1.y;
 					copyRay.ray.p2.y = rotateRay.p2.z*2-rotateRay.p1.z;
 					copyRay.ray.p2.z = rotateRay.p1.x;
+				}*/
+				copyRay.ray.p1 = ray.ray.p2;
+				if(axis==0){
+					copyRay.ray.p2.x = ray.ray.p1.x;
+					copyRay.ray.p2.y = ray.ray.p2.y*2-ray.ray.p1.y;
+					copyRay.ray.p2.z = ray.ray.p2.z*2-ray.ray.p1.z;
+				}
+				if(axis==1){
+					copyRay.ray.p2.x = ray.ray.p2.x*2-ray.ray.p1.x;
+					copyRay.ray.p2.y = ray.ray.p1.y;
+					copyRay.ray.p2.z = ray.ray.p2.z*2-ray.ray.p1.z;
+				}
+				if(axis==2){
+					copyRay.ray.p2.x = ray.ray.p2.x*2-ray.ray.p1.x;
+					copyRay.ray.p2.y = ray.ray.p2.y*2-ray.ray.p1.y;
+					copyRay.ray.p2.z = ray.ray.p1.z;
 				}
 				world.cast(copyRay);
+				copyRay.finishCast(false);
 				if(axis==0){
 					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
 				}

@@ -29,7 +29,7 @@ void Camera::getRay(CRay& ray, float screenX, float screenY){
 	ray.ray.p1 = pos;
 	ray.ray.p2.x = pos.x+screenX;
 	ray.ray.p2.y = pos.y+screenY;
-	ray.ray.p2.z = pos.z-planeDist;
+	ray.ray.p2.z = pos.z+planeDist;
 	ray.color.r = 0;
 	ray.color.g = 0;
 	ray.color.b = 0;

@@ -63,7 +63,7 @@ CRay::CRay(Ray setRay){
 	color.r = 0;
 	color.g = 0;
 	color.b = 0;
-	color.a = 0;
+	color.a = 65535;
 	setPos.x = F_INFINITY;
 	setPos.y = F_INFINITY;
 	setPos.z = F_INFINITY;
@@ -76,6 +76,7 @@ void CRay::setColor(Color toSet, Point hit, float dist, bool ignoreDirection){
 		setDist = dist;
 		setPos = hit;
 		if(toSet.a>0){
+			//if(toSet.r==65432){printf("Alpha:%i\n", color.a);}
 			setCastColor.r = toSet.r;
 			setCastColor.g = toSet.g;
 			setCastColor.b = toSet.b;
