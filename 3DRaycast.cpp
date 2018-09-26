@@ -39,8 +39,8 @@ void set(int, int, Color);
 //float square(float num);
 //float dist3D(float x1, float y1, float z1, float x2, float y2, float z2);
 
-int displayWidth = 600;
-int displayHeight = 600;
+int displayWidth = 400;
+int displayHeight = 280;
 Uint32* pixels = new Uint32[displayWidth*displayHeight];
 int frameCount = 0;
 int mouseX = 0;

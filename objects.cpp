@@ -22,9 +22,9 @@ float dist3D(Point p1, Point p2){
 	light.z = 0;
 }*/
 World::World(){
-	light.x = 600;
-	light.y = 600;
-	light.z = 600;
+	light.x = 400;
+	light.y = 400;
+	light.z = 400;
 }
 
 void World::cast(CRay& ray){
