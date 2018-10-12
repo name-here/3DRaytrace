@@ -1,19 +1,20 @@
 /*
 TODO:                                                                                    |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
 	-Add and impliment/use ray.length                                                    |Maybe Do|
+	-Separate alpha from color object (not needed for some uses)                         |Maybe Do|
 	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
 	-Find the normal of a triangle when it is created                                    |StilToDo|
 	-Finish triangle.cast                                                                |StilToDo|
 	-Make triangle.cast work for shadows                                                 |StilToDo|
 	-Find the required vectors for the camera when it is created                         |StilToDo|
 	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |StilToDo|
-	-Add shadows for plane.cast                                                          |StilToDo|
-	-Add reflections to all objects                                                      |StilToDo|
 	-Properly clean up World objects on exit                                             |StilToDo|
 	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
 	-Fix issue of no shadows on line of x=0                                              |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
+	-Add shadows for plane.cast                                                          |PartDone|
+	-Add reflections to all objects                                                      |PartDone|
 	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
 	-Fix color issues caused by non-linear association of RGB values and brightness      |  Done  |
@@ -36,11 +37,9 @@ TODO:                                                                           
 #include "objects.h"
 
 void set(int, int, Color);
-//float square(float num);
-//float dist3D(float x1, float y1, float z1, float x2, float y2, float z2);
 
-int displayWidth = 400;
-int displayHeight = 280;
+int displayWidth = 512;//600
+int displayHeight = 512;//420
 Uint32* pixels = new Uint32[displayWidth*displayHeight];
 int frameCount = 0;
 int mouseX = 0;
@@ -56,27 +55,11 @@ Object* testTri = new Tri(Point(0, 0, displayWidth*2), Point(displayWidth, 0, di
 
 
 void setup(){
-	world.objList.emplace_back(new Ball(world.light, displayHeight/10, Color(65535, 0, 0, 65535), 0));//lightBall
+	world.lightList.emplace_back(new Light(Point(0, displayWidth, 0), Color(65535, 65535, 65535, 65535)));
+	world.objList.emplace_back(new Ball(world.lightList[0]->pos, displayHeight/10, world.lightList[0]->color, 0));//lightBall
+	world.objList.emplace_back(new Plane(1, -displayWidth*11/20, displayWidth/3, Color(0, 38400, 38400, 65535), Color(0, 10000, 20000, 65535), 0));//testPlane
 	world.objList.emplace_back(new Ball(Point(0, 0, displayWidth), displayHeight/2, Color(65535, 65535, 65535, 65535), 0));//testBall
-	world.objList.emplace_back(new Plane(1, -displayWidth*11/20, displayWidth/3, Color(0, 38400, 38400, 65535), Color(0, 10000, 20000, 65535), 20000));//testPlane
 }
-
-/*CRay test2D(CRay ray){
-	if(square(ray.p2.x)+square(ray.p2.y)<square(displayHeight/2)){
-		if(ray.p2.y<sin(ray.p2.x*15.7079632679/displayWidth-frameCount*displayWidth/50)*displayHeight/4){
-			ray.r = 50;
-			ray.g = 200;
-			ray.b = 20;
-		}
-		else{
-			ray.r = 200;
-			ray.g = 20;
-			ray.b = 50;
-		}
-		ray.escape = false;
-	}
-	return ray;
-}*/
 
 
 void renderPixel(int x, int y){
@@ -98,7 +81,7 @@ void renderPixel(int x, int y){
 
 void draw(){
 	camera.pos.z = -(mouseX+displayWidth/2)*4;
-	static_cast<Plane*>(world.objList[2])->dist = mouseY*4;
+	static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
 	//camera.pos.z = (displayWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*displayHeight/20;
 	for(int y = displayHeight-1; y>=0; y --){
@@ -138,7 +121,6 @@ int main(/*int argc, char* args[]*/){
 			setup();
 			while(!quit){
 				draw();
-				//memset(pixels, 255, displayWidth*displayHeight*sizeof(Uint32));
 				SDL_UpdateTexture(buffer, NULL, pixels, displayWidth*sizeof(Uint32));
 				SDL_RenderClear(renderer);
 				SDL_RenderCopy(renderer, buffer, NULL, NULL);
@@ -153,7 +135,6 @@ int main(/*int argc, char* args[]*/){
 				}
 				else{quit = true;}*/
 
-				//if(frameCount==30){quit = true;}
 				while(SDL_PollEvent(&event)!=0){
 					switch(event.type){
 						case SDL_QUIT:
@@ -169,9 +150,6 @@ int main(/*int argc, char* args[]*/){
 		}
 	}
 	delete testTri;
-	//delete testBall;
-	//delete lightBall;
-	//delete testPlane;
 	delete[] pixels;
 	SDL_DestroyTexture(buffer);
 	SDL_DestroyRenderer(renderer);
@@ -185,11 +163,5 @@ void set(int x, int y, Color color){
 	if(x>=0 && x<displayWidth && y>=0 && y<displayHeight){pixels[y*displayWidth+x] = (((int)sqrt(color.r))<<16)+(((int)sqrt(color.g))<<8)+((int)sqrt(color.b));}
 	else{printf("Tried to draw pixel out of bounds at (%i, %i)\n", x, y);}
 }
-/*float square(float num){
-	return num*num;
-}
-float dist3D(float x1, float y1, float z1, float x2, float y2, float z2){
-	return sqrt(square(x2-x1)+square(y2-y1)+square(z2-z1));
-}*/
 
 

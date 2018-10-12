@@ -21,11 +21,9 @@ float dist3D(Point p1, Point p2){
 	light.y = 1000;
 	light.z = 0;
 }*/
-World::World(){
-	light.x = 400;
-	light.y = 400;
-	light.z = 400;
-}
+/*World::World(){
+	
+}*/
 
 void World::cast(CRay& ray){
 	ray.bounceCount ++;
@@ -34,13 +32,18 @@ void World::cast(CRay& ray){
 	}
 	ray.setColor(Color(38400, 51200, 65535, 65535), Point(F_INFINITY, F_INFINITY, F_INFINITY), F_INFINITY, true);
 	ray.finishCast(true);
-	ray.ray.p1 = light;
-	//ray.ray.p2 = Point(0, 0, -1000);
+	ray.ray.p1 = lightList[0]->pos;
 	//ray.setDist = F_INFINITY;
 	for(auto i = objList.begin(); i!=objList.end(); ++i){
 		(*i)->cast(ray, true, *this);
 	}
 	//ray.finishCast(false);
+}
+
+
+Light::Light(Point setPos, Color setColor){
+	pos = setPos;
+	color = setColor;
 }
 
 
@@ -95,7 +98,6 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 		num2 = square(num1)+1;
 		num3 = num2*radiusSq-lineX1*lineX1;
 	}
-	//if(print){printf("lineX2:%f, ray z:%f, lineY2:%f\n",lineX2,ray.ray.p2.z,lineY2);}
 	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
 		float num4;
 		if(lineY2==0){num4 = radius;}
@@ -118,22 +120,19 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 		else /*if(	(ray.ray.p2.x>ray.ray.p1.x==hit.x>ray.ray.p1.x) &&
 					(ray.ray.p2.y>ray.ray.p1.x==hit.y>ray.ray.p1.y) &&
 					(ray.ray.p2.z>ray.ray.p1.x==hit.z>ray.ray.p1.z) )*/{
+			ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), hit, distance, false);
 			if(reflect>0 && ray.bounceCount<2){
 				ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), hit, distance, false);
 				ray.finishCast(true);
 				CRay copyRay;
 				copyRay.bounceCount = ray.bounceCount;
 				copyRay.ray.p1 = ray.ray.p2;
-
+				
 				world.cast(copyRay);
-				ray.setColor(copyRay.color, hit, distance, false);
-			}
-			else{
-				ray.setColor(color, hit, distance, false);
+				ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), hit, distance, false);
 			}
 		}
 	}
-	//else if(lineY2<0.1){printf("lineY2=%f\n", lineY2);}
 }
 
 Plane::Plane(uint8_t setAxis, float setDist, float setGridSize, Color setColor1, Color setColor2, uint16_t setReflect){
@@ -159,10 +158,30 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 		float planeX = (rotateRay.p2.z-rotateRay.p1.z)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.z;//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
 		float planeY = (rotateRay.p2.y-rotateRay.p1.y)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.y;
 		if(isShadow){
-
+			if(axis==0){
+				if(ray.ray.p1.x<dist!=ray.ray.p2.x<dist){
+					ray.color.r *= 0.5;
+					ray.color.g *= 0.5;
+					ray.color.b *= 0.5;
+				}
+			}
+			else if(axis==1){
+				if(ray.ray.p1.y<dist!=ray.ray.p2.y<dist){
+					ray.color.r *= 0.5;
+					ray.color.g *= 0.5;
+					ray.color.b *= 0.5;
+				}
+			}
+			else{
+				if(ray.ray.p1.z<dist!=ray.ray.p2.z<dist){
+					ray.color.r *= 0.5;
+					ray.color.g *= 0.5;
+					ray.color.b *= 0.5;
+				}
+			}
 		}
 		else{
-			if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){ 
+			if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){
 				if(axis==0){
 					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
 				}
@@ -188,33 +207,6 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 				ray.finishCast(true);
 				CRay copyRay;
 				copyRay.bounceCount = ray.bounceCount;
-				//ray.ray.p1.x = ray.ray.p2.x;
-				//ray.ray.p1.y = ray.ray.p2.y;
-				//ray.ray.p1.z = ray.ray.p2.z;
-				/*if(axis==0){
-					copyRay.ray.p1.x = rotateRay.p2.x;
-					copyRay.ray.p1.y = rotateRay.p2.y;
-					copyRay.ray.p1.z = rotateRay.p2.z;
-					copyRay.ray.p2.x = rotateRay.p1.x;
-					copyRay.ray.p2.y = rotateRay.p2.y*2-rotateRay.p1.y;
-					copyRay.ray.p2.z = rotateRay.p2.z*2-rotateRay.p1.z;
-				}
-				if(axis==1){
-					copyRay.ray.p1.x = rotateRay.p2.z;
-					copyRay.ray.p1.y = rotateRay.p2.x;
-					copyRay.ray.p1.z = rotateRay.p2.y;
-					copyRay.ray.p2.x = rotateRay.p2.z*2-rotateRay.p1.z;
-					copyRay.ray.p2.y = rotateRay.p1.x;
-					copyRay.ray.p2.z = rotateRay.p2.y*2-rotateRay.p1.y;
-				}
-				if(axis==2){
-					copyRay.ray.p1.x = rotateRay.p2.y;
-					copyRay.ray.p1.y = rotateRay.p2.z;
-					copyRay.ray.p1.z = rotateRay.p2.x;
-					copyRay.ray.p2.x = rotateRay.p2.y*2-rotateRay.p1.y;
-					copyRay.ray.p2.y = rotateRay.p2.z*2-rotateRay.p1.z;
-					copyRay.ray.p2.z = rotateRay.p1.x;
-				}*/
 				copyRay.ray.p1 = ray.ray.p2;
 				if(axis==0){
 					copyRay.ray.p2.x = ray.ray.p1.x;
@@ -244,7 +236,6 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 				}
 			}
 		}
-		//ray.escape = false;
 	}
 }
 

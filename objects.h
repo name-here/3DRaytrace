@@ -2,15 +2,22 @@
 #include <vector>
 
 
+struct Light;
 class Object;
 
 class World{
 	public:
-		Point light;
 		std::vector<Object*> objList;
 		//World(std::vector<Object*>&& setObjList);
-		World();
+		std::vector<Light*> lightList;
+		//World();
 		void cast(CRay& ray);
+};
+
+struct Light{
+	Point pos;
+	Color color;
+	Light(Point setPos = Point(), Color setColor = Color());
 };
 
 class Object{
@@ -18,7 +25,6 @@ class Object{
 		virtual ~Object() = default;
 		virtual void cast(CRay& ray, bool isShadow, World& world) = 0;
 };
-
 class Tri: public Object{
 	public:
 		Point p1;
@@ -30,7 +36,6 @@ class Tri: public Object{
 		Tri(Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
-
 class Ball: public Object{
 	public:
 		Point pos;
@@ -41,7 +46,6 @@ class Ball: public Object{
 		Ball(Point setPos = Point(), float setRadius = 0, Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
-
 class Plane: public Object{
 	public:
 		uint8_t axis;

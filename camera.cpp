@@ -17,19 +17,17 @@ void Camera::move(Point setPos){
 void Camera::rotate(float setAngleX, float setAngleY){//This should set the front, up, and right vectors.
 	front.x = 0;//front is a unit vector pointing in the direction that the camera is facing.
 	front.y = 0;
-	front.z = 0;
+	front.z = planeDist;
 	up.x = 0;//up is a unit vector pointing directly up from the camera.
-	up.y = 0;
+	up.y = 1;
 	up.z = 0;
-	right.x = 0;//right is a unit vector pointing directly to the right the camera.
+	right.x = 1;//right is a unit vector pointing directly to the right the camera.
 	right.y = 0;
-	right.z = 0;//These should all be found instead of being set to 0.
+	right.z = 0;//These should all be found instead of being set to defaults.
 }
 void Camera::getRay(CRay& ray, float screenX, float screenY){
 	ray.ray.p1 = pos;
-	ray.ray.p2.x = pos.x+screenX;
-	ray.ray.p2.y = pos.y+screenY;
-	ray.ray.p2.z = pos.z+planeDist;
+	ray.ray.p2 = pos+front+right*screenX+up*screenY;
 	ray.color.r = 0;
 	ray.color.g = 0;
 	ray.color.b = 0;
