@@ -4,7 +4,7 @@ TODO:  |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
 	
 	-Separate alpha from color object (not needed for some uses)                         |Maybe Do|
 	
-	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
+	-[classes.cpp](classes.cpp) line 182: add position to ball shadow casting(??)        |StilToDo|
 	
 	-Find the normal of a triangle when it is created                                    |StilToDo|
 	
