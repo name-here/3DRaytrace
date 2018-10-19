@@ -6,7 +6,7 @@ A 3D Raycasting Engine
 
 
 ## References
-* Testing
+* Testing, see ["closed"](https://stackoverflow.com/questions/91384/unit-testing-for-c-code-tools-and-methodology) and and ["not constructive"](https://stackoverflow.com/questions/242926/comparison-of-c-unit-test-frameworks)
 * Re-factoring (see Malcolm Fowler)
 * [Markdown](https://daringfireball.net/projects/markdown/) how to edit “markdown” text on github. 
 Also see [Editing in Github in general](https://help.github.com/articles/about-writing-and-formatting-on-github/), 
