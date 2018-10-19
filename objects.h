@@ -25,6 +25,7 @@ class Object{
 		virtual ~Object() = default;
 		virtual void cast(CRay& ray, bool isShadow, World& world) = 0;
 };
+
 class Tri: public Object{
 	public:
 		Point p1;
@@ -33,9 +34,11 @@ class Tri: public Object{
 		Point normal;
 		Color color;
 		uint16_t reflect;
-		Tri(Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color(), uint16_t setReflect = 0);
+		Tri(Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), 
+		    Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
+
 class Ball: public Object{
 	public:
 		Point pos;
@@ -46,6 +49,7 @@ class Ball: public Object{
 		Ball(Point setPos = Point(), float setRadius = 0, Color setColor = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
+
 class Plane: public Object{
 	public:
 		uint8_t axis;
@@ -54,7 +58,8 @@ class Plane: public Object{
 		Color color1;
 		Color color2;
 		uint16_t reflect;
-		Plane(uint8_t setAxis = 0, float setDist = 0, float setGridSize = 1, Color setColor1 = Color(), Color setColor2 = Color(), uint16_t setReflect = 0);
+		Plane(uint8_t setAxis = 0, float setDist = 0, float setGridSize = 1, 
+		      Color setColor1 = Color(), Color setColor2 = Color(), uint16_t setReflect = 0);
 		void cast(CRay& ray, bool isShadow, World& world);
 };
 
