@@ -6,9 +6,12 @@
 
 #define F_INFINITY std::numeric_limits<float>::infinity()
 
+
 float square(float num){
 	return num*num;
 }
+
+
 float dist3D(Point p1, Point p2){
 	return sqrt(square(p2.x-p1.x)+square(p2.y-p1.y)+square(p2.z-p1.z));
 }
@@ -21,9 +24,12 @@ float dist3D(Point p1, Point p2){
 	light.y = 1000;
 	light.z = 0;
 }*/
+
+
 /*World::World(){
 	
 }*/
+
 
 void World::cast(CRay& ray){
 	ray.bounceCount ++;
@@ -57,6 +63,8 @@ Tri::Tri(Point setP1, Point setP2, Point setP3, Color setColor, uint16_t setRefl
 	color = setColor;
 	reflect = setReflect;
 }
+
+
 void Tri::cast(CRay& ray, bool isShadow, World& world){
 	float pointX = ray.ray.p2.x;
 	float pointY = ray.ray.p2.y;
@@ -66,7 +74,9 @@ void Tri::cast(CRay& ray, bool isShadow, World& world){
 	float triY2 = p2.y;
 	float triX3 = p3.x;
 	float triY3 = p3.y;
-	if(!(pointY-triY1<(triY2-triY1)*(pointX-triX1)/(triX2-triX1)^triX2<triX1) && !(pointY-triY2<(triY3-triY2)*(pointX-triX2)/(triX3-triX2)^triX3<triX2) && !(pointY-triY3<(triY1-triY3)*(pointX-triX3)/(triX1-triX3)^triX1<triX3)){
+	if(!(pointY-triY1 < (triY2-triY1)*(pointX-triX1)/(triX2-triX1)^triX2<triX1) 
+	   && !(pointY-triY2 < (triY3-triY2)*(pointX-triX2)/(triX3-triX2)^triX3<triX2) 
+	   && !(pointY-triY3 < (triY1-triY3)*(pointX-triX3)/(triX1-triX3)^triX1<triX3)){
 		if(isShadow){
 
 		}
@@ -75,7 +85,8 @@ void Tri::cast(CRay& ray, bool isShadow, World& world){
 			ray.escape = false;
 		}
 	}
-}
+} // Tri::cast( )
+	
 
 Ball::Ball(Point setPos, float setRadius, Color setColor, uint16_t setReflect){
 	pos = setPos;
@@ -84,34 +95,51 @@ Ball::Ball(Point setPos, float setRadius, Color setColor, uint16_t setReflect){
 	color = setColor;
 	reflect = setReflect;
 }
+
+
 void Ball::cast(CRay& ray, bool isShadow, World& world){
 	float lineX1 = dist3D(ray.ray.p1, pos);
 	float dist1Sq = square(pos.x-ray.ray.p2.x)+square(pos.y-ray.ray.p2.y)+square(pos.z-ray.ray.p2.z);
 	float dist2 = dist3D(ray.ray.p1, ray.ray.p2);
-	float lineX2 = /*abs*/((dist1Sq-square(dist2)+square(lineX1))/(2*lineX1)); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	float lineX2 = /*abs*/((dist1Sq-square(dist2)+square(lineX1))/(2*lineX1)); 
+	/* This x and y, along with lineX1 (and lineX2), define a ray in a 2D space 
+	that will actually be used to calculate the intersection between the original ray and the sphere.  
+	The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray. */
 	float lineY2 = sqrt(dist1Sq-square(lineX2));
 	float num1;
 	float num2;
 	float num3;
 	if(lineY2!=0){
-		num1 = (lineX2-lineX1)/lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
+		num1 = (lineX2-lineX1)/lineY2;
+		/* The num+[number] variables store numbers that are used more than once, 
+		so that they don't have to be calculated 2 or 3 times. */
+		
 		num2 = square(num1)+1;
 		num3 = num2*radiusSq-lineX1*lineX1;
 	}
-	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
+	
+	/*if ray hits 2D circle (slice of sphere)*/
+	if(lineY2==0 || num3>=0){
 		float num4;
 		if(lineY2==0){num4 = radius;}
 		else{num4 = (-lineX1*num1-sqrt(num3))/(num2);}
 		float distance = sqrt(square(lineX1-sqrt(radiusSq-num4*num4))+num4*num4);
-		float scale = distance/dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.ray.length" if ray.length gets implemented.
+		float scale = distance/dist3D(ray.ray.p1, ray.ray.p2);
+		// could also be "/ray.ray.length" if ray.length gets implemented.
+		
 		Point hit = ray.ray.p1+(ray.ray.p2-ray.ray.p1)*scale;
 		if(isShadow){
-			/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
+			/* The following "if" statement determines if the hit location is actually between the 
+			light source and the point to cast the shadow on. */
+			
+			are you counting upon order of operations working here?
 			if( 	(hit.x>ray.ray.p1.x!=hit.x>ray.ray.p2.x) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
 					(hit.y>ray.ray.p1.y!=hit.y>ray.ray.p2.y) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
 					(hit.z>ray.ray.p1.z!=hit.z>ray.ray.p2.z) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
 					dist3D(hit, ray.ray.p2)>1){
-				//ray.setColor(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
+				//ray.setColor(0, 0, 0, 255, ray.ray.p2, 0, true);
+				//The position for this should actually be set, but isn't yet
+				
 				ray.color.r *= 0.5;
 				ray.color.g *= 0.5;
 				ray.color.b *= 0.5;
@@ -122,18 +150,21 @@ void Ball::cast(CRay& ray, bool isShadow, World& world){
 					(ray.ray.p2.z>ray.ray.p1.x==hit.z>ray.ray.p1.z) )*/{
 			ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), hit, distance, false);
 			if(reflect>0 && ray.bounceCount<2){
-				ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), hit, distance, false);
+				ray.setColor(Color(color.r, color.g, color.b, color.a*(65535-reflect)/65535), 
+					     hit, distance, false);
 				ray.finishCast(true);
 				CRay copyRay;
 				copyRay.bounceCount = ray.bounceCount;
 				copyRay.ray.p1 = ray.ray.p2;
 				
 				world.cast(copyRay);
-				ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), hit, distance, false);
+				ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), 
+					     hit, distance, false);
 			}
 		}
 	}
-}
+}  // Ball::Cast
+
 
 Plane::Plane(uint8_t setAxis, float setDist, float setGridSize, Color setColor1, Color setColor2, uint16_t setReflect){
 	axis = setAxis;
@@ -143,19 +174,26 @@ Plane::Plane(uint8_t setAxis, float setDist, float setGridSize, Color setColor1,
 	color2 = setColor2;
 	reflect = setReflect;
 }
+
+
 void Plane::cast(CRay& ray, bool isShadow, World& world){
 	Ray rotateRay;
 	if(axis==0){
-		rotateRay = Ray(Point(ray.ray.p1.x, ray.ray.p1.y, ray.ray.p1.z), Point(ray.ray.p2.x, ray.ray.p2.y, ray.ray.p2.z));
-	}
-	else if(axis==1){
-		rotateRay = Ray(Point(ray.ray.p1.y, ray.ray.p1.z, ray.ray.p1.x), Point(ray.ray.p2.y, ray.ray.p2.z, ray.ray.p2.x));
-	}
-	else{
-		rotateRay = Ray(Point(ray.ray.p1.z, ray.ray.p1.x, ray.ray.p1.y), Point(ray.ray.p2.z, ray.ray.p2.x, ray.ray.p2.y));
+		rotateRay = Ray(Point(ray.ray.p1.x, ray.ray.p1.y, ray.ray.p1.z), 
+				Point(ray.ray.p2.x, ray.ray.p2.y, ray.ray.p2.z));
+	} else if(axis==1){
+		rotateRay = Ray(Point(ray.ray.p1.y, ray.ray.p1.z, ray.ray.p1.x), 
+				Point(ray.ray.p2.y, ray.ray.p2.z, ray.ray.p2.x));
+	} else{
+		rotateRay = Ray(Point(ray.ray.p1.z, ray.ray.p1.x, ray.ray.p1.y), 
+				Point(ray.ray.p2.z, ray.ray.p2.x, ray.ray.p2.y));
 	}
 	if(((rotateRay.p2.x<rotateRay.p1.x)==(dist<rotateRay.p1.x)) && abs(dist-rotateRay.p1.x)>0.5){
-		float planeX = (rotateRay.p2.z-rotateRay.p1.z)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.z;//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
+		are you counting upon order of operations working here?
+		float planeX = (rotateRay.p2.z-rotateRay.p1.z)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.z;
+		//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
+	
+		are you counting upon order of operations working here?
 		float planeY = (rotateRay.p2.y-rotateRay.p1.y)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.y;
 		if(isShadow){
 			if(axis==0){
@@ -164,43 +202,53 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 					ray.color.g *= 0.5;
 					ray.color.b *= 0.5;
 				}
-			}
-			else if(axis==1){
+			} else if(axis==1){
 				if(ray.ray.p1.y<dist!=ray.ray.p2.y<dist){
 					ray.color.r *= 0.5;
 					ray.color.g *= 0.5;
 					ray.color.b *= 0.5;
 				}
-			}
-			else{
+			} else{
 				if(ray.ray.p1.z<dist!=ray.ray.p2.z<dist){
 					ray.color.r *= 0.5;
 					ray.color.g *= 0.5;
 					ray.color.b *= 0.5;
 				}
 			}
-		}
-		else{
+		} else { /* not isShadow...*/  
+			are you counting upon order of operations working here?
 			if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){
 				if(axis==0){
-					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
+					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), 
+						     Point(dist, planeY, planeX), 
+						     dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
 				}
 				else if(axis==1){
-					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), Point(planeX, dist, planeY), dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
+					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), 
+						Point(planeX, dist, planeY), 
+						dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
 				}
 				else{
-					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
+					ray.setColor(Color(color1.r, color1.g, color1.b, color1.a*(65535-reflect)/65535), 
+						     Point(planeY, planeX, dist), 
+						     dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
 				}
 			}
 			else{
 				if(axis==0){
-					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
+					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), 
+						     Point(dist, planeY, planeX), 
+						     dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
 				}
 				else if(axis==1){
-					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), Point(planeX, dist, planeY), dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
+					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), 
+						     Point(planeX, dist, planeY), 
+						     dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
 				}
 				else{
-					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
+					ray.setColor(Color(color2.r, color2.g, color2.b, color2.a*(65535-reflect)/65535), 
+						     Point(planeY, planeX, dist), 
+						     dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
 				}
 			}
 			if(reflect>0 && ray.bounceCount<2){
@@ -208,35 +256,41 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 				CRay copyRay;
 				copyRay.bounceCount = ray.bounceCount;
 				copyRay.ray.p1 = ray.ray.p2;
-				if(axis==0){
+				if(axis==0){   // are 0, 1, 2 intended to correspond to x,y,z??
 					copyRay.ray.p2.x = ray.ray.p1.x;
-					copyRay.ray.p2.y = ray.ray.p2.y*2-ray.ray.p1.y;
-					copyRay.ray.p2.z = ray.ray.p2.z*2-ray.ray.p1.z;
+					copyRay.ray.p2.y = ray.ray.p2.y*2 - ray.ray.p1.y;
+					copyRay.ray.p2.z = ray.ray.p2.z*2 - ray.ray.p1.z;
 				}
 				if(axis==1){
-					copyRay.ray.p2.x = ray.ray.p2.x*2-ray.ray.p1.x;
+					copyRay.ray.p2.x = ray.ray.p2.x*2 - ray.ray.p1.x;
 					copyRay.ray.p2.y = ray.ray.p1.y;
-					copyRay.ray.p2.z = ray.ray.p2.z*2-ray.ray.p1.z;
+					copyRay.ray.p2.z = ray.ray.p2.z*2 - ray.ray.p1.z;
 				}
 				if(axis==2){
-					copyRay.ray.p2.x = ray.ray.p2.x*2-ray.ray.p1.x;
-					copyRay.ray.p2.y = ray.ray.p2.y*2-ray.ray.p1.y;
+					copyRay.ray.p2.x = ray.ray.p2.x*2 - ray.ray.p1.x;
+					copyRay.ray.p2.y = ray.ray.p2.y*2 - ray.ray.p1.y;
 					copyRay.ray.p2.z = ray.ray.p1.z;
 				}
 				world.cast(copyRay);
 				copyRay.finishCast(false);
 				if(axis==0){
-					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(dist, planeY, planeX), dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), 
+						     Point(dist, planeY, planeX), 
+						     dist3D(ray.ray.p1, Point(dist, planeY, planeX)), false);
 				}
 				else if(axis==1){
-					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(planeX, dist, planeY), dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), 
+						     Point(planeX, dist, planeY), 
+						     dist3D(ray.ray.p1, Point(planeX, dist, planeY)), false);
 				}
 				else{
-					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), Point(planeY, planeX, dist), dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
+					ray.setColor(Color(copyRay.color.r, copyRay.color.g, copyRay.color.b, 65535), 
+						     Point(planeY, planeX, dist), 
+						     dist3D(ray.ray.p1, Point(planeY, planeX, dist)), false);
 				}
 			}
 		}
 	}
-}
+} // Plane::Cast( )
 
 
