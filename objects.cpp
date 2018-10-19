@@ -7,10 +7,7 @@
 #define F_INFINITY std::numeric_limits<float>::infinity()
 
 
-float square(float num){
-	return num*num;
-}
-
+float square(float num){ return num*num; }
 
 float dist3D(Point p1, Point p2){
 	return sqrt(square(p2.x-p1.x)+square(p2.y-p1.y)+square(p2.z-p1.z));
@@ -25,11 +22,8 @@ float dist3D(Point p1, Point p2){
 	light.z = 0;
 }*/
 
-
-/*World::World(){
-	
-}*/
-
+/* World::World(){
+} */
 
 void World::cast(CRay& ray){
 	ray.bounceCount ++;
@@ -64,7 +58,6 @@ Tri::Tri(Point setP1, Point setP2, Point setP3, Color setColor, uint16_t setRefl
 	reflect = setReflect;
 }
 
-
 void Tri::cast(CRay& ray, bool isShadow, World& world){
 	float pointX = ray.ray.p2.x;
 	float pointY = ray.ray.p2.y;
@@ -95,7 +88,6 @@ Ball::Ball(Point setPos, float setRadius, Color setColor, uint16_t setReflect){
 	color = setColor;
 	reflect = setReflect;
 }
-
 
 void Ball::cast(CRay& ray, bool isShadow, World& world){
 	float lineX1 = dist3D(ray.ray.p1, pos);
@@ -188,13 +180,14 @@ void Plane::cast(CRay& ray, bool isShadow, World& world){
 		rotateRay = Ray(Point(ray.ray.p1.z, ray.ray.p1.x, ray.ray.p1.y), 
 				Point(ray.ray.p2.z, ray.ray.p2.x, ray.ray.p2.y));
 	}
-	if(((rotateRay.p2.x<rotateRay.p1.x)==(dist<rotateRay.p1.x)) && abs(dist-rotateRay.p1.x)>0.5){
-		are you counting upon order of operations working here?
-		float planeX = (rotateRay.p2.z-rotateRay.p1.z)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.z;
+	if(((rotateRay.p2.x<rotateRay.p1.x)==(dist<rotateRay.p1.x)) 
+	   		&& (abs(dist-rotateRay.p1.x) > 0.5)){
+		float planeX = ((rotateRay.p2.z - rotateRay.p1.z)*(dist - rotateRay.p1.x)/(rotateRay.p2.x - rotateRay.p1.x)) 
+			+ rotateRay.p1.z;
 		//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
 	
 		are you counting upon order of operations working here?
-		float planeY = (rotateRay.p2.y-rotateRay.p1.y)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x)+rotateRay.p1.y;
+		float planeY = ((rotateRay.p2.y-rotateRay.p1.y)*(dist-rotateRay.p1.x)/(rotateRay.p2.x-rotateRay.p1.x))+rotateRay.p1.y;
 		if(isShadow){
 			if(axis==0){
 				if(ray.ray.p1.x<dist!=ray.ray.p2.x<dist){
