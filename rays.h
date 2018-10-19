@@ -23,22 +23,31 @@ struct Point{
 	//Point& operator/=(const Point& toDiv);
 };
 
+
 inline Point operator+(Point pos1, const Point& pos2){
 	pos1 += pos2;
 	return pos1;
 }
+
+
 inline Point operator-(Point pos1, const Point& pos2){
 	pos1 -= pos2;
 	return pos1;
 }
+
+
 /*inline Point operator*(Point pos1, const Point& pos2){
 	pos1 *= pos2;
 	return pos1;
 }*/
+
+
 inline Point operator*(Point pos, float num){
 	pos *= num;
 	return pos;
 }
+
+
 /*inline Point operator/(Point pos1, const Point& pos2){
 	pos1 /= pos2;
 	return pos1;
@@ -51,6 +60,7 @@ struct Ray{
 	//float length;
 	Ray(Point setP1 = Point(), Point setP2 = Point());
 };
+
 
 class CRay{
 	Color setCastColor;
