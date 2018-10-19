@@ -20,10 +20,8 @@ void Camera::move(Point setPos){
 
 void Camera::rotate(float setAngleX, float setAngleY){
 	//Can probably be optimized. Also, should maybe be passed by reference?
-	front.x = sin(setAngleX) * cos(setAngleY);
-	/* front is a vector pointing in the direction that the camera is facing 
-	that extends to the plane the camera traces through.*/
-	
+	front.x = sin(setAngleX) * cos(setAngleY); /* front is a vector pointing in the direction
+		that the camera is facing that extends to the plane the camera traces through.*/
 	front.y = sin(setAngleY);
 	front.z = cos(setAngleX) * cos(setAngleY);
 	front *= planeDist;
