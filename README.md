@@ -8,6 +8,9 @@ A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
 ## How to install
 * Need SDL2 library, [download either runtime or development SDL2](https://www.libsdl.org/download-2.0.php) and put it into /Library/Frameworks. (Installer says it will work in ~/Library/Frameworks, too. We didn't have such a folder on our osX 10.13.6 machine, so we made one.)
 
+## How to compile and run:
+* ```cd``` to code's directory, type ```make``` into terminal. Stand back!
+* ```./3DRaycast```
 
 
 ## References
