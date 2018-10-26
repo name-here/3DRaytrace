@@ -12,7 +12,7 @@ TODO:                                                                           
 	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |StilToDo|
 	-Make new file for world and make camera part of world class                         |StilToDo|
 	-Transfer reflections(maybe more) to World.cast()                                    |StilToDo|
-	-Solve camera funcs(see start of draw()) not working without another func after      |StilToDo|
+	-Solve camera funcs(see start of draw()) not working without another func after it   |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
 	-Add shadows for plane.cast                                                          |PartDone|
