@@ -7,4 +7,4 @@ Currently, the program is able to render flat shaded spheres and planes with sim
 ### Compiling
 To compile, simply ```cd``` into directory containing the project files and run ```make```.  This will create the executable "3DRaycast".  To start the program, just run the executable with ```./3DRaycast```.
 
-Note: You must have SDL2 (download [here](https://www.libsdl.org/download-2.0.php))installed to compile and run the program.  For Mac, the executable must be in either /Library/Frameworks or ~/Library/Frameworks.
+Note: You must have the development version of SDL2 (download [here](https://www.libsdl.org/download-2.0.php))installed to compile the program, and either the development or runtime version installed to run it.  For Mac, the executable must be in either /Library/Frameworks or ~/Library/Frameworks.
