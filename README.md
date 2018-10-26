@@ -8,6 +8,8 @@ A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
 ## How to install
 * Need SDL2 library, [download](https://www.libsdl.org/download-2.0.php)
 
+Note: "Simple DirectMedia Layer is a cross-platform development library designed to provide low level access to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D."
+
 
 ## References
 * [SDL library](https://wiki.libsdl.org/) including ["how to compile"](https://wiki.libsdl.org/Installation) 
