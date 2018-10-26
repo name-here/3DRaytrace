@@ -2,8 +2,8 @@
 A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast).
 
 ## TODO
-[ ] Work on [TODO](TODO.md).
-[ ] Find what other dependencies are necessary. (We have SDL2 on another mac, so why won't 3DRaycast compile there?)
+*[ ] Work on [TODO](TODO.md).
+*[ ] Find what other dependencies are necessary. (We have SDL2 on another mac, so why won't 3DRaycast compile there?)
 
 
 ## How to install
