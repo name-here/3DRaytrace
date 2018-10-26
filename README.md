@@ -1,18 +1,18 @@
 # 3DRaycast
-A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
+A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast).
 
 ## TODO
-[ ] Work on [TODO](TODO.md)
+[ ] Work on [TODO](TODO.md).
 [ ] Find what other dependencies are necessary. (We have SDL2 on another mac, so why won't 3DRaycast compile there?)
 
 
 ## How to install
-* Need SDL2 library. [Download either runtime or development SDL2](https://www.libsdl.org/download-2.0.php) and put it into /Library/Frameworks. (Installer says it will work in ~/Library/Frameworks, too. We didn't have such a folder on our osX 10.13.6 "standard" non-admin account, so we made one.)
+* Need SDL2 library. [Download either runtime or development SDL2](https://www.libsdl.org/download-2.0.php) and put it into `/Library/Frameworks`. (Installer says it will work in `~/Library/Frameworks`, too. We didn't have such a folder on our osX 10.13.6 "standard" non-admin account, so we made one.)
 
 
 ## How to compile and run:
 * ```cd``` to code's directory, type ```make``` into terminal. Stand back!
- Using ```make``` unfortunately is giving us error ```sdl2-config: command not found``` followed by a (probably related) fatal error re header not found. (Here's the [Makefile](Makefile).)
+ Using ```make``` unfortunately is giving us error ```sdl2-config: command not found``` followed by a (probably related) fatal error re header not found. (Here's the [Makefile](Makefile).) We're getting this error when SDL2.framework is in `/Library/Frameworks` and when SDL2.framework is instead in `~/Library/Frameworks`.
 ```
     g++ -c -o 3DRaycast.o 3DRaycast.cpp -g -Og -Wall -Wextra -pedantic -std=c++11 `sdl2-config --cflags`
     /bin/sh: sdl2-config: command not found
