@@ -1,51 +1,63 @@
-TODO: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .|𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
+TODO:
+|𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
 
-	-Add and implement/use ray.length                                                    |Maybe Do|
+# |Maybe Do|
+-Add and implement/use "ray.length". 
 	
-	-Separate alpha from color object (not needed for some uses)                         |Maybe Do|
+-Separate alpha from color object (not needed for some uses).                      
 	
-	-[classes.cpp](classes.cpp) line 182: add position to ball shadow casting(??)        |StilToDo|
+# |StilToDo|
+
+[classes.cpp](classes.cpp) line 182: add position to ball shadow casting(??).
 	
-	-Find the normal of a triangle when it is created                                    |StilToDo|
+-Find the normal of a triangle when it is created.
 	
-	-Finish triangle.cast                                                                |StilToDo|
+-Finish triangle.cast.
 	
-	-Make triangle.cast work for shadows                                                 |StilToDo|
+-Make triangle.cast work for shadows.
 	
-	-Find the required vectors for the camera when it is created                         |StilToDo|
+-Find the required vectors for the camera when it is created.
 	
-	-Properly clean up World objects on exit                                             |StilToDo|
+-Properly clean up World objects on exit.
 	
-	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
+-Make shadows more realistic (add indirect lighting, integrate into normal cast).
 	
-	-Fix issue of no shadows on line of x=0                                              |StilToDo|
+-Fix issue of no shadows on line of x=0.
+
+
+# |_-_-_-_-|
 	
-	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |_-_-_-_-|
+-Optimize getting rays for camera (maybe don't use sine/cosine).
 	
-	-                                                                                    |_-_-_-_-|
+- 
 	
-	-                                                                                    |_-_-_-_-|
+-
 	
-	-Add shadows for plane.cast                                                          |PartDone|
+
+# |PartDone|
+-Add shadows for plane.cast.                                                         
 	
-	-Add reflections to all objects                                                      |PartDone|
+-Add reflections to all objects.
 	
-	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |PartDone|
+-Redefine operators and such to work with points (and rays?)  (Object overloading).
 	
-	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+-Avoid drawing spheres that are behind the camera.
+
 	
-	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |  Done  |
+# |  Done  |
 	
-	-Fix color issues caused by non-linear association of RGB values and brightness      |  Done  |
+-Finish camera.rotate and camera.getRay to make them actually work with rotation.
 	
-	-Make use of Color objects universal                                                 |  Done  |
+-Fix color issues caused by non-linear association of RGB values and brightness.
 	
-	-Fix shadows!                                                                        |  Done  |
+-Make use of Color objects universal.
 	
-	-Make use of Point object universal                                                  |  Done  |
+-Fix shadows!
 	
-	-Restructure so that world object contains all objects to be cast                    |  Done  |
+-Make use of Point object universal.
 	
-	-Figure out mouseX and mouseY polarity                                               |  Done  |
+-Restructure so that world object contains all objects to be cast.
 	
-	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
+-Figure out mouseX and mouseY polarity.
+	
+-Make the plane cast actually get what axis it is on from the variable.
