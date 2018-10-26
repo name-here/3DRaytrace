@@ -6,17 +6,18 @@ A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
 
 
 ## How to install
-* Need SDL2 library, [download either runtime or development SDL2](https://www.libsdl.org/download-2.0.php) and put it into /Library/Frameworks. (Installer says it will work in ~/Library/Frameworks, too. We didn't have such a folder on our osX 10.13.6 machine, so we made one. Using ```make``` unfortunately gave us errors:
-    ```
-    g++ -c -o 3DRaycast.o 3DRaycast.cpp -g -Og -Wall -Wextra -pedantic -std=c++11 `sdl2-config --cflags`
-    /bin/sh: sdl2-config: command not found
-    3DRaycast.cpp:34:10: fatal error: 'SDL2/SDL.h' file not found
-    #include <SDL2/SDL.h>
-    ```
+* Need SDL2 library. [Download either runtime or development SDL2](https://www.libsdl.org/download-2.0.php) and put it into /Library/Frameworks. (Installer says it will work in ~/Library/Frameworks, too. We didn't have such a folder on our osX 10.13.6 "standard" non-admin account, so we made one.)
 
 
 ## How to compile and run:
 * ```cd``` to code's directory, type ```make``` into terminal. Stand back!
+ Using ```make``` unfortunately is giving us error ```sdl2-config: command not found``` followed by a (probably related) fatal error re header not found:
+```
+    g++ -c -o 3DRaycast.o 3DRaycast.cpp -g -Og -Wall -Wextra -pedantic -std=c++11 `sdl2-config --cflags`
+    /bin/sh: sdl2-config: command not found
+    3DRaycast.cpp:34:10: fatal error: 'SDL2/SDL.h' file not found
+    #include <SDL2/SDL.h>
+```
 * ```./3DRaycast```
 
 
