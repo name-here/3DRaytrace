@@ -2,7 +2,8 @@
 A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
 
 ## TODO
-[ ]Work on [TODO](TODO.md)
+[ ] Work on [TODO](TODO.md)
+[ ] Find what other dependencies are necessary. (We have SDL2 on another mac, so why won't 3DRaycast compile there?)
 
 
 ## How to install
@@ -11,7 +12,7 @@ A 3D Raycasting Engine (fork of https://github.com/name-here/3DRaycast)
 
 ## How to compile and run:
 * ```cd``` to code's directory, type ```make``` into terminal. Stand back!
- Using ```make``` unfortunately is giving us error ```sdl2-config: command not found``` followed by a (probably related) fatal error re header not found:
+ Using ```make``` unfortunately is giving us error ```sdl2-config: command not found``` followed by a (probably related) fatal error re header not found. (Here's the [Makefile](Makefile).)
 ```
     g++ -c -o 3DRaycast.o 3DRaycast.cpp -g -Og -Wall -Wextra -pedantic -std=c++11 `sdl2-config --cflags`
     /bin/sh: sdl2-config: command not found
