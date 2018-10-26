@@ -1,23 +1,25 @@
 /*
 TODO:                                                                                    |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
 	-Add and impliment/use ray.length                                                    |Maybe Do|
-	-Separate alpha from color object (not needed for some uses)                         |Maybe Do|
+	-Separate alpha from color object (not needed for some uses of Color)                |Maybe Do|
 	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
 	-Find the normal of a triangle when it is created                                    |StilToDo|
 	-Finish triangle.cast                                                                |StilToDo|
 	-Make triangle.cast work for shadows                                                 |StilToDo|
-	-Find the required vectors for the camera when it is created                         |StilToDo|
 	-Properly clean up World objects on exit                                             |StilToDo|
 	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
 	-Fix issue of no shadows on line of x=0                                              |StilToDo|
 	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |StilToDo|
 	-Make new file for world and make camera part of world class                         |StilToDo|
+	-Transfer reflections(maybe more) to World.cast()                                    |StilToDo|
+	-Solve camera funcs(see start of draw()) not working without another func after      |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
 	-Add shadows for plane.cast                                                          |PartDone|
 	-Add reflections to all objects                                                      |PartDone|
-	-Redefine operators and such to work with points (and rays?)  (Object overloading)   |PartDone|
+	-Redefine operators and such to work with points(and rays?) (Operator overloading)   |PartDone|
 	-Avoid drawing spheres that are behind the camera                                    |PartDone|
+	-Find the required vectors for the camera when it is created                         |  Done  |
 	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |  Done  |
 	-Fix color issues caused by non-linear association of RGB values and brightness      |  Done  |
 	-Make use of Color objects universal                                                 |  Done  |
@@ -82,8 +84,10 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, ((mouseY*1.5)/(windowHeight-1.5))*windowWidth ) );
-	camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
+	camera.move( Point( 0, 0, ((float)mouseY) / windowHeight * windowWidth ) );
+	camera.planeDist = ( 1 - (((float)mouseY) / windowHeight) ) * windowWidth;
+	camera.rotate( 0, 0 );
+	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
