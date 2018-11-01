@@ -16,9 +16,9 @@
 /*World::World(){
 	
 }*/
-void World::cast( int camNum, float screenX, float screenY ){
+/*void World::cast( int camNum, float screenX, float screenY ){
 	cast(camList[camNum]->getRay( CRay& ray, screenX, screenY ));
-}
+}*/
 void World::cast( CRay& ray ){
 	ray.bounceCount ++;
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
