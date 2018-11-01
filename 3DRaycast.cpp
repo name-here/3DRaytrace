@@ -12,7 +12,8 @@ TODO:                                                                           
 	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |StilToDo|
 	-Make new file for world and make camera part of world class                         |StilToDo|
 	-Transfer reflections(maybe more) to World.cast()                                    |StilToDo|
-	-Solve camera funcs(see start of draw()) not working without another func after it   |StilToDo|
+	-Solve Camera funcs(see start of draw()) not working without another func after it   |StilToDo|
+	-Make window resizable                                                               |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
 	-Add shadows for plane.cast                                                          |PartDone|
@@ -39,6 +40,7 @@ TODO:                                                                           
 #include "rays.h"
 #include "camera.h"
 #include "objects.h"
+#include "world.h"
 
 void set(int, int, Color);
 
@@ -124,7 +126,7 @@ int main(/*int argc, char* args[]*/) {
 		printf( "SDL could not initialize.  SDL_Error: %s\n", SDL_GetError() );
 	}
 	else{
-		window = SDL_CreateWindow( "3D Raycaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, 0 );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0"
+		window = SDL_CreateWindow( "3D Raycaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, 0 );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
 		if( window == NULL ){
 			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
 
@@ -158,6 +160,13 @@ int main(/*int argc, char* args[]*/) {
 							mouseX = event.motion.x-(windowWidth/2);
 							mouseY = -event.motion.y+(windowHeight/2);
 							//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
+						/*case SDL_WINDOWEVENT:
+							switch( event.window.event ){
+								case SDL_WINDOWEVENT_RESIZED:
+									windowWidth = event.window.data2;
+									windowHeight = event.window.data1;
+									pixels = new Uint32[ windowWidth * windowHeight ];
+							}*/
 					}
 				}
 			}

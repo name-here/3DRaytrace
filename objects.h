@@ -1,18 +1,7 @@
 #include <cstdint>
-#include <vector>
 
+class World;
 
-struct Light;
-class Object;
-
-class World{
-	public:
-		std::vector<Object*> objList;
-		//World( std::vector<Object*>&& setObjList );
-		std::vector<Light*> lightList;
-		//World();
-		void cast( CRay& ray );
-};
 
 struct Light{
 	Point pos;
