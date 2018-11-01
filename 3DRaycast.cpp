@@ -10,12 +10,13 @@ TODO:                                                                           
 	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
 	-Fix issue of no shadows on line of x=0                                              |StilToDo|
 	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |StilToDo|
-	-Make new file for world and make camera part of world class                         |StilToDo|
 	-Transfer reflections(maybe more) to World.cast()                                    |StilToDo|
 	-Solve Camera funcs(see start of draw()) not working without another func after it   |StilToDo|
 	-Make window resizable                                                               |StilToDo|
+	-Make used CRay(s) not part of main file (maybe put into Camera class)               |StilToDo|
 	-                                                                                    |_-_-_-_-|
 	-                                                                                    |_-_-_-_-|
+	-Make new file for world and make camera part of world class                         |PartDone|
 	-Add shadows for plane.cast                                                          |PartDone|
 	-Add reflections to all objects                                                      |PartDone|
 	-Redefine operators and such to work with points(and rays?) (Operator overloading)   |PartDone|
