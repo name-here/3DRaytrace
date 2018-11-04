@@ -33,3 +33,5 @@ void World::cast( CRay& ray ){
 	}
 	//ray.finishCast( false );
 }
+
+

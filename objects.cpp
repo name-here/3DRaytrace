@@ -8,7 +8,7 @@
 #define F_INFINITY std::numeric_limits<float>::infinity()
 
 float square( float num ){
-	return num*num;
+	return num*=num;
 }
 float dist3D( Point p1, Point p2 ){
 	return sqrt( square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z) );

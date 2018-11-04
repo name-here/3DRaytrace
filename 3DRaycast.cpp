@@ -87,7 +87,7 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, ((float)mouseY) / windowHeight * windowWidth ) );
+	camera.move( Point( 0, 0, (((float)mouseY) / windowHeight * windowWidth) ) );
 	camera.planeDist = ( 1 - (((float)mouseY) / windowHeight) ) * windowWidth;
 	camera.rotate( 0, 0 );
 	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
@@ -104,7 +104,12 @@ void draw() {
 	for(int y = windowHeight-1; y>=0; y --){
 		for(int x = 0; x<windowWidth; x ++){
 			renderPixel(x-windowWidth/2, y-windowHeight/2);
-			//set(x, y, Color(65535*x/windowWidth/2, 0, 0));
+			/*if( (y > windowHeight*(sin(x*M_PI*3/windowWidth)+1)/2-mouseY) ^ (y > windowHeight/2) ){
+				set( x, y, Color(65535, 30000, 10000) );
+			}
+			else{
+				set( x, y, Color(0, 0, 0) );
+			}*/
 		}
 	}
 }
@@ -183,7 +188,7 @@ int main(/*int argc, char* args[]*/) {
 }
 
 void set( int x, int y, Color color ){
-	if( x >= 0  &&  x < windowWidth  &&  y >= 0  &&  y < windowHeight ){
+	if( x >= 0  &&  x < windowWidth  &&  y >= 0  &&  y < windowHeight  &&  (y*windowWidth)+x < windowWidth*windowHeight){
 		pixels[ (y*windowWidth)+x ] = ( ( (int)sqrt( color.r ) ) << 16 ) + ( ( (int)sqrt( color.g ) ) << 8 ) + ( (int)sqrt( color.b ) );
 	}
 	else{ printf( "Tried to draw pixel out of bounds at (%i, %i)\n", x, y ); }

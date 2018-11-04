@@ -12,3 +12,5 @@ class World{
 		//World();
 		void cast( CRay& ray );
 };
+
+
