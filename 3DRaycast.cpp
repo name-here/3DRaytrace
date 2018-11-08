@@ -1,38 +1,3 @@
-/*
-TODO:                                                                                    |𝔻𝕠𝕟𝕖𝕟𝕖𝕤𝕤|
-	-Add and impliment/use ray.length                                                    |Maybe Do|
-	-Separate alpha from color object (not needed for some uses of Color)                |Maybe Do|
-	-classes.cpp line 182: add position to ball shadow casting(??)                       |StilToDo|
-	-Find the normal of a triangle when it is created                                    |StilToDo|
-	-Finish triangle.cast                                                                |StilToDo|
-	-Make triangle.cast work for shadows                                                 |StilToDo|
-	-Properly clean up World objects on exit                                             |StilToDo|
-	-Make shadows more realistic (add indirect lighting, integrate into normal cast)     |StilToDo|
-	-Fix issue of no shadows on line of x=0                                              |StilToDo|
-	-Optimize getting rays for camera (maybe don't use sine/cosine)                      |StilToDo|
-	-Transfer reflections(maybe more) to World.cast()                                    |StilToDo|
-	-Solve Camera funcs(see start of draw()) not working without another func after it   |StilToDo|
-	-Make window resizable                                                               |StilToDo|
-	-Make used CRay(s) not part of main file (maybe put into Camera class)               |StilToDo|
-	-                                                                                    |_-_-_-_-|
-	-                                                                                    |_-_-_-_-|
-	-Make new file for world and make camera part of world class                         |PartDone|
-	-Add shadows for plane.cast                                                          |PartDone|
-	-Add reflections to all objects                                                      |PartDone|
-	-Redefine operators and such to work with points(and rays?) (Operator overloading)   |PartDone|
-	-Avoid drawing spheres that are behind the camera                                    |PartDone|
-	-Find the required vectors for the camera when it is created                         |  Done  |
-	-Finish camera.rotate and camera.getRay to make them actually work with rotation     |  Done  |
-	-Fix color issues caused by non-linear association of RGB values and brightness      |  Done  |
-	-Make use of Color objects universal                                                 |  Done  |
-	-Fix shadows!                                                                        |  Done  |
-	-Make use of Point object universal                                                  |  Done  |
-	-Restructure so that world object contains all objects to be cast                    |  Done  |
-	-Figure out mouseX and mouseY polarity                                               |  Done  |
-	-Make the plane cast actually get what axis it is on from the variable               |  Done  |
-*/
-
-
 #include <SDL2/SDL.h>
 #include <cstdio>
 #include <cstdint>
