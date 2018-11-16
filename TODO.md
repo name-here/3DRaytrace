@@ -2,7 +2,7 @@
 
 ### To Do:
 
-- classes.cpp line 182: add position to ball shadow casting(??)
+<!-- - classes.cpp line 182: add position to ball shadow casting(??) -->
 - Find the normal of a triangle when it is created
 - Finish triangle.cast
 - Make triangle.cast work for shadows
@@ -14,7 +14,7 @@
 - Solve Camera funcs(see start of draw()) not working without another func after it
 - Make window resizable
 - Make used CRay(s) not part of main file (maybe put into Camera class)
-- Link SDL2 into application (see "macosx" hg.libsdl.org/SDL/file/default/docs/)
+- Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](hg.libsdl.org/SDL/file/default/docs/))
 
 ### Partially Done:
 
