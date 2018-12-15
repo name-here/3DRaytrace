@@ -1,8 +1,8 @@
 #include <cstdio>
-#include <limits>//This library is used to get the float max value.
+#include <limits>//This library is used to get the double max value.
 #include "rays.h"
 
-#define F_INFINITY std::numeric_limits<float>::infinity()
+#define F_INFINITY std::numeric_limits<double>::infinity()
 
 
 Color::Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA ){
@@ -13,7 +13,7 @@ Color::Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA ){
 }
 
 
-Point::Point(float setX, float setY, float setZ ){
+Point::Point(double setX, double setY, double setZ ){
 	x = setX;
 	y = setY;
 	z = setZ;
@@ -37,18 +37,18 @@ Point& Point::operator-=( const Point& toSub ){
 	z *= toMult.z;
 	return *this;
 }*/
-Point& Point::operator*=( const float toMult ){
+Point& Point::operator*=( const double toMult ){
 	x *= toMult;
 	y *= toMult;
 	z *= toMult;
 	return *this;
 }
-/*Point& Point::operator/=( const Point& toDiv ){
-	x /= toDiv.x;
-	y /= toDiv.y;
-	z /= toDiv.z;
+Point& Point::operator/=( const double toDiv ){
+	x /= toDiv;
+	y /= toDiv;
+	z /= toDiv;
 	return *this;
-}*/
+}
 
 
 Ray::Ray( Point setP1, Point setP2 ){
@@ -71,7 +71,7 @@ CRay::CRay( Ray setRay ){
 	escape = true;
 	bounceCount = 0;
 }
-void CRay::setColor( Color toSet, Point hit, float dist, bool ignoreDirection ){
+void CRay::setColor( Color toSet, Point hit, double dist, bool ignoreDirection ){
 	if( (ignoreDirection  ||  ( ( (ray.p2.x>ray.p1.x) == (hit.x>ray.p1.x) ) &&
 								( (ray.p2.y>ray.p1.y) == (hit.y>ray.p1.y) ) &&
 								( (ray.p2.z>ray.p1.z) == (hit.z>ray.p1.z) )  )   )

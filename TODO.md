@@ -15,6 +15,8 @@
 - Make window resizable
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))
+- Optomize operator== on points if possible
+- Move color setting into world.cast
 
 ### Partially Done:
 

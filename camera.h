@@ -1,14 +1,14 @@
 class Camera{
 	public:
 		Point pos;
-		float planeDist;
+		double planeDist;
 		Point front;
 		Point up;
 		Point right;//These three(front, up, right) are used as vectors, not points/
-		Camera( Point setPos = Point(), float setPlaneDist = 1, float setAngleX = 0, float setAngleY = 0 );
+		Camera( Point setPos = Point(), double setPlaneDist = 1, double setAngleX = 0, double setAngleY = 0 );
 		void move( Point setPos );
-		void rotate( float setAngleX, float setAngleY );
-		void getRay( CRay& ray, float screenX, float screenY );
+		void rotate( double setAngleX, double setAngleY );
+		void getRay( CRay& ray, double screenX, double screenY );
 };
 
 

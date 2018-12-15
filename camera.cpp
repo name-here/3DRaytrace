@@ -1,12 +1,12 @@
 #include <cmath>
-#include <limits>//This library is used to get the float max value.
+#include <limits>//This library is used to get the double max value.
 #include "rays.h"
 #include "camera.h"
 
-#define F_INFINITY std::numeric_limits<float>::infinity()
+#define F_INFINITY std::numeric_limits<double>::infinity()
 
 
-Camera::Camera( Point setPos, float setPlaneDist, float setAngleX, float setAngleY ){
+Camera::Camera( Point setPos, double setPlaneDist, double setAngleX, double setAngleY ){
 	planeDist = setPlaneDist;//planeDist effectively sets the field of view of the camera.
 	move( setPos );
 	rotate( setAngleX, setAngleY );
@@ -14,7 +14,7 @@ Camera::Camera( Point setPos, float setPlaneDist, float setAngleX, float setAngl
 void Camera::move( Point setPos ){
 	pos = setPos;
 }
-void Camera::rotate( float setAngleX, float setAngleY ){//Can probably be optomized.  Also, should maybe be passed by reference?
+void Camera::rotate( double setAngleX, double setAngleY ){//Can probably be optomized.  Also, should maybe be passed by reference?
 	front.x = sin(setAngleX) * cos(setAngleY);//front is a vector pointing in the direction that the camera is facing that extends to the plane the camera traces through.
 	front.y = sin(setAngleY);
 	front.z = cos(setAngleX) * cos(setAngleY);
@@ -29,7 +29,7 @@ void Camera::rotate( float setAngleX, float setAngleY ){//Can probably be optomi
 	right.y = 0;
 	right.z = cos(setAngleX + (M_PI/2));
 }
-void Camera::getRay( CRay& ray, float screenX, float screenY ){
+void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	ray.ray.p1 = pos;
 	ray.ray.p2 = pos + front + (right * screenX) + (up*screenY);
 	ray.color.r = 0;
