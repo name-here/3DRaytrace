@@ -5,6 +5,7 @@ class Object;
 
 class World{
 	public:
+		~World();
 		//std::vector<Camera*> camList;
 		std::vector<Object*> objList;
 		//World( std::vector<Object*>&& setObjList );

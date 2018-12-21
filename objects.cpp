@@ -99,7 +99,7 @@ Point Ball::cast( CRay& ray, bool isShadow ){
 					( (ray.ray.p2.y > ray.ray.p1.x)  ==  (hit.y > ray.ray.p1.y) ) &&
 					( (ray.ray.p2.z > ray.ray.p1.x)  ==  (hit.z > ray.ray.p1.z) ) )*/{
 			ray.setColor( Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
-			//ray.setColor( Color( (((hit-pos)/radius).x+1)/2*65535, (((hit-pos)/radius).y+1)/2*65535, (((hit-pos)/radius).z+1)/2*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
+			//ray.setColor( Color( (hit.x+1)/64*65535, (hit.y+1)/64*65535, (hit.z+1)/64*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
 			if( reflect > 0 ){
 				return Point( (hit-pos) / radius );
 			}

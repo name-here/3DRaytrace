@@ -5,7 +5,14 @@
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
 
-
+World::~World(){
+	for( auto i = objList.begin(); i!=objList.end(); ++i ){
+		delete *i;
+	}
+	for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
+		delete *i;
+	}
+}
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
 {
@@ -24,14 +31,14 @@ void World::cast( CRay& ray ){
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
 		normalVec = (*i)->cast( ray, false );
 	}
+	ray.setColor( Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, true );
+	ray.finishCast( true );
 	if( ray.bounceCount<15 && normalVec!=Point() ){
-		//ray.ray = Ray(ray.ray.p2, ray.ray.p2+normalVec);//This should be the reflected ray
-		ray.ray = Ray(Point(0, 0, 0), Point(0, 0, 1));
+		ray.ray = Ray(ray.ray.p2, ray.ray.p2+normalVec);//This should be the reflected ray
+		//ray.ray = Ray(Point(0, 0, 0), Point(0, 0, 1));
 		ray.bounceCount ++;
 		this->cast( ray );
 	}
-	ray.setColor( Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, true );
-	ray.finishCast( true );
 	ray.ray.p1 = lightList[0]->pos;
 	//ray.setDist = F_INFINITY;
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){

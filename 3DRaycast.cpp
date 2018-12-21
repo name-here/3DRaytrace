@@ -20,19 +20,21 @@ bool print;
 int detail = 1;
 int detailSq = detail*detail;
 
+double scale = 10;
+
 World world;
 //The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-Camera camera( Point( 0, 0, -windowWidth*3 ), windowWidth, 0, 0 );
-CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, windowWidth ) ) );
-Object* testTri = new Tri( Point( 0, 0, windowWidth*2 ), Point( windowWidth, 0, windowWidth*2 ), Point( windowWidth/2, windowWidth/2, windowWidth*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
+Camera camera( Point( 0, 0, -scale*3 ), windowWidth, 0, 0 );
+CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, scale ) ) );
+Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), Point( scale/2, scale/2, scale*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
 
 
 void setup() {
-	world.lightList.emplace_back( new Light( Point( 0, windowWidth, windowWidth ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
+	world.lightList.emplace_back( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
 	//world.objList.emplace_back( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
-	world.objList.emplace_back( new Plane( 1, -windowWidth*11/20, windowWidth/3, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
-	world.objList.emplace_back( new Ball( Point( 0, 0, windowWidth*2 ), windowWidth/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	world.objList.emplace_back( new Plane( 1, -scale*11/20, scale/2, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
+	world.objList.emplace_back( new Ball( Point( 0, 0, scale*2 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
 }
 
 
@@ -54,7 +56,7 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * windowWidth) ) );
+	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
 	camera.planeDist = ( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
 	camera.rotate( 0, 0 );
 	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
@@ -64,8 +66,8 @@ void draw() {
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * windowWidth;
-	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * windowWidth;
+	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * scale;
+	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * scale;
 	//static_cast<Ball*>(world.objList[0])->pos.x = world.lightList[0]->pos.x;
 	//static_cast<Ball*>(world.objList[0])->pos.y = world.lightList[0]->pos.y;
 	for(int y = windowHeight-1; y>=0; y --){
