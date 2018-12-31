@@ -20,7 +20,7 @@ bool print;
 int detail = 1;
 int detailSq = detail*detail;
 
-double scale = 10;
+double scale = 1;
 
 World world;
 //The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
@@ -33,8 +33,15 @@ void setup() {
 	world.lightList.emplace_back( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
 	//world.objList.emplace_back( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
-	world.objList.emplace_back( new Plane( 1, -scale*11/20, scale/2, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
-	world.objList.emplace_back( new Ball( Point( 0, 0, scale*2 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	world.objList.emplace_back( new Plane( 1, -scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
+	world.objList.emplace_back( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
+	world.objList.emplace_back( new Ball( Point( 0, 0, scale*3 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	int gridSize = 3;
+	for( int x = 0; x<gridSize; x ++){
+		/*for( int y = 0; y<gridSize; y ++){
+			world.objList.emplace_back( new Ball( Point( -scale/2+(x+0.5)*scale/gridSize, -scale/2+(y+0.5)*scale/gridSize, scale*1.5 ), scale/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 0 ) );//littleBall
+		}*/
+	}
 }
 
 

@@ -10,8 +10,11 @@
 inline double square( double num ){
 	return num*num;
 }
-double dist3D( Point p1, Point p2 ){
-	return sqrt( square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z) );
+inline double dist3DSq( Point p1, Point p2 ){//returns the square of the distance between 2 3D points
+	return square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z);
+}
+double dist3D( Point p1, Point p2 ){//returns the distance between 2 3D points
+	return sqrt( dist3DSq( p1, p2 ) );
 }
 
 
@@ -88,16 +91,19 @@ Point Ball::cast( CRay& ray, bool isShadow ){
 			if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
 					( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
 					( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
-					dist3D( hit, ray.ray.p2 ) > 1 ){
+					dist3DSq( hit, ray.ray.p2 ) > 0.001 ){
 				//ray.setColor(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
+				//ray.color.r = (ray.color.r + color.r)/2;
+				//ray.color.g = (ray.color.g + color.g)/2;
+				//ray.color.b = (ray.color.b + color.b)/2;
 				ray.color.r *= 0.5;
 				ray.color.g *= 0.5;
 				ray.color.b *= 0.5;
 			}
 		}
-		else /*if(	( (ray.ray.p2.x > ray.ray.p1.x)  ==  (hit.x > ray.ray.p1.x) ) &&
-					( (ray.ray.p2.y > ray.ray.p1.x)  ==  (hit.y > ray.ray.p1.y) ) &&
-					( (ray.ray.p2.z > ray.ray.p1.x)  ==  (hit.z > ray.ray.p1.z) ) )*/{
+		else if(	( (ray.ray.p2.x > ray.ray.p1.x)  ==  (hit.x > ray.ray.p1.x) ) &&
+					( (ray.ray.p2.y > ray.ray.p1.y)  ==  (hit.y > ray.ray.p1.y) ) &&
+					( (ray.ray.p2.z > ray.ray.p1.z)  ==  (hit.z > ray.ray.p1.z) ) ){
 			ray.setColor( Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
 			//ray.setColor( Color( (hit.x+1)/64*65535, (hit.y+1)/64*65535, (hit.z+1)/64*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
 			if( reflect > 0 ){
@@ -154,7 +160,7 @@ Point Plane::cast( CRay& ray, bool isShadow ){
 			}
 		}
 		else{
-			if(abs((int)planeX)%(int)(gridSize*2)<gridSize^abs((int)planeY)%(int)(gridSize*2)<gridSize^planeX>0^planeY>0){
+			if(  (int)(planeX/gridSize)%2 == 0  ^  (int)(planeY/gridSize)%2 == 0  ^  planeX > 0  ^  planeY > 0  ){
 				if( axis == 0 ){
 					ray.setColor( Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( dist, planeY, planeX ), dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ), false );
 				}

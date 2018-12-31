@@ -5,14 +5,7 @@
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
 
-World::~World(){
-	for( auto i = objList.begin(); i!=objList.end(); ++i ){
-		delete *i;
-	}
-	for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
-		delete *i;
-	}
-}
+
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
 {
@@ -45,6 +38,15 @@ void World::cast( CRay& ray ){
 		(*i)->cast( ray, true );
 	}
 	//ray.finishCast( false );
+}
+
+World::~World(){
+	for( auto i = objList.begin(); i!=objList.end(); ++i ){
+		delete *i;
+	}
+	for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
+		delete *i;
+	}
 }
 
 
