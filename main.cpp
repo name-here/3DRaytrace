@@ -108,7 +108,7 @@ int main(/*int argc, char* args[]*/) {
 		printf( "SDL could not initialize.  SDL_Error: %s\n", SDL_GetError() );
 	}
 	else{
-		window = SDL_CreateWindow( "3D Raycaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, 0 );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
+		window = SDL_CreateWindow( "3D Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, 0 );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
 		if( window == NULL ){
 			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
 
