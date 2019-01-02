@@ -13,8 +13,9 @@
 - Make window resizable
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))
-- Optomize operator== on points if possible
+- Optimize operator== on points if possible
 - Move color setting into world.cast
+- Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
 
 ### Partially Done:
 
@@ -22,6 +23,7 @@
 - Add reflections to all objects
 - Make new file for world and make camera part of world class
 - Properly clean up World objects on exit (I think I did it?)
+- Optimize Plane::cast to not create new Point and Ray objects
 
 ### Done:
 

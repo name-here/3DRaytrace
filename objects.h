@@ -13,6 +13,7 @@ class Object{
 		virtual ~Object() = default;
 		virtual Point cast( CRay& ray, bool isShadow ) = 0;
 		uint16_t reflect;
+		int id;
 };
 class Tri: public Object{
 	public:

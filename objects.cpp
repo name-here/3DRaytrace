@@ -67,16 +67,16 @@ Ball::Ball( Point setPos, double setRadius, Color setColor, uint16_t setReflect 
 }
 Point Ball::cast( CRay& ray, bool isShadow ){
 	double lineX1 = dist3D( ray.ray.p1, pos );
-	double dist1Sq = square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
+	double dist1Sq = dist3DSq(pos, ray.ray.p2); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
 	double dist2 = dist3D( ray.ray.p1, ray.ray.p2 );
-	double lineX2 = /*abs(*/( dist1Sq-square(dist2)+square(lineX1) )  /  ( 2*lineX1 ); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
-	double lineY2 = sqrt( dist1Sq - square(lineX2) );
+	double lineX2 = /*abs(*/( dist1Sq - (dist2*dist2) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
 	double num1;
 	double num2;
-	double num3;
+	double num3;//optimize these by creating the variables with the object (maybe, since won't work for multithreading)
 	if(lineY2!=0){
 		num1 = (lineX2-lineX1) / lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
-		num2 = square(num1)+1;
+		num2 = num1*num1+1;
 		num3 = (num2*radiusSq) - (lineX1*lineX1);
 	}
 	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
@@ -125,13 +125,23 @@ Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColo
 Point Plane::cast( CRay& ray, bool isShadow ){
 	Ray rotateRay;
 	if( axis == 0 ){
-		rotateRay = Ray( Point( ray.ray.p1.x, ray.ray.p1.y, ray.ray.p1.z ), Point( ray.ray.p2.x, ray.ray.p2.y, ray.ray.p2.z ) );
+		rotateRay = ray.ray;
 	}
 	else if( axis == 1 ){
-		rotateRay = Ray( Point( ray.ray.p1.y, ray.ray.p1.z, ray.ray.p1.x ), Point( ray.ray.p2.y, ray.ray.p2.z, ray.ray.p2.x ) );
+		rotateRay.p1.x = ray.ray.p1.y;
+		rotateRay.p1.y = ray.ray.p1.z;
+		rotateRay.p1.z = ray.ray.p1.x;
+		rotateRay.p2.x = ray.ray.p2.y;
+		rotateRay.p2.y = ray.ray.p2.z;
+		rotateRay.p2.z = ray.ray.p2.x;
 	}
 	else{
-		rotateRay = Ray( Point( ray.ray.p1.z, ray.ray.p1.x, ray.ray.p1.y ), Point( ray.ray.p2.z, ray.ray.p2.x, ray.ray.p2.y ) );
+		rotateRay.p1.x = ray.ray.p1.z;
+		rotateRay.p1.y = ray.ray.p1.x;
+		rotateRay.p1.z = ray.ray.p1.y;
+		rotateRay.p2.x = ray.ray.p2.z;
+		rotateRay.p2.y = ray.ray.p2.x;
+		rotateRay.p2.z = ray.ray.p2.y;
 	}
 	if( ( (rotateRay.p2.x < rotateRay.p1.x) == (dist < rotateRay.p1.x) )  &&  ( abs(dist-rotateRay.p1.x) > 0.5 ) ){
 		double planeX = ( ( rotateRay.p2.z - rotateRay.p1.z ) * ( dist - rotateRay.p1.x ) / ( rotateRay.p2.x - rotateRay.p1.x ) )  +  ( rotateRay.p1.z );//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line

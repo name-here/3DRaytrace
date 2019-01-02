@@ -34,7 +34,7 @@ void setup() {
 
 	//world.objList.emplace_back( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
 	world.objList.emplace_back( new Plane( 1, -scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
-	world.objList.emplace_back( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
+	//world.objList.emplace_back( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
 	world.objList.emplace_back( new Ball( Point( 0, 0, scale*3 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
 	int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
@@ -59,14 +59,14 @@ void renderPixel( int x, int y ) {
 			bTotal += cRay.color.b;
 		}
 	}
-	set(x+windowWidth/2, windowHeight-1-(y+windowHeight/2)/*optomizing here could cause an off-by-one error with some display sizes*/, Color((int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq)));
+	set(x+windowWidth/2, windowHeight-1-(y+windowHeight/2)/*optimizing here could cause an off-by-one error with some display sizes*/, Color((int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq)));
 }
 
 void draw() {
 	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
 	camera.planeDist = ( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
-	camera.rotate( 0, 0 );
-	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
+	//camera.rotate( 0, 0 );
+	camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
