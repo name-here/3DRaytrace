@@ -69,8 +69,10 @@ class CRay{
 		double setDist;
 		bool escape;
 		uint32_t bounceCount;
+		unsigned int objLastHit;
+		Point normalVec;
 		CRay( Ray setRay = Ray() );
-		void setColor( Color toSet, Point hit, double dist, bool ignoreDirection );
+		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection );
 		void finishCast( bool setPos );
 };
 

@@ -16,6 +16,10 @@
 - Optimize operator== on points if possible
 - Move color setting into world.cast
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
+- Check if cstdint package is actually needed in world.cpp
+- Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
+- Go through code and trim out unnecessary variables and stuff
+- Make lists in World object private and create some other way of changing the properties of objects in them.
 
 ### Partially Done:
 

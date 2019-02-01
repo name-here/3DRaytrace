@@ -20,14 +20,13 @@
 	cast(camList[camNum]->getRay( CRay& ray, screenX, screenY ));
 }*/
 void World::cast( CRay& ray ){
-	Point normalVec = Point();
-	for( auto i = objList.begin(); i!=objList.end(); ++i ){
-		normalVec = (*i)->cast( ray, false );
+	for( auto i = objList.begin(); i!=objList.end(); ++i ){//This system does not work if the reflective object is not the last one in objList!
+		(*i)->cast( ray, false );
 	}
-	ray.setColor( Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, true );
+	ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
 	ray.finishCast( true );
-	if( ray.bounceCount<15 && normalVec!=Point() ){
-		ray.ray = Ray(ray.ray.p2, ray.ray.p2+normalVec);//This should be the reflected ray
+	if( ray.bounceCount<1 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+		ray.ray = Ray(ray.ray.p2, ray.ray.p2+ray.normalVec);//This should be the reflected ray
 		//ray.ray = Ray(Point(0, 0, 0), Point(0, 0, 1));
 		ray.bounceCount ++;
 		this->cast( ray );
@@ -38,6 +37,14 @@ void World::cast( CRay& ray ){
 		(*i)->cast( ray, true );
 	}
 	//ray.finishCast( false );
+}
+
+void World::addObj( Object* object ){
+	object->id = objList.size()+1;
+	objList.emplace_back( object );
+}
+void World::addLight( Light* light ){
+	lightList.emplace_back( light );
 }
 
 World::~World(){

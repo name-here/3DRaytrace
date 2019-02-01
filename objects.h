@@ -11,9 +11,9 @@ struct Light{
 class Object{
 	public:
 		virtual ~Object() = default;
-		virtual Point cast( CRay& ray, bool isShadow ) = 0;
+		virtual void cast( CRay& ray, bool isShadow ) = 0;
 		uint16_t reflect;
-		int id;
+		unsigned int id;
 };
 class Tri: public Object{
 	public:
@@ -23,7 +23,7 @@ class Tri: public Object{
 		Point normal;
 		Color color;
 		Tri( Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color(), uint16_t setReflect = 0 );
-		Point cast( CRay& ray, bool isShadow );
+		void cast( CRay& ray, bool isShadow );
 };
 class Ball: public Object{
 	public:
@@ -32,7 +32,7 @@ class Ball: public Object{
 		double radiusSq;
 		Color color;
 		Ball( Point setPos = Point(), double setRadius = 0, Color setColor = Color(), uint16_t setReflect = 0 );
-		Point cast( CRay& ray, bool isShadow );
+		void cast( CRay& ray, bool isShadow );
 };
 class Plane: public Object{
 	public:
@@ -42,7 +42,7 @@ class Plane: public Object{
 		Color color1;
 		Color color2;
 		Plane( uint8_t setAxis = 0, double setDist = 0, double setGridSize = 1, Color setColor1 = Color(), Color setColor2 = Color(), uint16_t setReflect = 0 );
-		Point cast( CRay& ray, bool isShadow );
+		void cast( CRay& ray, bool isShadow );
 };
 
 

@@ -42,6 +42,7 @@ void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	ray.setDist = F_INFINITY;
 	ray.escape = true;
 	ray.bounceCount = 0;
+	ray.objLastHit = 0;//This value should not correspond to any object, as numbering should start at 1.
 }
 
 

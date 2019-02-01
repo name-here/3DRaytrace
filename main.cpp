@@ -30,16 +30,16 @@ Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), P
 
 
 void setup() {
-	world.lightList.emplace_back( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
+	world.addLight( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
-	//world.objList.emplace_back( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
-	world.objList.emplace_back( new Plane( 1, -scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
-	//world.objList.emplace_back( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
-	world.objList.emplace_back( new Ball( Point( 0, 0, scale*3 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	//world.addObj( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
+	world.addObj( new Ball( Point( 0, 0, scale*3 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	world.addObj( new Plane( 1, -scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
+	//world.addObj( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
 	int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		/*for( int y = 0; y<gridSize; y ++){
-			world.objList.emplace_back( new Ball( Point( -scale/2+(x+0.5)*scale/gridSize, -scale/2+(y+0.5)*scale/gridSize, scale*1.5 ), scale/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 0 ) );//littleBall
+			world.addObj( new Ball( Point( -scale/2+(x+0.5)*scale/gridSize, -scale/2+(y+0.5)*scale/gridSize, scale*1.5 ), scale/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 0 ) );//littleBall
 		}*/
 	}
 }
@@ -65,8 +65,8 @@ void renderPixel( int x, int y ) {
 void draw() {
 	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
 	camera.planeDist = ( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
-	//camera.rotate( 0, 0 );
-	camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
+	camera.rotate( 0, 0 );
+	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
@@ -115,7 +115,7 @@ int main(/*int argc, char* args[]*/) {
 		}
 		else{
 			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_PRESENTVSYNC );
-			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, windowWidth, windowHeight );
+			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			setup();
 			while(!quit){
 				draw();
