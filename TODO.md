@@ -10,13 +10,11 @@
 - Fix issue of no shadows on line of x=0
 - Optimize getting rays for camera (maybe don't use sine/cosine)
 - Solve Camera funcs(see start of draw()) not working without another func after it
-- Make window resizable
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))
 - Optimize operator== on points if possible
 - Move color setting into world.cast
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
-- Check if cstdint package is actually needed in world.cpp
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
 - Go through code and trim out unnecessary variables and stuff
 - Make lists in World object private and create some other way of changing the properties of objects in them.
@@ -28,6 +26,7 @@
 - Make new file for world and make camera part of world class
 - Properly clean up World objects on exit (I think I did it?)
 - Optimize Plane::cast to not create new Point and Ray objects
+- Make window resizable
 
 ### Done:
 
@@ -44,6 +43,7 @@
 - Redefine operators and such to work with points(and rays?) (Operator overloading)
 - Add shadows for plane.cast
 - Transfer reflections(maybe more) to World.cast()
+- Check if cstdint package is actually needed in world.cpp
 
 ### Maybe Do:
 
