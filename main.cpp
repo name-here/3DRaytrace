@@ -10,9 +10,9 @@
 
 void set(int, int, Color);
 
-int windowWidth = 512;//600
-int windowHeight = 512;//420
-Uint32* pixels = new Uint32[ windowWidth * windowHeight ];
+int windowWidth;//600
+int windowHeight;//420
+Uint32* pixels;
 int frameCount = 0;
 int mouseX = 0;
 int mouseY = -windowHeight/2;
@@ -24,7 +24,7 @@ double scale = 1;
 
 World world;
 //The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-Camera camera( Point( 0, 0, -scale*3 ), windowWidth, 0, 0 );
+Camera camera( Point( 0, 0, -scale*3 ), scale, 0, 0 );
 CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, scale ) ) );
 Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), Point( scale/2, scale/2, scale*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
 
@@ -32,9 +32,10 @@ Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), P
 void setup() {
 	world.addLight( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
-	//world.addObj( new Ball( world.lightList[0]->pos, windowWidth/10, world.lightList[0]->color, 0));//lightBall
-	world.addObj( new Ball( Point( 0, 0, scale*3 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
-	world.addObj( new Plane( 1, -scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane
+	//world.addObj( new Ball( world.lightList[0]->pos, scale/10, Color( 65535, 0, 0 ), 0));//lightBall
+	world.addObj( new Plane( 1, -scale*2, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 30000 ) );//testPlane1
+	world.addObj( new Plane( 3, scale*3, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 30000 ) );//testPlane2
+	world.addObj( new Ball( Point( scale, 0, scale ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
 	//world.addObj( new Plane( 1, scale*11/20, scale/10, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane2
 	int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
@@ -63,20 +64,20 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
-	camera.planeDist = ( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
-	camera.rotate( 0, 0 );
-	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);
+	//camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
+	camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
+	//camera.rotate( 0, 0 );
+	camera.rotate( -M_PI*3/2*mouseX/windowWidth, -M_PI*2*mouseY/windowHeight);
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * scale;
+	world.lightList[0]->pos.x = (sin(frameCount*M_PI/20) + 1) * scale;
 	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * scale;
-	//static_cast<Ball*>(world.objList[0])->pos.x = world.lightList[0]->pos.x;
-	//static_cast<Ball*>(world.objList[0])->pos.y = world.lightList[0]->pos.y;
+	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
+	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
 	for(int y = windowHeight-1; y>=0; y --){
 		for(int x = 0; x<windowWidth; x ++){
 			renderPixel(x-windowWidth/2, y-windowHeight/2);
@@ -99,15 +100,14 @@ int main(/*int argc, char* args[]*/) {
 	SDL_Texture* buffer = nullptr;
 	bool quit = false;
     SDL_Event event;
-	SDL_GetCurrentDisplayMode( 0, &DM );
-	//printf("width: %i, ", DM.w);
-	//printf("height: %i\n", DM.h);
-	//windowWidth = DM.w;
-	//windowHeight = DM.h;
 	if(SDL_Init( SDL_INIT_VIDEO ) < 0){
 		printf( "SDL could not initialize.  SDL_Error: %s\n", SDL_GetError() );
 	}
 	else{
+		SDL_GetCurrentDisplayMode( 0, &DM );
+		windowWidth = DM.w/2;
+		windowHeight = DM.h/2;
+		pixels = new Uint32[ windowWidth * windowHeight ];
 		window = SDL_CreateWindow( "3D Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, 0 );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
 		if( window == NULL ){
 			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );

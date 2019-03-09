@@ -21,6 +21,8 @@ struct Point{
 	//Point& operator*=( const Point& toMult );
 	Point& operator*=( const double toMult );
 	Point& operator/=( const double toDiv );
+	double dot( const Point& vec );
+	Point& cross( const Point& vec );
 };
 
 inline Point operator+( Point pos1, const Point& pos2 ){
@@ -35,13 +37,20 @@ inline Point operator-( Point pos1, const Point& pos2 ){
 	pos1 *= pos2;
 	return pos1;
 }*/
-inline Point operator*( Point pos, double num ){
+inline Point operator*( Point pos, const double& num ){
 	pos *= num;
 	return pos;
 }
-inline Point operator/( Point pos, double num ){
+inline Point operator/( Point pos, const double& num ){
 	pos /= num;
 	return pos;
+}
+inline double dot( Point v1, const Point& v2 ){
+	return v1.dot( v2 );
+}
+inline Point cross( Point v1, const Point& v2 ){
+	v1.cross( v2 );
+	return v1;
 }
 
 inline bool operator==( const Point& point1, const Point& point2 ){

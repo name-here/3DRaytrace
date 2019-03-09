@@ -49,6 +49,17 @@ Point& Point::operator/=( const double toDiv ){
 	z /= toDiv;
 	return *this;
 }
+double Point::dot( const Point& vec ){
+	return x * vec.x  +  y * vec.y  +  z * vec.z;
+}
+Point& Point::cross( const Point& vec ){
+	double tempX = y * vec.z  -  z * vec.y;
+	double tempY = z * vec.x  -  x * vec.z;
+	z = x * vec.y  -  y * vec.x;
+	x = tempX;
+	y = tempY;
+	return *this;
+}
 
 
 Ray::Ray( Point setP1, Point setP2 ){

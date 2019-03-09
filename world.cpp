@@ -5,6 +5,16 @@
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
 
+#include <cmath>//these are temporary
+inline double square( double num ){
+	return num*num;
+}
+inline double dist3DSq( Point p1, Point p2 ){
+	return square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z);
+}
+inline double dist3D( Point p1, Point p2 ){
+	return sqrt( dist3DSq( p1, p2 ) );
+}
 
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
@@ -20,16 +30,20 @@
 	cast(camList[camNum]->getRay( CRay& ray, screenX, screenY ));
 }*/
 void World::cast( CRay& ray ){
-	for( auto i = objList.begin(); i!=objList.end(); ++i ){//This system does not work if the reflective object is not the last one in objList!
+	for( auto i = objList.begin(); i!=objList.end(); ++i ){
 		(*i)->cast( ray, false );
 	}
 	ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
 	ray.finishCast( true );
-	if( ray.bounceCount<1 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
-		ray.ray = Ray(ray.ray.p2, ray.ray.p2+ray.normalVec);//This should be the reflected ray
-		//ray.ray = Ray(Point(0, 0, 0), Point(0, 0, 1));
+	if( ray.bounceCount<3 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+		{//brackets are here to tell compiler that temp is no longer needed after this
+			Point temp = ray.ray.p2;
+			ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
+			ray.ray.p1 = temp;
+		}
 		ray.bounceCount ++;
-		this->cast( ray );
+		ray.normalVec = Point();
+		//this->cast( ray );
 	}
 	ray.ray.p1 = lightList[0]->pos;
 	//ray.setDist = F_INFINITY;

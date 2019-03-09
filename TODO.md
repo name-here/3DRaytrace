@@ -18,10 +18,10 @@
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
 - Go through code and trim out unnecessary variables and stuff
 - Make lists in World object private and create some other way of changing the properties of objects in them.
+- Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object.
 
 ### Partially Done:
 
-- Avoid drawing spheres that are behind the camera
 - Add reflections to all objects
 - Make new file for world and make camera part of world class
 - Properly clean up World objects on exit (I think I did it?)
@@ -44,10 +44,12 @@
 - Add shadows for plane.cast
 - Transfer reflections(maybe more) to World.cast()
 - Check if cstdint package is actually needed in world.cpp
+- Avoid drawing spheres that are behind the camera
 
 ### Maybe Do:
 
 - Separate alpha from color object (not needed for some uses of Color)
 - Add and impliment/use ray.length
+- Optimize cross and dot products
 
 
