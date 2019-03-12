@@ -11,7 +11,7 @@ struct Light{
 class Object{
 	public:
 		virtual ~Object() = default;
-		virtual void cast( CRay& ray, bool isShadow ) = 0;
+		virtual void cast( CRay& ray, bool isShadow ) = 0;//isShadow is used if only checking for intersection (used for lighting)
 		uint16_t reflect;
 		unsigned int id;
 };

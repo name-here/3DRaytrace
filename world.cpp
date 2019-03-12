@@ -35,7 +35,15 @@ void World::cast( CRay& ray ){
 	}
 	ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
 	ray.finishCast( true );
-	if( ray.bounceCount<3 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+	/*for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
+		ray.ray.p1 = lightList[0]->pos;
+		//ray.setDist = F_INFINITY;
+		for( auto i = objList.begin(); i!=objList.end(); ++i ){
+			(*i)->cast( ray, true );
+		}
+		//ray.finishCast( false );
+	}*/
+	if( ray.bounceCount<5 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
 		{//brackets are here to tell compiler that temp is no longer needed after this
 			Point temp = ray.ray.p2;
 			ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
@@ -43,14 +51,9 @@ void World::cast( CRay& ray ){
 		}
 		ray.bounceCount ++;
 		ray.normalVec = Point();
-		//this->cast( ray );
+		ray.setDist = F_INFINITY;
+		this->cast( ray );
 	}
-	ray.ray.p1 = lightList[0]->pos;
-	//ray.setDist = F_INFINITY;
-	for( auto i = objList.begin(); i!=objList.end(); ++i ){
-		(*i)->cast( ray, true );
-	}
-	//ray.finishCast( false );
 }
 
 void World::addObj( Object* object ){

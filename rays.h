@@ -68,7 +68,7 @@ struct Ray{
 	Ray( Point setP1 = Point(), Point setP2 = Point() );
 };
 
-class CRay{
+class CRay{//This type (casting ray) is used for casting out from the camera and checking against objects.  Its variables are used to keep track of relevant information.
 	Color setCastColor;
 	public:
 		Ray ray;
@@ -81,7 +81,7 @@ class CRay{
 		unsigned int objLastHit;
 		Point normalVec;
 		CRay( Ray setRay = Ray() );
-		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection );
+		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection );//previously returned whether or not there was an intersection
 		void finishCast( bool setPos );
 };
 

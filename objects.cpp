@@ -85,33 +85,34 @@ void Ball::cast( CRay& ray, bool isShadow ){
 		double distance = sqrt( square( lineX1-sqrt( radiusSq - (num4*num4) ) ) + (num4*num4) );
 		double scale = distance / dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.ray.length" if ray.length gets implemented.
 		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
-		//if()
-		if(isShadow){
-			/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
-			if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
-					( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
-					( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
-					dist3DSq( hit, ray.ray.p2 ) > 0.0001 ){
-				//ray.intersect(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
-				//ray.color.r = (ray.color.r + color.r)/2;
-				//ray.color.g = (ray.color.g + color.g)/2;
-				//ray.color.b = (ray.color.b + color.b)/2;
+		if( dist3DSq( pos, hit ) - radiusSq < 0.0001 ){
+			if(isShadow){
+				/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
+				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
+						( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
+						( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
+						dist3DSq( hit, ray.ray.p2 ) > 0.0001 ){
+					//ray.intersect(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
+					//ray.color.r = (ray.color.r + color.r)/2;
+					//ray.color.g = (ray.color.g + color.g)/2;
+					//ray.color.b = (ray.color.b + color.b)/2;
 
-				ray.color.r *= 0.5;
-				ray.color.g *= 0.5;
-				ray.color.b *= 0.5;
+					ray.color.r *= 0.5;
+					ray.color.g *= 0.5;
+					ray.color.b *= 0.5;
+				}
 			}
-		}
-		else if(   dist3DSq( hit, ray.ray.p1 ) > 0.0001  &&  dist3DSq( pos, hit ) - radiusSq < 0.0001   ){
-			Point normal;
-			if( reflect > 0 ){
-				normal = Point( (hit-pos) / radius );
+			else if( dist3DSq( hit, ray.ray.p1 ) > 0.0001 ){
+				Point normal;
+				if( reflect > 0 ){
+					normal = Point( (hit-pos) / radius );
+				}
+				ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal, false );
+				//ray.intersect( id, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal, false );
+				/*if( reflect > 0 ){
+					return Point( (hit-pos) / radius );
+				}*/  //no longer returned this way.
 			}
-			ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal, false );
-			//ray.intersect( Color( (hit.x+1)/64*65535, (hit.y+1)/64*65535, (hit.z+1)/64*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, false );
-			/*if( reflect > 0 ){
-				return Point( (hit-pos) / radius );
-			}*/  //no longer returned this way.
 		}
 	}
 }
@@ -145,7 +146,7 @@ void Plane::cast( CRay& ray, bool isShadow ){
 		rotateRay.p2.y = ray.ray.p2.x;
 		rotateRay.p2.z = ray.ray.p2.y;
 	}
-	if( ( (rotateRay.p2.x < rotateRay.p1.x) == (dist < rotateRay.p1.x) )  &&  ( abs(dist-rotateRay.p1.x) > 0.5 ) ){
+	if( ( (rotateRay.p2.x < rotateRay.p1.x) == (dist < rotateRay.p1.x) )  ){//&&  ( abs(dist-rotateRay.p1.x) > 0.5 ) ){
 		double planeX = ( ( rotateRay.p2.z - rotateRay.p1.z ) * ( dist - rotateRay.p1.x ) / ( rotateRay.p2.x - rotateRay.p1.x ) )  +  ( rotateRay.p1.z );//potential problem area with positivity of "...+ray.ray.p1.x" at end instead on this line and next line
 		double planeY = ( ( rotateRay.p2.y - rotateRay.p1.y ) * ( dist - rotateRay.p1.x ) / ( rotateRay.p2.x - rotateRay.p1.x ) )  +  ( rotateRay.p1.y );
 		if( isShadow ){

@@ -85,7 +85,7 @@ CRay::CRay( Ray setRay ){
 void CRay::intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection ){
 	if( (ignoreDirection  ||  ( ( (ray.p2.x>ray.p1.x) == (hit.x>ray.p1.x) ) &&
 								( (ray.p2.y>ray.p1.y) == (hit.y>ray.p1.y) ) &&
-								( (ray.p2.z>ray.p1.z) == (hit.z>ray.p1.z) )  )   )
+								( (ray.p2.z>ray.p1.z) == (hit.z>ray.p1.z) )  )   )//these three lines are probably unnecessary.
 			&& (dist <= setDist) ){
 		objLastHit = id;
 		normalVec = objNormalVec;
@@ -97,7 +97,9 @@ void CRay::intersect( unsigned int id, Color toSet, Point hit, double dist, Poin
 			setCastColor.b = toSet.b;
 		}
 		setCastColor.a = toSet.a;
+		//return true;
 	}
+	//return false;
 }
 void CRay::finishCast( bool doSetPos ){
 	if( doSetPos ){
