@@ -24,7 +24,6 @@
 - Make new file for world and make camera part of world class
 - Properly clean up World objects on exit (I think I did it?)
 - Optimize Plane::cast to not create new Point and Ray objects
-- Make window resizable
 - Fix issue of no shadows on line of x=0 (Maybe done?)
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))
 
@@ -45,6 +44,7 @@
 - Transfer reflections(maybe more) to World.cast()
 - Check if cstdint package is actually needed in world.cpp
 - Avoid drawing spheres that are behind the camera
+- Make window resizable
 
 ### Maybe Do:
 

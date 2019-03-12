@@ -33,16 +33,16 @@ Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), P
 
 
 void setup() {
-	camera = Camera( Point( 0, 0, -scale*5 ), windowWidth, 0, 0 );
+	camera = Camera( Point( 0, scale*5, -scale*8 ), windowWidth, 0, 0 );
 
 
-	world.addLight( new Light( Point( 0, scale, scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
+	world.addLight( new Light( Point( 0, 0, -scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
 	//world.addObj( new Ball( world.lightList[0]->pos, scale/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj( new Plane( 1, -scale, scale/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 20000 ) );//testPlane1
-	world.addObj( new Plane( 3, scale*2, scale/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 20000 ) );//testPlane2
+	world.addObj( new Plane( 1, -scale, scale/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 32768 ) );//testPlane1
+	world.addObj( new Plane( 3, scale*2, scale/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 0 ) );//testPlane2
 	//world.addObj( new Plane( 1, scale*2, scale/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane3
-	world.addObj( new Ball( Point( 0, 0, 0 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 10000 ) );//testBall
+	world.addObj( new Ball( Point( 0, 0, 0 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
 	int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		/*for( int y = 0; y<gridSize; y ++){
@@ -80,7 +80,7 @@ void draw() {
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.x = (sin(frameCount*M_PI/20) + 1) * scale;
+	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * scale;
 	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * scale;
 	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
