@@ -70,10 +70,10 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale*8) ) );
+	camera.move( Point( 0, 0, ( (double)mouseY * 8 / windowHeight - 4 ) * scale  ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
-	camera.rotate( 0, 0 );
-	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, -M_PI*mouseY/windowHeight);
+	//camera.rotate( 0, 0 );
+	camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);//Y rotation was -M_PI*mouseY/windowHeight
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
