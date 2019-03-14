@@ -33,16 +33,16 @@ Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), P
 
 
 void setup() {
-	camera = Camera( Point( 0, scale*5, -scale*8 ), windowWidth, 0, 0 );
+	camera = Camera( Point( -scale*2, scale, -scale*3 ), windowWidth, 0, 0 );
 
 
 	world.addLight( new Light( Point( 0, 0, -scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
 	//world.addObj( new Ball( world.lightList[0]->pos, scale/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj( new Plane( 1, -scale, scale/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 32768 ) );//testPlane1
+	world.addObj( new Plane( 1, -scale, scale/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 0 ) );//testPlane1
 	world.addObj( new Plane( 3, scale*2, scale/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 0 ) );//testPlane2
 	//world.addObj( new Plane( 1, scale*2, scale/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane3
-	world.addObj( new Ball( Point( 0, 0, 0 ), scale/2, Color( 65535, 65535, 65535, 65535 ), 0 ) );//testBall
+	world.addObj( new Ball( Point( scale, 0, 0 ), scale/2, Color( 30000, 65535, 65535, 65535 ), 30000 ) );//testBall
 	int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		/*for( int y = 0; y<gridSize; y ++){
@@ -70,10 +70,10 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	//camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale) ) );
+	camera.move( Point( 0, 0, (((double)mouseY) / windowHeight * scale*8) ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
-	//camera.rotate( 0, 0 );
-	camera.rotate( -M_PI*3/2*mouseX/windowWidth, -M_PI*mouseY/windowHeight);
+	camera.rotate( 0, 0 );
+	//camera.rotate( -M_PI*3/2*mouseX/windowWidth, -M_PI*mouseY/windowHeight);
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;

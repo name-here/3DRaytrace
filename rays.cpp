@@ -109,7 +109,7 @@ void CRay::finishCast( bool doSetPos ){
 	color.g = ( ((uint64_t)setCastColor.g) * setCastColor.a * color.a / 4294836225 )  +  ( ((uint64_t)color.g) * (4294836225 - (((uint32_t)setCastColor.a) * color.a / 4294836225) ) );
 	color.b = ( ((uint64_t)setCastColor.b) * setCastColor.a * color.a / 4294836225 )  +  ( ((uint64_t)color.b) * (4294836225 - (((uint32_t)setCastColor.a) * color.a / 4294836225) ) );
 	color.a = ((uint32_t)color.a) * (65535 - setCastColor.a) / 65535;
-	if( color.a == 0 ){ escape = false; }
+	if( setDist < F_INFINITY ){ escape = false; }
 }
 
 
