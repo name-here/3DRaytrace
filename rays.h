@@ -6,7 +6,8 @@ struct Color{
 	uint16_t g;
 	uint16_t b;
 	uint16_t a;
-	Color( uint16_t setR = 0, uint16_t setG = 0, uint16_t setB = 0, uint16_t setA = 0 );
+	Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA = 0 );
+	Color( uint16_t brightness = 0, uint16_t setA = 0 );
 };
 
 
@@ -82,7 +83,7 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		Point normalVec;
 		CRay( Ray setRay = Ray() );
 		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection );//previously returned whether or not there was an intersection
-		void finishCast( bool setPos );
+		void finishCast( bool doSetPos, Color lightColor );
 };
 
 

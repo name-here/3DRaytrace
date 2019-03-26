@@ -11,6 +11,12 @@ Color::Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA ){
 	b = setB;
 	a = setA;
 }
+Color::Color( uint16_t brightness, uint16_t setA ){
+	r = brightness;
+	g = brightness;
+	b = brightness;
+	a = setA;
+}
 
 
 Point::Point(double setX, double setY, double setZ ){
@@ -101,15 +107,15 @@ void CRay::intersect( unsigned int id, Color toSet, Point hit, double dist, Poin
 	}
 	//return false;
 }
-void CRay::finishCast( bool doSetPos ){
+void CRay::finishCast( bool doSetPos, Color lightColor ){
 	if( doSetPos ){
 		ray.p2 = setPos;
 	}
-	color.r = ( ((uint64_t)setCastColor.r) * setCastColor.a * color.a / 4294836225 )  +  ( ((uint64_t)color.r) * (4294836225 - (((uint32_t)setCastColor.a) * color.a / 4294836225) ) );
-	color.g = ( ((uint64_t)setCastColor.g) * setCastColor.a * color.a / 4294836225 )  +  ( ((uint64_t)color.g) * (4294836225 - (((uint32_t)setCastColor.a) * color.a / 4294836225) ) );
-	color.b = ( ((uint64_t)setCastColor.b) * setCastColor.a * color.a / 4294836225 )  +  ( ((uint64_t)color.b) * (4294836225 - (((uint32_t)setCastColor.a) * color.a / 4294836225) ) );
-	color.a = ((uint32_t)color.a) * (65535 - setCastColor.a) / 65535;
-	if( setDist < F_INFINITY ){ escape = false; }
+	color.r = (uint32_t)( (uint64_t)setCastColor.r * setCastColor.a * color.a / 4294836225 ) * lightColor.r / 65535   +   (uint64_t)color.r * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 );
+	color.g = (uint32_t)( (uint64_t)setCastColor.g * setCastColor.a * color.a / 4294836225 ) * lightColor.g / 65535   +   (uint64_t)color.g * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 );
+	color.b = (uint32_t)( (uint64_t)setCastColor.b * setCastColor.a * color.a / 4294836225 ) * lightColor.b / 65535   +   (uint64_t)color.b * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 );
+	color.a = (uint32_t)color.a * (65535 - setCastColor.a) / 65535;
+ 	 if( setDist < F_INFINITY ){ escape = false; }
 }
 
 

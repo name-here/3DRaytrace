@@ -5,17 +5,6 @@
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
 
-#include <cmath>//these are temporary
-inline double square( double num ){
-	return num*num;
-}
-inline double dist3DSq( Point p1, Point p2 ){
-	return square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z);
-}
-inline double dist3D( Point p1, Point p2 ){
-	return sqrt( dist3DSq( p1, p2 ) );
-}
-
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
 {
@@ -34,7 +23,7 @@ void World::cast( CRay& ray ){
 		(*i)->cast( ray, false );
 	}
 	ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
-	ray.finishCast( true );
+	ray.finishCast( true, Color( 65535, 65535, 65535 ) );
 	if( !ray.escape ){
 		{//brackets are to tell compiler temp is no longer needed after this
 			Point temp = ray.ray.p1;

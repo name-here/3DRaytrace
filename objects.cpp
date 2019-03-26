@@ -91,7 +91,7 @@ void Ball::cast( CRay& ray, bool isShadow ){
 				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
 						( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
 						( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
-						dist3DSq( hit, ray.ray.p2 ) > 0.0001 ){
+						dist3DSq( hit, ray.ray.p2 ) > INTERSECT_ERR ){
 					//ray.intersect(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
 					//ray.color.r = (ray.color.r + color.r)/2;
 					//ray.color.g = (ray.color.g + color.g)/2;
@@ -102,7 +102,7 @@ void Ball::cast( CRay& ray, bool isShadow ){
 					ray.color.b *= 0.5;
 				}
 			}
-			else if( dist3DSq( hit, ray.ray.p1 ) > 0.0001 ){
+			else if( dist3DSq( hit, ray.ray.p1 ) > INTERSECT_ERR ){
 				Point normal;
 				if( reflect > 0 ){
 					normal = Point( (hit-pos) / radius );

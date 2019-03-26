@@ -23,32 +23,31 @@ bool mousePressed;
 int detail = 1;
 int detailSq = detail*detail;
 
-double scale = 100;
-
 World world;
 //The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
 Camera camera;
-CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, scale ) ) );
-Object* testTri = new Tri( Point( 0, 0, scale*2 ), Point( scale, 0, scale*2 ), Point( scale/2, scale/2, scale*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
+CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, UNIT ) ) );
+Object* testTri = new Tri( Point( 0, 0, UNIT*2 ), Point( UNIT, 0, UNIT*2 ), Point( UNIT/2, UNIT/2, UNIT*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
 
 
 void setup() {
-	camera = Camera( Point( -scale*2, scale, -scale*3 ), windowWidth, 0, 0 );
+	camera = Camera( Point( 0, UNIT, -UNIT*3 ), windowWidth, 0, 0 );
 
 
-	world.addLight( new Light( Point( 0, 0, -scale ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
+	world.addLight( new Light( Point( 0, 0, -UNIT ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
 
-	//world.addObj( new Ball( world.lightList[0]->pos, scale/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj( new Plane( 1, -scale, scale/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 0 ) );//testPlane1
-	world.addObj( new Plane( 3, scale*2, scale/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 0 ) );//testPlane2
-	//world.addObj( new Plane( 1, scale*2, scale/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane3
-	world.addObj( new Ball( Point( scale, 0, 0 ), scale/2, Color( 30000, 65535, 65535, 65535 ), 30000 ) );//testBall
-	int gridSize = 3;
+	//world.addObj( new Ball( world.lightList[0]->pos, UNIT/10, Color( 65535, 0, 0 ), 0));//lightBall
+	world.addObj( new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 0 ) );//testPlane1
+	world.addObj( new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 0 ) );//testPlane2
+	//world.addObj( new Plane( 1, UNIT*2, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane3
+	world.addObj( new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0, 65535 ), 65535 ) );//testBall1
+	world.addObj( new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 ) );//testBall2
+	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
-		/*for( int y = 0; y<gridSize; y ++){
-			world.addObj( new Ball( Point( -scale/2+(x+0.5)*scale/gridSize, -scale/2+(y+0.5)*scale/gridSize, scale*1.5 ), scale/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 0 ) );//littleBall
-		}*/
-	}
+		for( int y = 0; y<gridSize; y ++){
+			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 30000 ) );//littleBall
+		}
+	}*/
 }
 
 
@@ -70,18 +69,18 @@ void renderPixel( int x, int y ) {
 }
 
 void draw() {
-	camera.move( Point( 0, 0, ( (double)mouseY * 8 / windowHeight - 4 ) * scale  ) );
+	//camera.move( Point( 0, 0, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
 	//camera.rotate( 0, 0 );
-	camera.rotate( -M_PI*3/2*mouseX/windowWidth, 0);//Y rotation was -M_PI*mouseY/windowHeight
+	camera.rotate( -M_PI*3/4*mouseX/windowWidth, -M_PI*3/4*mouseY/windowHeight );//Y rotation was -M_PI*mouseY/windowHeight
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * scale;
-	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * scale;
+	world.lightList[0]->pos.x = sin(frameCount*M_PI/20) * UNIT;
+	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * UNIT;
 	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
 	for(int y = windowHeight-1; y>=0; y --){
@@ -123,6 +122,7 @@ int main(/*int argc, char* args[]*/) {
 			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_PRESENTVSYNC );
 			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			setup();
+			SDL_ShowCursor( SDL_DISABLE );
 			while(!quit){
 				if( SDL_GetTicks() != lastTime  ){
 					frameRate = 1000 / ( SDL_GetTicks() - lastTime );
@@ -152,8 +152,9 @@ int main(/*int argc, char* args[]*/) {
 						break;
 					}
 					else if( event.type == SDL_MOUSEMOTION ){
-						mouseX = event.motion.x-(windowWidth/2);
-						mouseY = -event.motion.y+(windowHeight/2);
+						mouseX += event.motion.x-(windowWidth/2);
+						mouseY += -event.motion.y+(windowHeight/2);
+						SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
 						//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
 					}
 					else if( event.type == SDL_MOUSEBUTTONDOWN ){
