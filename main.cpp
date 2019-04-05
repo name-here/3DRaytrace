@@ -20,28 +20,28 @@ int mouseX = 0;
 int mouseY = -windowHeight/2;
 bool mousePressed;
 //bool print;
-int detail = 1;
-int detailSq = detail*detail;
+//int detail = 1;
+//int detailSq = detail*detail;
 
 World world;
-//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-Camera camera;
-CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, UNIT ) ) );
+//Camera camera;
+//CRay cRay( Ray( Point( 0, 0, 0 ), Point( 0, 0, UNIT ) ) );
 Object* testTri = new Tri( Point( 0, 0, UNIT*2 ), Point( UNIT, 0, UNIT*2 ), Point( UNIT/2, UNIT/2, UNIT*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
 
 
 void setup() {
-	camera = Camera( Point( 0, UNIT, -UNIT*3 ), windowWidth, 0, 0 );
+	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
+	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowWidth, 0, 0 )  );
 
 
-	world.addLight( new Light( Point( 0, 0, -UNIT ), Color( 65535, 65535, 65535, 65535 ) ) );//light1
+	world.addLight(  new Light( Point( 0, 0, -UNIT ), Color( 65535, 65535, 65535, 65535 ) )  );//light1
 
 	//world.addObj( new Ball( world.lightList[0]->pos, UNIT/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj( new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ), 0 ) );//testPlane1
-	world.addObj( new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ), 0 ) );//testPlane2
-	//world.addObj( new Plane( 1, UNIT*2, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ), 0 ) );//testPlane3
-	world.addObj( new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0, 65535 ), 65535 ) );//testBall1
-	world.addObj( new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 ) );//testBall2
+	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ) )  );//testPlane1
+	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ) )  );//testPlane2
+	//world.addObj(  new Plane( 1, UNIT*2, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0, 65535 ), 65535 )  );//testBall1
+	world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
@@ -51,28 +51,11 @@ void setup() {
 }
 
 
-void renderPixel( int x, int y ) {
-	//print = x==0 && y==0 && frameCount==15;
-	uint32_t rTotal = 0;
-	uint32_t gTotal = 0;
-	uint32_t bTotal = 0;
-	for( int subX = 0; subX<detail; subX ++ ) {
-		for( int subY = 0; subY<detail; subY ++ ) {
-			camera.getRay( cRay, x+subX*1.0/detail, y+subY*1.0/detail );
-			world.cast( cRay );
-			rTotal += cRay.color.r;
-			gTotal += cRay.color.g;
-			bTotal += cRay.color.b;
-		}
-	}
-	set(x+windowWidth/2, windowHeight-1-(y+windowHeight/2)/*optimizing here could cause an off-by-one error with some display sizes*/, Color((int)(rTotal/detailSq), (int)(gTotal/detailSq), (int)(bTotal/detailSq)));
-}
-
 void draw() {
 	//camera.move( Point( 0, 0, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
 	//camera.rotate( 0, 0 );
-	camera.rotate( -M_PI*3/4*mouseX/windowWidth, -M_PI*3/4*mouseY/windowHeight );//Y rotation was -M_PI*mouseY/windowHeight
+	world.camList[0]->rotate( -M_PI*3/4*mouseX/windowWidth, -M_PI*3/4*mouseY/windowHeight );//Y rotation was -M_PI*mouseY/windowHeight
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
@@ -83,17 +66,8 @@ void draw() {
 	world.lightList[0]->pos.y = cos(frameCount*M_PI/20) * UNIT;
 	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
-	for(int y = windowHeight-1; y>=0; y --){
-		for(int x = 0; x<windowWidth; x ++){
-			renderPixel(x-windowWidth/2, y-windowHeight/2);
-			/*if( (y > windowHeight*(sin(x*M_PI*3/windowWidth)+1)/2-mouseY) ^ (y > windowHeight/2) ){
-				set( x, y, Color(65535, 30000, 10000) );
-			}
-			else{
-				set( x, y, Color(0, 0, 0) );
-			}*/
-		}
-	}
+
+	world.draw( 0, pixels, windowWidth, windowHeight );
 }
 
 
@@ -167,7 +141,7 @@ int main(/*int argc, char* args[]*/) {
 						if( event.window.event == SDL_WINDOWEVENT_RESIZED ){
 							windowWidth = event.window.data1;
 							windowHeight = event.window.data2;
-							camera.planeDist = windowWidth;
+							world.camList[0]->planeDist = windowWidth;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED
 							delete pixels;
 							pixels = new Uint32[ windowWidth * windowHeight ];
 							SDL_DestroyTexture( buffer );
@@ -189,7 +163,7 @@ int main(/*int argc, char* args[]*/) {
 
 void set( int x, int y, Color color ){
 	if( x >= 0  &&  x < windowWidth  &&  y >= 0  &&  y < windowHeight  &&  (y*windowWidth)+x < windowWidth*windowHeight){
-		pixels[ (y*windowWidth)+x ] = ( ( (int)sqrt( color.r ) ) << 16 ) + ( ( (int)sqrt( color.g ) ) << 8 ) + ( (int)sqrt( color.b ) );
+		pixels[ y * windowWidth  +  x ] = ( ( (int)sqrt( color.r ) ) << 16 ) + ( ( (int)sqrt( color.g ) ) << 8 ) + ( (int)sqrt( color.b ) );
 	}
 	else{ printf( "Tried to draw pixel out of bounds at (%i, %i)\n", x, y ); }
 }

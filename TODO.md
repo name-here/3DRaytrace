@@ -15,8 +15,9 @@
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
 - Go through code and trim out unnecessary variables and stuff
-- Make lists in World object private and create some other way of changing the properties of objects in them.
+- Make lists in World object private and create some other way of changing the properties of objects in them (add functions should return pointer/id)
 - Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object.
+- Find way of updating all relevant planeDist on window resize
 
 ### Partially Done:
 
@@ -51,5 +52,6 @@
 - Separate alpha from color object (not needed for some uses of Color)
 - Add and impliment/use ray.length
 - Optimize cross and dot products
+- Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
 
 

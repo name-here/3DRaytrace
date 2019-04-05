@@ -1,6 +1,8 @@
 #include <limits>//This library is used to get the double max value.
+#include <cmath>//used for sqrt() in color setting
 #include "rays.h"
 #include "objects.h"
+#include "camera.h"
 #include "world.h"
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
@@ -37,7 +39,7 @@ void World::cast( CRay& ray ){
 			}
 			ray.ray.p1 = temp;
 		}
-		if( ray.color.a > 0 && ray.bounceCount<15 && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+		if( ray.color.a > 0 && ray.bounceCount<MAX_BOUNCES && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
 			{//brackets are here to tell compiler that temp is no longer needed after this
 				Point temp = ray.ray.p2;
 				ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
@@ -52,12 +54,44 @@ void World::cast( CRay& ray ){
 	}
 }
 
+void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsigned int height, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY ){
+	if( drawWidth == 0 ){ drawWidth = width; }
+	if( drawHeight == 0 ){drawHeight = height; }
+	unsigned int detailSq = detail * detail;
+	CRay cRay;
+	uint32_t rTotal;
+	uint32_t gTotal;
+	uint32_t bTotal;
+	for( unsigned int pxlX = 0; pxlX < drawWidth; pxlX ++ ){
+		for( unsigned int pxlY = 0; pxlY < drawHeight; pxlY ++ ){
+			rTotal = 0;
+			gTotal = 0;
+			bTotal = 0;
+			for( unsigned int subX = 0; subX < detail; subX ++ ){
+				for( unsigned int subY = 0; subY < detail; subY ++ ){
+					camList[camNum]->getRay( cRay, pxlX - (double)drawWidth/2 + (double)subX / detail, pxlY - (double)drawHeight/2 + (double)subY / detail );
+					this->cast( cRay );
+					rTotal += cRay.color.r;
+					gTotal += cRay.color.g;
+					bTotal += cRay.color.b;
+				}
+			}
+			if(   pxlX + startX < width  &&  pxlY + startY < height  &&  ( (pxlY + startY) * width) + pxlX + startX < width * height   ){
+				pixels[ (height - pxlY - startY-1) * width  +  pxlX + startX ] =  ( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 ) + ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 ) + ( (int)sqrt( (int)(bTotal/detailSq) ) );
+			}
+		}
+	}
+}
+
 void World::addObj( Object* object ){
 	object->id = objList.size()+1;
 	objList.emplace_back( object );
 }
 void World::addLight( Light* light ){
 	lightList.emplace_back( light );
+}
+void World::addCam( Camera* camera ){
+	camList.emplace_back( camera );
 }
 
 World::~World(){
