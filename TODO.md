@@ -17,7 +17,9 @@
 - Go through code and trim out unnecessary variables and stuff
 - Make lists in World object private and create some other way of changing the properties of objects in them (add functions should return pointer/id)
 - Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object.
-- Find way of updating all relevant planeDist on window resize
+- Find way of updating all relevant planeDist on window resize (difficult if multiple cameras)
+- Add textured objects
+- Add cube object
 
 ### Partially Done:
 
