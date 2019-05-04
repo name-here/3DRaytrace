@@ -5,9 +5,10 @@ The goal of this project is to create a 3D raytracer that can render various obj
 Currently, the program is able to render flat shaded and reflected spheres and planes with simplified direct lighting.  Unfortunately, all planes are restricted to being aligned with one of the three axes.  A TODO list with features to add, bugs to fix, and things to finish can be found in "[TODO.md](http://github.com/name-here/3DRaytrace/blob/master/TODO.md)".  
 
 ### Problems Solved
-- Finding intersection between a ray and planes or spheres
+- Calculating all of the rays for a camera with position and rotation
+- Finding the intersection between a 3D ray and planes or spheres
 - Calculating surface normals, and calculating a reflected ray based on that normal
-- 
+- Color mixing
 
 ### Notes
 - Currently, there may be bugs if there are more objects loaded than the max int value, as each object has an ID, which is stored as an int.
