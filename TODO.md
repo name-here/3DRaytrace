@@ -11,15 +11,14 @@
 - Solve Camera funcs(see start of draw()) not working without another func after it
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Optimize operator== on points if possible
-- Move color setting into world.cast
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
 - Go through code and trim out unnecessary variables and stuff
 - Make lists in World object private and create some other way of changing the properties of objects in them (add functions should return pointer/id)
-- Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object.
 - Find way of updating all relevant planeDist on window resize (difficult if multiple cameras)
-- Add textured objects
-- Add cube object
+- Add textured objects (texture system, textures maybe as part of generic Object?)
+- Use square of distance to check closest to save sqrt() call
+- Add multithreading
 
 ### Partially Done:
 
@@ -28,6 +27,9 @@
 - Optimize Plane::cast to not create new Point and Ray objects
 - Fix issue of no shadows on line of x=0 (Maybe done?, probably not)
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))  OR  add Xcode files to github
+- Add cube object
+- Add movement controls
+- Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object  (also Camera.move)
 
 ### Done:
 
@@ -55,5 +57,7 @@
 - Add and impliment/use ray.length
 - Optimize cross and dot products
 - Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
+- Move Color to new file
+- Move color setting into world.cast (??)
 
 

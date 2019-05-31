@@ -54,7 +54,7 @@ void World::cast( CRay& ray ){
 	}
 }
 
-void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsigned int height, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY ){
+void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsigned int height, unsigned int pixelSize, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY ){
 	if( drawWidth == 0 ){ drawWidth = width; }
 	if( drawHeight == 0 ){drawHeight = height; }
 	unsigned int detailSq = detail * detail;
@@ -62,22 +62,28 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 	uint32_t rTotal;
 	uint32_t gTotal;
 	uint32_t bTotal;
-	for( unsigned int pxlX = 0; pxlX < drawWidth; pxlX ++ ){
-		for( unsigned int pxlY = 0; pxlY < drawHeight; pxlY ++ ){
-			rTotal = 0;
-			gTotal = 0;
-			bTotal = 0;
-			for( unsigned int subX = 0; subX < detail; subX ++ ){
-				for( unsigned int subY = 0; subY < detail; subY ++ ){
-					camList[camNum]->getRay( cRay, pxlX - (double)drawWidth/2 + (double)subX / detail, pxlY - (double)drawHeight/2 + (double)subY / detail );
-					this->cast( cRay );
-					rTotal += cRay.color.r;
-					gTotal += cRay.color.g;
-					bTotal += cRay.color.b;
-				}
-			}
+	for( unsigned int pxlX = 0; pxlX < drawWidth; pxlX += pixelSize ){
+		for( unsigned int pxlY = 0; pxlY < drawHeight; pxlY += pixelSize ){
 			if(   pxlX + startX < width  &&  pxlY + startY < height  &&  ( (pxlY + startY) * width) + pxlX + startX < width * height   ){
-				pixels[ (height - pxlY - startY-1) * width  +  pxlX + startX ] =  ( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 ) + ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 ) + ( (int)sqrt( (int)(bTotal/detailSq) ) );
+				rTotal = 0;
+				gTotal = 0;
+				bTotal = 0;
+				for( unsigned int subX = 0; subX < detail; subX ++ ){
+					for( unsigned int subY = 0; subY < detail; subY ++ ){
+						camList[camNum]->getRay( cRay, pxlX - (double)drawWidth/2 + (double)subX / detail, pxlY - (double)drawHeight/2 + (double)subY / detail );
+						this->cast( cRay );
+						rTotal += cRay.color.r;
+						gTotal += cRay.color.g;
+						bTotal += cRay.color.b;
+					}
+				}
+				for( unsigned int setSubX = 0; setSubX < pixelSize; setSubX ++ ){
+					for( unsigned int setSubY = 0; setSubY < pixelSize; setSubY ++ ){
+						if( pxlX + setSubX < drawWidth  &&  pxlY + setSubY < drawHeight ){
+							pixels[ (height - pxlY - startY-1 + setSubY) * width  +  pxlX + startX + setSubX ] =  ( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 ) + ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 ) + ( (int)sqrt( (int)(bTotal/detailSq) ) );
+						}
+					}
+				}
 			}
 		}
 	}

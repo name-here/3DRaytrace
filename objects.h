@@ -8,6 +8,7 @@ struct Light{
 	Light(Point setPos = Point(), Color setColor = Color());
 };
 
+
 class Object{
 	public:
 		virtual ~Object() = default;
@@ -15,6 +16,7 @@ class Object{
 		uint16_t reflect;
 		unsigned int id;
 };
+
 class Tri: public Object{
 	public:
 		Point p1;
@@ -25,6 +27,7 @@ class Tri: public Object{
 		Tri( Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color(), uint16_t setReflect = 0 );
 		void cast( CRay& ray, bool isShadow );
 };
+
 class Ball: public Object{
 	public:
 		Point pos;
@@ -34,6 +37,16 @@ class Ball: public Object{
 		Ball( Point setPos = Point(), double setRadius = 0, Color setColor = Color(), uint16_t setReflect = 0 );
 		void cast( CRay& ray, bool isShadow );
 };
+
+class AxisBox: public Object{
+	public:
+		Point pos;//at the center of the cube
+		Point size;//x, y, and z distance from center to faces
+		Color color;
+		AxisBox( Point setPos = Point(), Point setSize = Point(), Color setColor = Color(), uint16_t setReflect = 0 );
+		void cast( CRay& ray, bool isShadow );
+};
+
 class Plane: public Object{
 	public:
 		uint8_t axis;

@@ -24,6 +24,7 @@ Light::Light( Point setPos, Color setColor ){
 }
 
 
+
 Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, uint16_t setReflect ){
 	p1 = setP1;
 	p2 = setP2;
@@ -34,6 +35,7 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, uint16_t setRef
 	color = setColor;
 	reflect = setReflect;
 }
+
 void Tri::cast( CRay& ray, bool isShadow ){
 	double pointX = ray.ray.p2.x;
 	double pointY = ray.ray.p2.y;
@@ -51,11 +53,12 @@ void Tri::cast( CRay& ray, bool isShadow ){
 
 		}
 		else{
-			ray.intersect( id, color, Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, normal, false );
+			ray.intersect( id, color, Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, normal );
 			ray.escape = false;
 		}
 	}
 }
+
 
 Ball::Ball( Point setPos, double setRadius, Color setColor, uint16_t setReflect ){
 	pos = setPos;
@@ -64,6 +67,7 @@ Ball::Ball( Point setPos, double setRadius, Color setColor, uint16_t setReflect 
 	color = setColor;
 	reflect = setReflect;
 }
+
 void Ball::cast( CRay& ray, bool isShadow ){
 	double lineX1 = dist3D( ray.ray.p1, pos );
 	double dist1Sq = dist3DSq(pos, ray.ray.p2); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
@@ -107,7 +111,7 @@ void Ball::cast( CRay& ray, bool isShadow ){
 				if( reflect > 0 ){
 					normal = Point( (hit-pos) / radius );
 				}
-				ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal, false );
+				ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal );
 				//ray.intersect( id, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, normal, false );
 				/*if( reflect > 0 ){
 					return Point( (hit-pos) / radius );
@@ -117,6 +121,33 @@ void Ball::cast( CRay& ray, bool isShadow ){
 	}
 }
 
+
+AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, uint16_t setReflect ){
+	pos = setPos;
+	size = setSize;
+	color = setColor;
+	reflect = setReflect;
+}
+
+void AxisBox::cast( CRay& ray, bool isShadow ){
+	double totalDistOverLength = ( pos.z - ray.ray.p1.z ) / ( ray.ray.p2.z - ray.ray.p1.z );
+	double hitX = ( ray.ray.p2.x - ray.ray.p1.x ) * totalDistOverLength;
+	double hitY = ( ray.ray.p2.y - ray.ray.p1.y ) * totalDistOverLength;
+	if( abs( hitX - pos.x ) < size.x  &&  abs( hitY - pos.y ) < size.y  &&  abs(pos.z - ray.ray.p1.z) > INTERSECT_ERR ){
+		if( isShadow ){
+			ray.color.r *= 0.5;
+			ray.color.g *= 0.5;
+			ray.color.b *= 0.5;
+		}
+		else{
+			Point normal;
+			if( reflect > 0 ){ normal = Point( 0, 0, -1 ); }
+			ray.intersect( id, Color( (int)(hitX*255), (int)(hitY*255), 0, color.a * ( 65535-reflect ) / 65535 ), Point( hitX, hitY, pos.z ), dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ), normal, true );
+		}
+	}
+}
+
+
 Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColor1, Color setColor2, uint16_t setReflect ){
 	axis = setAxis;
 	dist = setDist;
@@ -125,6 +156,7 @@ Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColo
 	color2 = setColor2;
 	reflect = setReflect;
 }
+
 void Plane::cast( CRay& ray, bool isShadow ){
 	Ray rotateRay;
 	if( axis == 0 ){
@@ -177,29 +209,29 @@ void Plane::cast( CRay& ray, bool isShadow ){
 			if(  (int)(planeX/gridSize)%2 == 0  ^  (int)(planeY/gridSize)%2 == 0  ^  planeX > 0  ^  planeY > 0  ){
 				if( axis == 0 ){
 					if( reflect > 0 ){ normal = Point( 1, 0, 0 ); }
-					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( dist, planeY, planeX ), dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ), normal, false );
+					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( dist, planeY, planeX ), dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ), normal );
 				}
 				else if( axis == 1 ){
 					if( reflect > 0 ){ normal = Point( 0, 1, 0 ); }
-					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( planeX, dist, planeY ), dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ), normal, false );
+					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( planeX, dist, planeY ), dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ), normal );
 				}
 				else{
 					if( reflect > 0 ){ normal = Point( 0, 0, 1 ); }
-					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( planeY, planeX, dist ), dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ), normal, false );
+					ray.intersect( id, Color( color1.r, color1.g, color1.b, (color1.a) * (65535-reflect) / 65535 ), Point( planeY, planeX, dist ), dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ), normal );
 				}
 			}
 			else{
 				if( axis == 0 ){
 					if( reflect > 0 ){ normal = Point( 1, 0, 0 ); }
-					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( dist, planeY, planeX ), dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ), normal, false );
+					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( dist, planeY, planeX ), dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ), normal );
 				}
 				else if( axis == 1 ){
 					if( reflect > 0 ){ normal = Point( 0, 1, 0 ); }
-					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( planeX, dist, planeY ), dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ), normal, false );
+					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( planeX, dist, planeY ), dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ), normal );
 				}
 				else{
 					if( reflect > 0 ){ normal = Point( 0, 0, 1 ); }
-					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( planeY, planeX, dist ), dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ), normal, false );
+					ray.intersect( id, Color( color2.r, color2.g, color2.b, (color2.a) * (65535-reflect) / 65535 ), Point( planeY, planeX, dist ), dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ), normal );
 				}
 			}
 			/*if( reflect > 0 ){

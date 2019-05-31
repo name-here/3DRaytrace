@@ -17,12 +17,28 @@ Color::Color( uint16_t brightness, uint16_t setA ){
 	b = brightness;
 	a = setA;
 }
+Color::Color(){
+	r = 0;
+	g = 0;
+	b = 0;
+	a = 0;
+}
 
 
 Point::Point(double setX, double setY, double setZ ){
 	x = setX;
 	y = setY;
 	z = setZ;
+}
+void Point::set( double setX, double setY, double setZ ){
+	x = setX;
+	y = setY;
+	z = setZ;
+}
+void Point::set(){
+	x = 0;
+	y = 0;
+	z = 0;
 }
 
 Point& Point::operator+=( const Point& toAdd ){
@@ -73,6 +89,11 @@ Ray::Ray( Point setP1, Point setP2 ){
 	p2 = setP2;
 	//length = dist3D(x1, y1, z1, x2, y2, z2);
 }
+inline bool Ray::pointsAt( Point point ){//Make sure point is in fromt of ray (on each axis, from ray p1 to ray p2 is the same direction as ray p1 to point)
+	return	(  ( p2.x >= p1.x )  ==  ( point.x >= p1.x )  )  &&
+			(  ( p2.y >= p1.y )  ==  ( point.y >= p1.y )  )  &&
+			(  ( p2.z >= p1.z )  ==  ( point.z >= p1.z )  );
+}
 
 CRay::CRay( Ray setRay ){
 	ray = setRay;
@@ -89,9 +110,7 @@ CRay::CRay( Ray setRay ){
 	bounceCount = 0;
 }
 void CRay::intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection ){
-	if( (ignoreDirection  ||  ( ( (ray.p2.x>ray.p1.x) == (hit.x>ray.p1.x) ) &&
-								( (ray.p2.y>ray.p1.y) == (hit.y>ray.p1.y) ) &&
-								( (ray.p2.z>ray.p1.z) == (hit.z>ray.p1.z) )  )   )//these three lines are probably unnecessary.
+	if( (ignoreDirection  ||  ray.pointsAt( hit ) )//this line is probably unnecessary (if something fails this test, something probably went wrong elsewhere)
 			&& (dist <= setDist) ){
 		objLastHit = id;
 		normalVec = objNormalVec;
