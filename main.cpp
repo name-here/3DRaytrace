@@ -40,15 +40,15 @@ void setup() {
 	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowWidth, 0, 0 )  );
 
 
-	world.addLight(  new Light( Point( 0, 0, -UNIT*2 ), Color( 65535, 65535, 65535, 65535 ) )  );//light1
+	world.addLight(  new Light( Point( 0, 0, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
 
 	//world.addObj( new Ball( world.lightList[0]->pos, UNIT/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000, 65535 ) )  );//testPlane1
-	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000, 65535 ) )  );//testPlane2
+	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
+	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 1, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
 	//world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
-	world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT, UNIT, UNIT ), Color( 30000, 0, 50000, 65535 ) )  );//testCube1
+	world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
 	/*int gridSize = 2;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
@@ -92,7 +92,7 @@ void draw() {
 	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 2, 1, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, 1, 1, windowWidth, windowHeight-1, 0, 1 );
 }
 
 

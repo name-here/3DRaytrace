@@ -70,7 +70,8 @@ struct Ray{
 	Point p2;
 	//double length;
 	Ray( Point setP1 = Point(), Point setP2 = Point() );
-	inline bool pointsAt( Point point );
+	bool pointsAt( Point point );
+	bool inRange( Point point );
 };
 
 class CRay{//This type (casting ray) is used for casting out from the camera and checking against objects.  Its variables are used to keep track of relevant information.

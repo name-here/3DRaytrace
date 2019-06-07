@@ -89,7 +89,7 @@ void Ball::cast( CRay& ray, bool isShadow ){
 		double distance = sqrt( square( lineX1-sqrt( radiusSq - (num4*num4) ) ) + (num4*num4) );
 		double scale = distance / dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.ray.length" if ray.length gets implemented.
 		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
-		if( dist3DSq( pos, hit ) - radiusSq < 0.0001 ){
+		if( dist3DSq( pos, hit ) - radiusSq < INTERSECT_ERR ){//<<<<<<<<<<<<<<<<<<<<<<<<<<<figure out what this does!!
 			if(isShadow){
 				/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
 				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
@@ -131,18 +131,21 @@ AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, uint16_t setRefle
 
 void AxisBox::cast( CRay& ray, bool isShadow ){
 	double totalDistOverLength = ( pos.z - ray.ray.p1.z ) / ( ray.ray.p2.z - ray.ray.p1.z );
-	double hitX = ( ray.ray.p2.x - ray.ray.p1.x ) * totalDistOverLength;
-	double hitY = ( ray.ray.p2.y - ray.ray.p1.y ) * totalDistOverLength;
-	if( abs( hitX - pos.x ) < size.x  &&  abs( hitY - pos.y ) < size.y  &&  abs(pos.z - ray.ray.p1.z) > INTERSECT_ERR ){
+	double hitX = ( ray.ray.p2.x - ray.ray.p1.x ) * totalDistOverLength + ray.ray.p1.x;
+	double hitY = ( ray.ray.p2.y - ray.ray.p1.y ) * totalDistOverLength + ray.ray.p1.y;
+	if(  abs( hitX - pos.x ) < size.x  &&  abs( hitY - pos.y ) < size.y  &&  abs(pos.z - ray.ray.p1.z) > INTERSECT_ERR  ){
+		Point intersection = Point( hitX, hitY, pos.z );
 		if( isShadow ){
-			ray.color.r *= 0.5;
-			ray.color.g *= 0.5;
-			ray.color.b *= 0.5;
+			if( ray.ray.inRange( intersection ) ){
+				ray.color.r *= 0.5;
+				ray.color.g *= 0.5;
+				ray.color.b *= 0.5;
+			}
 		}
-		else{
+		else if( ray.ray.pointsAt( intersection ) ){
 			Point normal;
 			if( reflect > 0 ){ normal = Point( 0, 0, -1 ); }
-			ray.intersect( id, Color( (int)(hitX*255), (int)(hitY*255), 0, color.a * ( 65535-reflect ) / 65535 ), Point( hitX, hitY, pos.z ), dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ), normal, true );
+			ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), intersection, dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ), normal, true );
 		}
 	}
 }

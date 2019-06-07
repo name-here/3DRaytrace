@@ -19,6 +19,7 @@
 - Add textured objects (texture system, textures maybe as part of generic Object?)
 - Use square of distance to check closest to save sqrt() call
 - Add multithreading
+- Don't include same inline functions in multiple files
 
 ### Partially Done:
 

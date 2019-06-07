@@ -1,8 +1,17 @@
 #include <cstdio>
 #include <limits>//This library is used to get the double max value.
 #include "rays.h"
+#include "world.h"
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
+
+inline double square( double num ){
+	return num*num;
+}
+
+inline double dist3DSq( Point p1, Point p2 ){//returns the square of the distance between 2 3D points
+	return square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z);
+}
 
 
 Color::Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA ){
@@ -89,10 +98,17 @@ Ray::Ray( Point setP1, Point setP2 ){
 	p2 = setP2;
 	//length = dist3D(x1, y1, z1, x2, y2, z2);
 }
-inline bool Ray::pointsAt( Point point ){//Make sure point is in fromt of ray (on each axis, from ray p1 to ray p2 is the same direction as ray p1 to point)
+bool Ray::pointsAt( Point point ){//Make sure point is in fromt of ray (on each axis, from ray p1 to ray p2 is the same direction as ray p1 to point)
 	return	(  ( p2.x >= p1.x )  ==  ( point.x >= p1.x )  )  &&
 			(  ( p2.y >= p1.y )  ==  ( point.y >= p1.y )  )  &&
-			(  ( p2.z >= p1.z )  ==  ( point.z >= p1.z )  );
+			(  ( p2.z >= p1.z )  ==  ( point.z >= p1.z )  )  &&
+			dist3DSq( p1, point ) > INTERSECT_ERR;
+}
+bool Ray::inRange( Point point ){
+	return 	(  ( point.x >= p1.x )  ==  ( point.x <= p2.x )  )  &&
+			(  ( point.y >= p1.y )  ==  ( point.y <= p2.y )  )  &&
+			(  ( point.z >= p1.z )  ==  ( point.z <= p2.z )  )  &&
+			dist3DSq( p2, point ) > INTERSECT_ERR;
 }
 
 CRay::CRay( Ray setRay ){
@@ -110,7 +126,7 @@ CRay::CRay( Ray setRay ){
 	bounceCount = 0;
 }
 void CRay::intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection ){
-	if( (ignoreDirection  ||  ray.pointsAt( hit ) )//this line is probably unnecessary (if something fails this test, something probably went wrong elsewhere)
+	if( (ignoreDirection  ||  /*ray.pointsAt( hit )*/ true )//this line is probably unnecessary (if something fails this test, something probably went wrong elsewhere)
 			&& (dist <= setDist) ){
 		objLastHit = id;
 		normalVec = objNormalVec;
