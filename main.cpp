@@ -12,6 +12,8 @@ void set(int, int, Color);
 
 int windowWidth;//600
 int windowHeight;//420
+int windowSmallDim;//will be set to whichever window dimension is smaller
+float FOVMultiplier = 1;//Multiplier for the field of view
 Uint32* pixels;
 int frameCount = 0;
 Uint32 lastTime;
@@ -22,6 +24,8 @@ bool mousePressed;
 //bool print;
 //int detail = 1;
 //int detailSq = detail*detail;
+
+bool doControl = true;
 bool wDown = false;
 bool aDown = false;
 bool sDown = false;
@@ -37,7 +41,7 @@ void setup() {
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowWidth, 0, 0 )  );
+	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowSmallDim * FOVMultiplier, 0, 0 )  );
 
 
 	world.addLight(  new Light( Point( 0, 0, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
@@ -59,18 +63,20 @@ void setup() {
 
 
 void draw() {
-	//The following movement system should be improved to account for same aligned and diagonal speed, and for frame time differences
-	if( wDown ){
-		world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z + UNIT/10 )  );
-	}
-	if( aDown ){
-		world.camList[0]->move(  Point( world.camList[0]->pos.x -  UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
-	}
-	if( sDown ){
-		world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z - UNIT/10 )  );
-	}
-	if( dDown ){
-		world.camList[0]->move(  Point( world.camList[0]->pos.x + UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
+	//The following movement system should be improved to account for same aligned and diagonal speed, movement relative to camera orientation, and frame time differences
+	if(doControl){
+		if( wDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z + UNIT/10 )  );
+		}
+		if( aDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x -  UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
+		}
+		if( sDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z - UNIT/10 )  );
+		}
+		if( dDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x + UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
+		}
 	}
 
 	//world.camList[0]->move( Point( 0, UNIT, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
@@ -92,7 +98,7 @@ void draw() {
 	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 1, 1, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, 3, 2, windowWidth, windowHeight-1, 0, 1 );
 }
 
 
@@ -111,6 +117,8 @@ int main(/*int argc, char* args[]*/) {
 		SDL_GetCurrentDisplayMode( 0, &DM );
 		windowWidth = DM.w/2;
 		windowHeight = DM.h/2;
+		if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
+		else{ windowSmallDim = windowHeight; }
 		pixels = new Uint32[ windowWidth * windowHeight ];
 		window = SDL_CreateWindow( "3D Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
 		if( window == NULL ){
@@ -121,8 +129,10 @@ int main(/*int argc, char* args[]*/) {
 			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_PRESENTVSYNC );
 			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			setup();
-			SDL_ShowCursor( SDL_DISABLE );
-			while(!quit){
+			if(doControl){
+				SDL_ShowCursor( SDL_DISABLE );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Probably not needed when program is build around rendering engine
+			}
+			while( !quit ){
 				if( SDL_GetTicks() != lastTime  ){
 					frameRate = 1000 / ( SDL_GetTicks() - lastTime );
 				}
@@ -131,7 +141,7 @@ int main(/*int argc, char* args[]*/) {
 					printf("Frame Rate:%i\n", frameRate);
 				}
 				draw();
-				SDL_UpdateTexture( buffer, NULL, pixels, windowWidth*sizeof(Uint32) );
+				SDL_UpdateTexture( buffer, NULL, pixels, windowWidth * sizeof(Uint32) );
 				SDL_RenderClear( renderer );
 				SDL_RenderCopy( renderer, buffer, NULL, NULL );
 				SDL_RenderPresent( renderer );
@@ -151,10 +161,12 @@ int main(/*int argc, char* args[]*/) {
 						break;
 					}
 					else if( event.type == SDL_MOUSEMOTION ){
-						mouseX += event.motion.x-(windowWidth/2);
-						mouseY += -event.motion.y+(windowHeight/2);
-						SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
-						//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
+						if(doControl){
+							mouseX += event.motion.x-(windowWidth/2);
+							mouseY += -event.motion.y+(windowHeight/2);
+							SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
+							//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
+						}
 					}
 					else if( event.type == SDL_MOUSEBUTTONDOWN ){
 						mousePressed = true;
@@ -178,7 +190,9 @@ int main(/*int argc, char* args[]*/) {
 						if( event.window.event == SDL_WINDOWEVENT_RESIZED ){
 							windowWidth = event.window.data1;
 							windowHeight = event.window.data2;
-							world.camList[0]->planeDist = windowWidth;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL
+							if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
+							else{ windowSmallDim = windowHeight; }
+							world.camList[0]->planeDist = windowSmallDim * FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL
 							delete pixels;
 							pixels = new Uint32[ windowWidth * windowHeight ];
 							SDL_DestroyTexture( buffer );

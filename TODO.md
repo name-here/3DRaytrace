@@ -20,6 +20,8 @@
 - Use square of distance to check closest to save sqrt() call
 - Add multithreading
 - Don't include same inline functions in multiple files
+- Fix black lines between some pixels when pixelSize > 1
+- Add high DPI capability
 
 ### Partially Done:
 
