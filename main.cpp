@@ -13,7 +13,7 @@ void set(int, int, Color);
 int windowWidth;//600
 int windowHeight;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
-float FOVMultiplier = 1;//Multiplier for the field of view
+float FOVMultiplier = 0.8;//Multiplier for the field of view
 Uint32* pixels;
 int frameCount = 0;
 Uint32 lastTime;
@@ -41,7 +41,7 @@ void setup() {
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowSmallDim * FOVMultiplier, 0, 0 )  );
+	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowSmallDim / FOVMultiplier, 0, 0 )  );
 
 
 	world.addLight(  new Light( Point( 0, 0, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
@@ -66,16 +66,16 @@ void draw() {
 	//The following movement system should be improved to account for same aligned and diagonal speed, movement relative to camera orientation, and frame time differences
 	if(doControl){
 		if( wDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z + UNIT/10 )  );
+			world.camList[0]->move( world.camList[0]->pos + ( world.camList[0]->front * UNIT/10 ) );
 		}
 		if( aDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x -  UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
+			world.camList[0]->move(  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 )  );
 		}
 		if( sDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y, world.camList[0]->pos.z - UNIT/10 )  );
+			world.camList[0]->move( world.camList[0]->pos - ( world.camList[0]->front * UNIT/10 ) );
 		}
 		if( dDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x + UNIT/10, world.camList[0]->pos.y, world.camList[0]->pos.z )  );
+			world.camList[0]->move(  world.camList[0]->pos + ( world.camList[0]->right * UNIT/10 )  );
 		}
 	}
 
@@ -98,7 +98,7 @@ void draw() {
 	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 3, 2, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, 2, 1, windowWidth, windowHeight-1, 0, 1 );
 }
 
 
@@ -192,7 +192,7 @@ int main(/*int argc, char* args[]*/) {
 							windowHeight = event.window.data2;
 							if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
 							else{ windowSmallDim = windowHeight; }
-							world.camList[0]->planeDist = windowSmallDim * FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL
+							world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL
 							delete pixels;
 							pixels = new Uint32[ windowWidth * windowHeight ];
 							SDL_DestroyTexture( buffer );

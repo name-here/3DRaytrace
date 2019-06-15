@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cmath>
 #include <limits>//This library is used to get the double max value.
 #include "rays.h"
 #include "world.h"
@@ -11,6 +12,9 @@ inline double square( double num ){
 
 inline double dist3DSq( Point p1, Point p2 ){//returns the square of the distance between 2 3D points
 	return square(p2.x-p1.x) + square(p2.y-p1.y) + square(p2.z-p1.z);
+}
+inline double dist3D( Point p1, Point p2 ){
+	return sqrt( dist3DSq( p1, p2 ) );
 }
 
 
@@ -109,6 +113,13 @@ bool Ray::inRange( Point point ){
 			(  ( point.y >= p1.y )  ==  ( point.y <= p2.y )  )  &&
 			(  ( point.z >= p1.z )  ==  ( point.z <= p2.z )  )  &&
 			dist3DSq( p2, point ) > INTERSECT_ERR;
+}
+Ray& Ray::normalize(){
+	double length = dist3D( p1, p2 );
+	p2.x = ( p2.x - p1.x ) / length  +  p1.x;
+	p2.y = ( p2.y - p1.y ) / length  +  p1.y;
+	p2.x = ( p2.z - p1.z ) / length  +  p1.z;
+	return *this;
 }
 
 CRay::CRay( Ray setRay ){

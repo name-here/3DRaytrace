@@ -62,5 +62,7 @@
 - Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
 - Move Color to new file
 - Move color setting into world.cast (??)
+- Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
+- make Vector object (separate from Point object?) to distinguish between uses
 
 
