@@ -30,10 +30,10 @@ bool wDown = false;
 bool aDown = false;
 bool sDown = false;
 bool dDown = false;
+bool spaceDown = false;
+bool shiftDown = false;
 
 World world;
-
-Object* testTri = new Tri( Point( 0, 0, UNIT*2 ), Point( UNIT, 0, UNIT*2 ), Point( UNIT/2, UNIT/2, UNIT*5/2 ), Color( 25600, 25600, 25600, 65535 ) );
 
 
 void setup() {
@@ -59,23 +59,32 @@ void setup() {
 			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 30000 ) );//littleBall
 		}
 	}*/
+
+	//world.addObj(  new Tri( Point( 0, 0, UNIT*2 ), Point( UNIT, 0, UNIT*2 ), Point( UNIT/2, UNIT/2, UNIT*5/2 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
 }
 
 
 void draw() {
-	//The following movement system should be improved to account for same aligned and diagonal speed, movement relative to camera orientation, and frame time differences
+	//The following movement system should be improved to give same speed when moving forwad and sideways at the same time and when frame time is inconsistent
 	if(doControl){
+		//Point moveFront = world.camList[0]->front * UNIT/10; moveFront.y = 0;
 		if( wDown ){
 			world.camList[0]->move( world.camList[0]->pos + ( world.camList[0]->front * UNIT/10 ) );
-		}
-		if( aDown ){
-			world.camList[0]->move(  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 )  );
 		}
 		if( sDown ){
 			world.camList[0]->move( world.camList[0]->pos - ( world.camList[0]->front * UNIT/10 ) );
 		}
 		if( dDown ){
 			world.camList[0]->move(  world.camList[0]->pos + ( world.camList[0]->right * UNIT/10 )  );
+		}
+		if( aDown ){
+			world.camList[0]->move(  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 )  );
+		}
+		if( spaceDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z )  );
+		}
+		if( shiftDown ){
+			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y - UNIT/10, world.camList[0]->pos.z )  );
 		}
 	}
 
@@ -176,15 +185,19 @@ int main(/*int argc, char* args[]*/) {
 					}
 					else if( event.type == SDL_KEYDOWN ){
 						if( event.key.keysym.sym == SDLK_w ){ wDown = true; }
-						if( event.key.keysym.sym == SDLK_a ){ aDown = true; }
-						if( event.key.keysym.sym == SDLK_s ){ sDown = true; }
-						if( event.key.keysym.sym == SDLK_d ){ dDown = true; }
+						else if( event.key.keysym.sym == SDLK_a ){ aDown = true; }
+						else if( event.key.keysym.sym == SDLK_s ){ sDown = true; }
+						else if( event.key.keysym.sym == SDLK_d ){ dDown = true; }
+						else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = true; }
+						else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = true; }
 					}
 					else if( event.type == SDL_KEYUP ){
 						if( event.key.keysym.sym == SDLK_w ){ wDown = false; }
-						if( event.key.keysym.sym == SDLK_a ){ aDown = false; }
-						if( event.key.keysym.sym == SDLK_s ){ sDown = false; }
-						if( event.key.keysym.sym == SDLK_d ){ dDown = false; }
+						else if( event.key.keysym.sym == SDLK_a ){ aDown = false; }
+						else if( event.key.keysym.sym == SDLK_s ){ sDown = false; }
+						else if( event.key.keysym.sym == SDLK_d ){ dDown = false; }
+						else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = false; }
+						else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = false; }
 					}
 					else if( event.type == SDL_WINDOWEVENT ){//This deals with window resizing
 						if( event.window.event == SDL_WINDOWEVENT_RESIZED ){
@@ -192,7 +205,7 @@ int main(/*int argc, char* args[]*/) {
 							windowHeight = event.window.data2;
 							if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
 							else{ windowSmallDim = windowHeight; }
-							world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL
+							world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a specific instance of the Camera object)
 							delete pixels;
 							pixels = new Uint32[ windowWidth * windowHeight ];
 							SDL_DestroyTexture( buffer );
@@ -203,7 +216,6 @@ int main(/*int argc, char* args[]*/) {
 			}
 		}
 	}
-	delete testTri;
 	delete[] pixels;
 	SDL_DestroyTexture( buffer );
 	SDL_DestroyRenderer( renderer );

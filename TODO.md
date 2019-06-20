@@ -22,6 +22,7 @@
 - Don't include same inline functions in multiple files
 - Fix black lines between some pixels when pixelSize > 1
 - Add high DPI capability
+- Move all global variables into main() or other functions
 
 ### Partially Done:
 
