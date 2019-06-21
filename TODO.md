@@ -23,17 +23,17 @@
 - Fix black lines between some pixels when pixelSize > 1
 - Add high DPI capability
 - Move all global variables into main() or other functions
+- Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
 
 ### Partially Done:
 
-- Make new file for world and make camera part of world class
 - Properly clean up World objects on exit (I think I did it?)
 - Optimize Plane::cast to not create new Point and Ray objects
 - Fix issue of no shadows on line of x=0 (Maybe done?, probably not)
-- Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))  OR  add Xcode files to github
 - Add cube object
 - Add movement controls
 - Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object  (also Camera.move)
+- Change instances of setting points by components to use Point.set() function
 
 ### Done:
 
@@ -54,6 +54,8 @@
 - Avoid drawing spheres that are behind the camera
 - Make window resizable
 - Add reflections to all objects
+- Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))  OR  add Xcode files to github
+- Make new file for world and make camera part of world class
 
 ### Maybe Do:
 
@@ -63,7 +65,6 @@
 - Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
 - Move Color to new file
 - Move color setting into world.cast (??)
-- Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
 - make Vector object (separate from Point object?) to distinguish between uses
 
 
