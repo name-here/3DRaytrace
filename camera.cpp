@@ -1,5 +1,6 @@
 #include <cmath>
 #include <limits>//This library is used to get the double max value.
+#include "point.h"
 #include "rays.h"
 #include "camera.h"
 
@@ -8,19 +9,19 @@
 
 Camera::Camera( Point setPos, double setPlaneDist, double setAngleX, double setAngleY ){
 	planeDist = setPlaneDist;//planeDist effectively sets the field of view of the camera.
-	move( setPos );
+	pos = setPos;
 	rotate( setAngleX, setAngleY );
 }
-void Camera::move( Point setPos ){
+/*void Camera::move( Point setPos ){
 	pos = setPos;
-}
+}*/
 void Camera::rotate( double setAngleX, double setAngleY ){//Can probably be optomized.  Also, should maybe be passed by reference?
 	front.x = sin(setAngleX) * cos(setAngleY);//front is a vector pointing in the direction that the camera is facing that extends to the plane the camera traces through.
 	front.y = sin(setAngleY);
 	front.z = cos(setAngleX) * cos(setAngleY);
-	up.x = sin(setAngleX) * cos((M_PI/2) + setAngleY);//up is a unit vector pointing directly up from the camera.
+	up.x = sin(setAngleX) * cos(M_PI/2 + setAngleY);//up is a unit vector pointing directly up from the camera.
 	up.y = sin((M_PI/2) + setAngleY);
-	up.z = cos(setAngleX) * cos((M_PI/2) + setAngleY);
+	up.z = cos(setAngleX) * cos(M_PI/2 + setAngleY);
 	//up.x = 0;
 	//up.y = 1;
 	//up.z = 0;

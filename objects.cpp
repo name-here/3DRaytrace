@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdio>
 #include <limits>//This library is used to get the double max value.
+#include "point.h"
 #include "rays.h"
 #include "objects.h"
 #include "world.h"//Won't compile without this for some mysterious reason (figure out how to remove)
@@ -29,9 +30,7 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, uint16_t setRef
 	p1 = setP1;
 	p2 = setP2;
 	p3 = setP3;
-	normal.x = 0;
-	normal.y = 0;
-	normal.z = 0;//These 3 values should actually be calculated instead of being set to 0.
+	normal = Point();//This should actually be calculated instead of being set to 0.
 	color = setColor;
 	reflect = setReflect;
 }
@@ -45,7 +44,7 @@ void Tri::cast( CRay& ray, bool isShadow ){
 	double triY2 = p2.y;
 	double triX3 = p3.x;
 	double triY3 = p3.y;//These represeent the points that make up the triangle when projected onto the plane of the triangle.
-					   //They are not currently set right, and some of the calculations should be done when the triangle is created
+						//They are not currently set right, and some of the calculations should be done when the triangle is created
 	if( 	!( (pointY-triY1 < (triY2-triY1)*(pointX-triX1)/(triX2-triX1))  ^  (triX2 < triX1) ) &&
 			!( (pointY-triY2 < (triY3-triY2)*(pointX-triX2)/(triX3-triX2))  ^  (triX3 < triX2) ) &&
 			!( (pointY-triY3 < (triY1-triY3)*(pointX-triX3)/(triX1-triX3))  ^  (triX1 < triX3) ) ){//This is temporary (not finished), and detects if

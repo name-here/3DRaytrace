@@ -13,7 +13,8 @@ class Object{
 	public:
 		virtual ~Object() = default;
 		virtual void cast( CRay& ray, bool isShadow ) = 0;//isShadow is used if only checking for intersection (used for lighting)
-		uint16_t reflect;
+		uint16_t reflect;//reflectiveness (0-65535)
+		double indexOfRefraction;//index of refraction of material
 		unsigned int id;
 };
 

@@ -1,5 +1,6 @@
 #include <limits>//This library is used to get the double max value.
 #include <cmath>//used for sqrt() in color setting
+#include "point.h"
 #include "rays.h"
 #include "objects.h"
 #include "camera.h"

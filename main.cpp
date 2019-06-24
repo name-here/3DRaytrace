@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cmath>
 #include <string>//needed to save to a file
+#include "point.h"
 #include "rays.h"
 #include "camera.h"
 #include "objects.h"
@@ -50,9 +51,9 @@ void setup() {
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
 	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 1, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
+	//world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
 	//world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
-	world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
+	//world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
 	/*int gridSize = 2;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
@@ -60,7 +61,7 @@ void setup() {
 		}
 	}*/
 
-	//world.addObj(  new Tri( Point( 0, 0, UNIT*2 ), Point( UNIT, 0, UNIT*2 ), Point( UNIT/2, UNIT/2, UNIT*5/2 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
+	world.addObj(  new Tri( Point( -UNIT/2, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT/2, 0, 0 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
 }
 
 
@@ -69,22 +70,22 @@ void draw() {
 	if(doControl){
 		//Point moveFront = world.camList[0]->front * UNIT/10; moveFront.y = 0;
 		if( wDown ){
-			world.camList[0]->move( world.camList[0]->pos + ( world.camList[0]->front * UNIT/10 ) );
+			world.camList[0]->pos =  world.camList[0]->pos + ( world.camList[0]->front * UNIT/10 );
 		}
 		if( sDown ){
-			world.camList[0]->move( world.camList[0]->pos - ( world.camList[0]->front * UNIT/10 ) );
+			world.camList[0]->pos =  world.camList[0]->pos - ( world.camList[0]->front * UNIT/10 );
 		}
 		if( dDown ){
-			world.camList[0]->move(  world.camList[0]->pos + ( world.camList[0]->right * UNIT/10 )  );
+			world.camList[0]->pos =  world.camList[0]->pos + ( world.camList[0]->right * UNIT/10 );
 		}
 		if( aDown ){
-			world.camList[0]->move(  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 )  );
+			world.camList[0]->pos =  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 );
 		}
 		if( spaceDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z )  );
+			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z );
 		}
 		if( shiftDown ){
-			world.camList[0]->move(  Point( world.camList[0]->pos.x, world.camList[0]->pos.y - UNIT/10, world.camList[0]->pos.z )  );
+			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y - UNIT/10, world.camList[0]->pos.z );
 		}
 	}
 
@@ -98,8 +99,7 @@ void draw() {
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.x = sin( (frameCount)*M_PI/30 ) * UNIT;
-	world.lightList[0]->pos.y = cos( (frameCount)*M_PI/30 ) * UNIT;
+	world.lightList[0]->pos.set(   sin( (frameCount)*M_PI/30 ) * UNIT,  cos( (frameCount)*M_PI/30 ) * UNIT,  world.lightList[0]->pos.z   );
 	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
 

@@ -24,6 +24,7 @@
 - Add high DPI capability
 - Move all global variables into main() or other functions
 - Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
+- Clean up includes (if necessary)
 
 ### Partially Done:
 
@@ -56,6 +57,7 @@
 - Add reflections to all objects
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))  OR  add Xcode files to github
 - Make new file for world and make camera part of world class
+- Move Point object into separate file
 
 ### Maybe Do:
 
