@@ -25,6 +25,7 @@
 - Move all global variables into main() or other functions
 - Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
 - Clean up includes (if necessary)
+- Replace number/ID systems with pointers
 
 ### Partially Done:
 

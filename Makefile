@@ -1,8 +1,8 @@
 CPP = g++
 CPPFLAGS = -g -O3 -Wall -Wextra -pedantic -std=c++11 `sdl2-config --cflags`
 PKGFLAGS = `sdl2-config --libs`
-DEPS = point.h rays.h camera.h objects.h world.h
-OBJ = point.o rays.o camera.o objects.o world.o main.o
+DEPS = camera.h rays.h world.h objects.h point.h
+OBJ = camera.o rays.o world.o objects.o point.o main.o
 
 3DRaytrace: $(OBJ)
 	$(CPP) -o $@ $^ $(CPPFLAGS) $(PKGFLAGS)
