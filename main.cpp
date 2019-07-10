@@ -217,7 +217,7 @@ int main(/*int argc, char* args[]*/) {
 		}
 	}
 	delete[] pixels;
-	SDL_DestroyTexture( buffer );
+	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashes on this line on exit
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );
 	SDL_Quit();
