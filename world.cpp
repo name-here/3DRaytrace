@@ -81,7 +81,8 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 				for( unsigned int setSubX = 0; setSubX < pixelSize; setSubX ++ ){
 					for( unsigned int setSubY = 0; setSubY < pixelSize; setSubY ++ ){
 						if( pxlX + setSubX < drawWidth  &&  pxlY + setSubY < drawHeight ){
-							pixels[ (height - pxlY - startY-1 + setSubY) * width  +  pxlX + startX + setSubX ] =  ( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 ) + ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 ) + ( (int)sqrt( (int)(bTotal/detailSq) ) );
+							pixels[  (height - pxlY - startY - setSubY) * width  +  pxlX + startX + setSubX  ] =
+								( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );
 						}
 					}
 				}

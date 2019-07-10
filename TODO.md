@@ -20,7 +20,6 @@
 - Use square of distance to check closest to save sqrt() call
 - Add multithreading
 - Don't include same inline functions in multiple files
-- Fix black lines between some pixels when pixelSize > 1
 - Add high DPI capability
 - Move all global variables into main() or other functions
 - Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
@@ -59,6 +58,7 @@
 - Link SDL2 into application (see "macosx" [hg.libsdl.org/SDL/file/default/docs/](http://hg.libsdl.org/SDL/file/default/docs/))  OR  add Xcode files to github
 - Make new file for world and make camera part of world class
 - Move Point object into separate file
+- Fix black lines between some pixels when pixelSize > 1
 
 ### Maybe Do:
 
