@@ -9,7 +9,6 @@
 - Make shadows more realistic (add indirect lighting, integrate into normal cast)
 - Optimize getting rays for camera (maybe don't use sine/cosine)
 - Solve Camera funcs(see start of draw()) not working without another func after it
-- Make used CRay(s) not part of main file (maybe put into Camera class)
 - Optimize operator== on points if possible
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
@@ -35,6 +34,7 @@
 - Add movement controls
 - Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object  (also Camera.move)
 - Change instances of setting points by components to use Point.set() function
+- Make used CRay(s) not part of main file (maybe put into Camera class)
 
 ### Done:
 
@@ -69,5 +69,6 @@
 - Move Color to new file
 - Move color setting into world.cast (??)
 - make Vector object (separate from Point object?) to distinguish between uses
+- Add player / first-person object which does camera controls
 
 
