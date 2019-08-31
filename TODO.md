@@ -17,13 +17,15 @@
 - Find way of updating all relevant planeDist on window resize (difficult if multiple cameras)
 - Add textured objects (texture system, textures maybe as part of generic Object?)
 - Use square of distance to check closest to save sqrt() call
-- Add multithreading
+- Add multithreading (COMPLICATED)
 - Don't include same inline functions in multiple files
 - Add high DPI capability
 - Move all global variables into main() or other functions
 - Change Ray objects to store a point and a vector instead of two points (still usint Point objects for both?)
 - Clean up includes (if necessary)
 - Replace number/ID systems with pointers
+- Replace simple square root color nonlinearization to something more correct (Account for screen gama or whatever, LIKELY COMPLICATED)
+- 
 
 ### Partially Done:
 
