@@ -15,6 +15,8 @@ int windowWidth;//600
 int windowHeight;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
 float FOVMultiplier = 0.8;//Multiplier for the field of view
+//float mouseMoveStepX = 0.375;
+//float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
 Uint32* pixels;
 int frameCount = 0;
 Uint32 lastTime;
@@ -51,7 +53,7 @@ void setup() {
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
 	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 1, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
-	//world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
 	//world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
 	//world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
 	/*int gridSize = 2;
@@ -70,19 +72,19 @@ void draw() {
 	if(doControl){
 		//Point moveFront = world.camList[0]->front * UNIT/10; moveFront.y = 0;
 		if( wDown ){
-			world.camList[0]->pos =  world.camList[0]->pos + ( world.camList[0]->front * UNIT/10 );
+			world.camList[0]->pos += ( world.camList[0]->front * UNIT/10 );
 		}
 		if( sDown ){
-			world.camList[0]->pos =  world.camList[0]->pos - ( world.camList[0]->front * UNIT/10 );
+			world.camList[0]->pos -= ( world.camList[0]->front * UNIT/10 );
 		}
 		if( dDown ){
-			world.camList[0]->pos =  world.camList[0]->pos + ( world.camList[0]->right * UNIT/10 );
+			world.camList[0]->pos += ( world.camList[0]->right * UNIT/10 );
 		}
 		if( aDown ){
-			world.camList[0]->pos =  world.camList[0]->pos - ( world.camList[0]->right * UNIT/10 );
+			world.camList[0]->pos -= ( world.camList[0]->right * UNIT/10 );
 		}
 		if( spaceDown ){
-			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z );
+			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z );//Alternatively, pos += Point(0, UNIT/10, 0)
 		}
 		if( shiftDown ){
 			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y - UNIT/10, world.camList[0]->pos.z );
@@ -126,8 +128,14 @@ int main(/*int argc, char* args[]*/) {
 		SDL_GetCurrentDisplayMode( 0, &DM );
 		windowWidth = DM.w/2;
 		windowHeight = DM.h/2;
-		if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
-		else{ windowSmallDim = windowHeight; }
+		if( windowWidth < windowHeight ){
+			windowSmallDim = windowWidth;
+			windowHeight = windowWidth;
+		}
+		else{
+			windowSmallDim = windowHeight;
+			windowWidth = windowHeight;
+		}
 		pixels = new Uint32[ windowWidth * windowHeight ];
 		window = SDL_CreateWindow( "3D Raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE );//used to end with "SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI" instead of "0".  For resizable, should be SDL_WINDOW_RESIZABLE.
 		if( window == NULL ){
@@ -217,7 +225,7 @@ int main(/*int argc, char* args[]*/) {
 		}
 	}
 	delete[] pixels;
-	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashes on this line on exit
+	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashes/crashed on this line on exit
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );
 	SDL_Quit();
