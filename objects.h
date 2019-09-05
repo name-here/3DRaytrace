@@ -15,7 +15,7 @@ class Object{
 		virtual void cast( CRay& ray, bool isShadow ) = 0;//isShadow is used if only checking for intersection (used for lighting)
 		uint16_t reflect;//reflectiveness (0-65535)
 		double indexOfRefraction;//index of refraction of material
-		unsigned int id;
+		unsigned long id;
 };
 
 class Tri: public Object{

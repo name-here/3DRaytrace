@@ -71,13 +71,20 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 				bTotal = 0;
 				for( unsigned int subX = 0; subX < detail; subX ++ ){
 					for( unsigned int subY = 0; subY < detail; subY ++ ){
-						camList[camNum]->getRay( cRay, pxlX - (double)drawWidth/2 + (double)subX / detail, pxlY - (double)drawHeight/2 + (double)subY / detail );
+						camList[camNum]->getRay( cRay,  pxlX  -  (double)drawWidth/2  +  (double)subX / detail,  pxlY  -  (double)drawHeight/2  +  (double)subY / detail );
 						this->cast( cRay );
 						rTotal += cRay.color.r;
 						gTotal += cRay.color.g;
 						bTotal += cRay.color.b;
 					}
 				}
+				/*if( pxlY > drawHeight/2 ){//if grayscale, set each color channel to the average of all color channels
+					uint64_t total = ( rTotal + gTotal + bTotal ) / 3;//total probably doesn't have to be 64 bits (otherwise could just put average in rTotal first and copy to other channels)
+					if( total > 4294967295 ){ total = 4294967295; }
+					rTotal = total;
+					gTotal = total;
+					bTotal = total;
+				}*/
 				for( unsigned int setSubX = 0; setSubX < pixelSize; setSubX ++ ){
 					for( unsigned int setSubY = 0; setSubY < pixelSize; setSubY ++ ){
 						if( pxlX + setSubX < drawWidth  &&  pxlY + setSubY < drawHeight ){

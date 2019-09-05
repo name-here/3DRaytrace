@@ -14,7 +14,7 @@ void set(int, int, Color);
 int windowWidth;//600
 int windowHeight;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
-float FOVMultiplier = 0.8;//Multiplier for the field of view
+double FOVMultiplier = .5;//Multiplier for the field of view
 //float mouseMoveStepX = 0.375;
 //float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
 Uint32* pixels;
@@ -44,10 +44,10 @@ void setup() {
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(  new Camera( Point( 0, UNIT, -UNIT*3 ), windowSmallDim / FOVMultiplier, 0, 0 )  );
+	world.addCam(   new Camera(  Point( 0, UNIT, -UNIT*3 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0.05  )   );
 
 
-	world.addLight(  new Light( Point( 0, 0, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
+	world.addLight(  new Light( Point( -UNIT, UNIT*2, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
 
 	//world.addObj( new Ball( world.lightList[0]->pos, UNIT/10, Color( 65535, 0, 0 ), 0));//lightBall
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
@@ -94,14 +94,15 @@ void draw() {
 	//world.camList[0]->move( Point( 0, UNIT, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
 	//camera.rotate( 0, 0 );
-	world.camList[0]->rotate( -M_PI*3/4*mouseX/windowWidth, -M_PI*mouseY/windowHeight );
+	world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth,  -M_PI*3/4 * mouseY / windowHeight  );
+	//world.camList[0]->distortion = (double)mouseX / windowWidth;
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
 	//static_cast<Plane*>(world.objList[1])->dist = mouseY*4;
 	//camera.pos.z = (windowWidth*frameCount/5);
 	//static_cast<Plane*>(world.objList[2])->dist = (-21+frameCount)*windowHeight/20;
 
-	world.lightList[0]->pos.set(   sin( (frameCount)*M_PI/30 ) * UNIT,  cos( (frameCount)*M_PI/30 ) * UNIT,  world.lightList[0]->pos.z   );
+	//world.lightList[0]->pos.set(   sin( (frameCount)*M_PI/30 ) * UNIT,  cos( (frameCount)*M_PI/30 ) * UNIT,  world.lightList[0]->pos.z   );
 	//static_cast<Ball*>(world.objList[1])->pos.x = mouseX*2.0/windowWidth;
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
 
@@ -109,7 +110,7 @@ void draw() {
 	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 2, 1, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, 4, 2, windowWidth, windowHeight-1, 0, 1 );
 }
 
 
@@ -126,8 +127,8 @@ int main(/*int argc, char* args[]*/) {
 	}
 	else{
 		SDL_GetCurrentDisplayMode( 0, &DM );
-		windowWidth = DM.w/2;
-		windowHeight = DM.h/2;
+		windowWidth = DM.w - 100;
+		windowHeight = DM.h - 100;
 		if( windowWidth < windowHeight ){
 			windowSmallDim = windowWidth;
 			windowHeight = windowWidth;
