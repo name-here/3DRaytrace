@@ -25,7 +25,8 @@ void World::cast( CRay& ray ){
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
 		(*i)->cast( ray, false );
 	}
-	ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
+	//ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
+	ray.castSky(  Color( 38400, 51200, 65535, 65535 )  );
 	ray.finishCast( true, Color( 65535, 65535, 65535 ) );
 	if( !ray.escape ){
 		{//brackets are to tell compiler temp is no longer needed after this

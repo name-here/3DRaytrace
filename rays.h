@@ -37,7 +37,8 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		unsigned int objLastHit;
 		Point normalVec;
 		CRay( Ray setRay = Ray() );
-		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec, bool ignoreDirection = false );//previously returned whether or not there was an intersection
+		void intersect( unsigned int id, Color toSet, Point hit, double dist, Point objNormalVec /*, bool ignoreDirection = false*/ );//previously returned whether or not there was an intersection
+		void castSky( Color skyColor );
 		void finishCast( bool doSetPos, Color lightColor );
 };
 

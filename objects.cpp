@@ -144,7 +144,7 @@ void AxisBox::cast( CRay& ray, bool isShadow ){
 		else if( ray.ray.pointsAt( intersection ) ){
 			Point normal;
 			if( reflect > 0 ){ normal = Point( 0, 0, -1 ); }
-			ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), intersection, dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ), normal, true );
+			ray.intersect( id, Color( color.r, color.g, color.b, color.a * ( 65535-reflect ) / 65535 ), intersection, dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ), normal );
 		}
 	}
 }
