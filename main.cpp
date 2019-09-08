@@ -1,8 +1,16 @@
+//#define MAKE_IMAGE_SEQUENCE
+#define USE_EMSCRIPTEN
+
+#ifdef USE_EMSCRIPTEN
+	#include <emscripten.h>
+	#include <emscripten/html5.h>
+#endif
 #include <SDL2/SDL.h>
 #include <cstdio>
+#include <iostream>
 #include <cstdint>
 #include <cmath>
-#include <string>//needed to save to a file
+//#include <string>//needed to save to a file
 #include "point.h"
 #include "rays.h"
 #include "camera.h"
@@ -11,13 +19,20 @@
 
 void set(int, int, Color);
 
-int windowWidth;//600
-int windowHeight;//420
+SDL_Window* window = nullptr;
+SDL_Renderer* renderer = nullptr;
+SDL_Texture* buffer = nullptr;
+Uint32* pixels;
+bool quit = false;
+SDL_Event event;
+
+int windowWidth = 100;//600
+int windowHeight = 100;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
 double FOVMultiplier = .5;//Multiplier for the field of view
 //float mouseMoveStepX = 0.375;
 //float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
-Uint32* pixels;
+
 int frameCount = 0;
 Uint32 lastTime;
 Uint32 frameRate;
@@ -28,7 +43,7 @@ bool mousePressed;
 //int detail = 1;
 //int detailSq = detail*detail;
 
-bool doControl = true;
+bool doControl = false;
 bool wDown = false;
 bool aDown = false;
 bool sDown = false;
@@ -69,7 +84,7 @@ void setup() {
 
 void draw() {
 	//The following movement system should be improved to give same speed when moving forwad and sideways at the same time and when frame time is inconsistent
-	if(doControl){
+	if( doControl ){
 		//Point moveFront = world.camList[0]->front * UNIT/10; moveFront.y = 0;
 		if( wDown ){
 			world.camList[0]->pos += ( world.camList[0]->front * UNIT/10 );
@@ -115,20 +130,119 @@ void draw() {
 
 
 
+void mainLoop(){
+	if( SDL_GetTicks() != lastTime  ){
+		frameRate = 1000 / ( SDL_GetTicks() - lastTime );
+	}
+	lastTime = SDL_GetTicks();
+	/*if( mousePressed ){
+		printf("Frame Rate:%i\n", frameRate);
+	}*///<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<print framerate if mouse pressed
+
+	draw();
+
+	SDL_UpdateTexture( buffer, NULL, pixels, windowWidth * sizeof(Uint32) );
+	SDL_RenderClear( renderer );
+	SDL_RenderCopy( renderer, buffer, NULL, NULL );
+	SDL_RenderPresent( renderer );
+
+	frameCount ++;
+
+	#ifdef MAKE_IMAGE_SEQUENCE
+		if(frameCount<=61){//This saves frames for an animation
+			const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
+			SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
+			printf("Saved file %s\n", name);
+		}
+		else{quit = true;}
+	#endif
+
+	while( SDL_PollEvent( &event ) != 0 ){
+		if( event.type == SDL_QUIT ){
+			quit = true;
+			break;
+		}
+		else if( event.type == SDL_MOUSEMOTION ){
+			if(doControl){
+				#ifdef USE_EMSCRIPTEN
+					mouseX = event.motion.x-(windowWidth/2);
+					mouseY = -event.motion.y+(windowHeight/2);
+				#else
+					mouseX += event.motion.x-(windowWidth/2);
+					mouseY += -event.motion.y+(windowHeight/2);
+					SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
+				#endif
+				//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
+			}
+		}
+		else if( event.type == SDL_MOUSEBUTTONDOWN ){
+			mousePressed = true;
+			if( !doControl ){
+				doControl = true;
+				#ifdef USE_EMSCRIPTEN
+					emscripten_request_pointerlock( "canvas", true );
+				#else
+					SDL_ShowCursor( SDL_ENABLE );
+				#endif
+			}
+		}
+		else if( event.type == SDL_MOUSEBUTTONUP ){
+			mousePressed = false;
+		}
+		else if( event.type == SDL_KEYDOWN ){
+			if( event.key.keysym.sym == SDLK_w ){ wDown = true; }
+			else if( event.key.keysym.sym == SDLK_a ){ aDown = true; }
+			else if( event.key.keysym.sym == SDLK_s ){ sDown = true; }
+			else if( event.key.keysym.sym == SDLK_d ){ dDown = true; }
+			else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = true; }
+			else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = true; }
+			else if( event.key.keysym.sym == SDLK_ESCAPE ){
+				doControl = false;
+				#ifdef USE_EMSCRIPTEN
+					emscripten_exit_pointerlock();
+				#else
+					SDL_ShowCursor( SDL_ENABLE );
+				#endif
+			}
+		}
+		else if( event.type == SDL_KEYUP ){
+			if( event.key.keysym.sym == SDLK_w ){ wDown = false; }
+			else if( event.key.keysym.sym == SDLK_a ){ aDown = false; }
+			else if( event.key.keysym.sym == SDLK_s ){ sDown = false; }
+			else if( event.key.keysym.sym == SDLK_d ){ dDown = false; }
+			else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = false; }
+			else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = false; }
+		}
+		else if( event.type == SDL_WINDOWEVENT ){//This deals with window resizing
+			if( event.window.event == SDL_WINDOWEVENT_RESIZED ){
+				windowWidth = event.window.data1;
+				windowHeight = event.window.data2;
+				if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
+				else{ windowSmallDim = windowHeight; }
+				world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a specific instance of the Camera object)
+				delete pixels;
+				pixels = new Uint32[ windowWidth * windowHeight ];
+				SDL_DestroyTexture( buffer );
+				buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
+			}
+		}
+	}
+}
+
 int main(/*int argc, char* args[]*/) {
-	SDL_Window* window = nullptr;
-	SDL_Renderer* renderer = nullptr;
+	//SDL_Window* window = nullptr;
+	//SDL_Renderer* renderer = nullptr;
 	SDL_DisplayMode DM;
-	SDL_Texture* buffer = nullptr;
-	bool quit = false;
-    SDL_Event event;
+	//SDL_Texture* buffer = nullptr;
+	//bool quit = false;
+    //SDL_Event event;
 	if(SDL_Init( SDL_INIT_VIDEO ) < 0){
 		printf( "SDL could not initialize.  SDL_Error: %s\n", SDL_GetError() );
 	}
 	else{
 		SDL_GetCurrentDisplayMode( 0, &DM );
-		windowWidth = DM.w - 100;
-		windowHeight = DM.h - 100;
+		windowWidth = DM.w - 150;
+		windowHeight = DM.h - 150;
 		if( windowWidth < windowHeight ){
 			windowSmallDim = windowWidth;
 			windowHeight = windowWidth;
@@ -147,82 +261,21 @@ int main(/*int argc, char* args[]*/) {
 			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_PRESENTVSYNC );
 			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			setup();
-			if(doControl){
-				SDL_ShowCursor( SDL_DISABLE );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Probably not needed when program is build around rendering engine
+			if( doControl ){
+				#ifdef USE_EMSCRIPTEN
+					emscripten_request_pointerlock( "canvas", true );
+				#else
+					SDL_ShowCursor( SDL_DISABLE );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Probably not needed when program is built around rendering engine
+				#endif
 			}
-			while( !quit ){
-				if( SDL_GetTicks() != lastTime  ){
-					frameRate = 1000 / ( SDL_GetTicks() - lastTime );
-				}
-				lastTime = SDL_GetTicks();
-				if( mousePressed ){
-					printf("Frame Rate:%i\n", frameRate);
-				}
-				draw();
-				SDL_UpdateTexture( buffer, NULL, pixels, windowWidth * sizeof(Uint32) );
-				SDL_RenderClear( renderer );
-				SDL_RenderCopy( renderer, buffer, NULL, NULL );
-				SDL_RenderPresent( renderer );
 
-				frameCount ++;
-
-				/*if(frameCount<=61){//This saves frames for an animation
-					const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
-					SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
-					printf("Saved file %s\n", name);
+			#ifdef USE_EMSCRIPTEN
+				emscripten_set_main_loop( mainLoop, 0, 1 );
+			#else
+				while( !quit ){
+					mainLoop();
 				}
-				else{quit = true;}*/
-
-				while( SDL_PollEvent( &event ) != 0 ){
-					if( event.type == SDL_QUIT ){
-						quit = true;
-						break;
-					}
-					else if( event.type == SDL_MOUSEMOTION ){
-						if(doControl){
-							mouseX += event.motion.x-(windowWidth/2);
-							mouseY += -event.motion.y+(windowHeight/2);
-							SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
-							//printf("mouseX=%f, mouseY=%f\n", mouseX*1.0/windowWidth, mouseY*1.0/windowHeight);
-						}
-					}
-					else if( event.type == SDL_MOUSEBUTTONDOWN ){
-						mousePressed = true;
-					}
-					else if( event.type == SDL_MOUSEBUTTONUP ){
-						mousePressed = false;
-					}
-					else if( event.type == SDL_KEYDOWN ){
-						if( event.key.keysym.sym == SDLK_w ){ wDown = true; }
-						else if( event.key.keysym.sym == SDLK_a ){ aDown = true; }
-						else if( event.key.keysym.sym == SDLK_s ){ sDown = true; }
-						else if( event.key.keysym.sym == SDLK_d ){ dDown = true; }
-						else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = true; }
-						else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = true; }
-					}
-					else if( event.type == SDL_KEYUP ){
-						if( event.key.keysym.sym == SDLK_w ){ wDown = false; }
-						else if( event.key.keysym.sym == SDLK_a ){ aDown = false; }
-						else if( event.key.keysym.sym == SDLK_s ){ sDown = false; }
-						else if( event.key.keysym.sym == SDLK_d ){ dDown = false; }
-						else if( event.key.keysym.sym == SDLK_SPACE ){ spaceDown = false; }
-						else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = false; }
-					}
-					else if( event.type == SDL_WINDOWEVENT ){//This deals with window resizing
-						if( event.window.event == SDL_WINDOWEVENT_RESIZED ){
-							windowWidth = event.window.data1;
-							windowHeight = event.window.data2;
-							if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
-							else{ windowSmallDim = windowHeight; }
-							world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a specific instance of the Camera object)
-							delete pixels;
-							pixels = new Uint32[ windowWidth * windowHeight ];
-							SDL_DestroyTexture( buffer );
-							buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
-						}
-					}
-				}
-			}
+			#endif
 		}
 	}
 	delete[] pixels;
