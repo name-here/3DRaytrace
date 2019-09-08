@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		66AD55692322F2BF0099EB30 /* point.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66AD55682322F2BF0099EB30 /* point.cpp */; };
 		66D216122204CFBB006748DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66D216112204CFBB006748DB /* Assets.xcassets */; };
 		66D216362204D0E4006748DB /* objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66D2162D2204D0E4006748DB /* objects.cpp */; };
 		66D216372204D0E4006748DB /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66D2162E2204D0E4006748DB /* camera.cpp */; };
@@ -31,6 +32,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		66AD55672322F2BF0099EB30 /* point.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = point.h; path = ../../point.h; sourceTree = "<group>"; };
+		66AD55682322F2BF0099EB30 /* point.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = point.cpp; path = ../../point.cpp; sourceTree = "<group>"; };
 		66D2160B2204CFBB006748DB /* 3DRaytrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = 3DRaytrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66D216112204CFBB006748DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66D216162204CFBB006748DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -81,6 +84,8 @@
 		66D2160D2204CFBB006748DB /* 3DRaytrace */ = {
 			isa = PBXGroup;
 			children = (
+				66AD55682322F2BF0099EB30 /* point.cpp */,
+				66AD55672322F2BF0099EB30 /* point.h */,
 				66D2162E2204D0E4006748DB /* camera.cpp */,
 				66D216342204D0E4006748DB /* camera.h */,
 				66D216302204D0E4006748DB /* main.cpp */,
@@ -177,6 +182,7 @@
 			files = (
 				66D216372204D0E4006748DB /* camera.cpp in Sources */,
 				66D216362204D0E4006748DB /* objects.cpp in Sources */,
+				66AD55692322F2BF0099EB30 /* point.cpp in Sources */,
 				66D216392204D0E4006748DB /* main.cpp in Sources */,
 				66D216382204D0E4006748DB /* rays.cpp in Sources */,
 				66D2163A2204D0E4006748DB /* world.cpp in Sources */,
