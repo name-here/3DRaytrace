@@ -3,9 +3,10 @@
 
 
 class Light{
-	Point pos;
-	Color color;
-	Light(Point setPos = Point(), Color setColor = Color());
+	public:
+		Point pos;
+		Color color;
+		Light(Point setPos = Point(), Color setColor = Color());
 };
 
 
