@@ -25,7 +25,7 @@
 - Clean up includes (if necessary)
 - Replace number/ID systems with pointers
 - Replace simple square root color nonlinearization to something more correct (Account for screen gama or whatever, LIKELY COMPLICATED)
-- 
+- Add complete list of dependencies to README
 
 ### Partially Done:
 

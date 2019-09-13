@@ -15,10 +15,13 @@ Currently, the program is able to render flat shaded and reflective spheres and 
 
 ### Compiling
 
-#### Linux
-To compile for linux, simply ```cd``` into directory containing the project files and run ```make```.  This will create the executable "3DRaytrace".  To start the program, just run the executable with ```./3DRaytrace```.
+#### Web
+To compile for web on either Linux or Mac, you must first install Emscripten, instructions for which can be found [here](https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install).  Once you've done that, just ```cd``` into the directory containing the project files and run ```make jsbin/asm.js```.  If you just want a viewable webpage to look at it without setting up any html, run ```make jsbin/3DRaytrace.html```.  Unfortunately, for some web security reasons, in most browsers, the page can only be viewed when running from a server.  Emscripten's website has some information on that [here](https://emscripten.org/docs/getting_started/Tutorial.html#generating-html).
 
-Note: You must have the development version of SDL2(download [here](http://www.libsdl.org/download-2.0.php)) installed to compile the program, and either the development or runtime version installed to run it.
+#### Linux
+To compile for linux, simply ```cd``` into directory containing the project files and run ```make bin/3DRaytrace```.  This will create the executable "3DRaytrace".  To start the program, just run the executable with ```./bin/3DRaytrace```.
+
+Note: You must have the development version of SDL2(download [here](http://www.libsdl.org/download-2.0.php)) installed to compile the program, and either the development or runtime version installed to run it.  Also, I have been testing on a Mac.
 
 #### Mac OS
 For Mac OS, compile using the Xcode project in the App folder.
