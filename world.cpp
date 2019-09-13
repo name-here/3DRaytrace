@@ -8,6 +8,14 @@
 
 #define F_INFINITY std::numeric_limits<double>::infinity()
 
+
+inline double square( double num ){
+	return num*num;
+}
+/*inline?*/ double dmod(double num1, double num2) {
+    return num1  -  (int)(num1 / num2) * num2;
+}
+
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
 {
@@ -42,6 +50,8 @@ void World::cast( CRay& ray ){
 			ray.ray.p1 = temp;
 		}
 		if( ray.color.a > 0 && ray.bounceCount<MAX_BOUNCES && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+			ray.addColor(  Color(  0,  0,  0,  (uint16_t)( ray.objLastHit->fresnel  *  sqrt( dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec) ) )  )  );//Adds darkness to account for Fresnel equations stuff
+
 			{//brackets are here to tell compiler that temp is no longer needed after this
 				Point temp = ray.ray.p2;
 				ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
@@ -100,7 +110,7 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 }
 
 void World::addObj( Object* object ){
-	object->id = objList.size()+1;
+	//object->id = objList.size()+1;
 	objList.emplace_back( object );
 }
 void World::addLight( Light* light ){

@@ -9,6 +9,7 @@ struct Light;
 class Object;
 class Camera;
 
+
 class World{
 	public:
 		std::vector<Light*> lightList;

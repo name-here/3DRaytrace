@@ -1,4 +1,5 @@
 #include "point.h"
+#include<cmath>
 
 Point::Point(double setX, double setY, double setZ ){
 	x = setX;
@@ -14,6 +15,10 @@ void Point::set(){
 	x = 0;
 	y = 0;
 	z = 0;
+}
+
+double Point::magnitude(){
+	return sqrt( x*x + y*x + z*z );
 }
 
 Point& Point::operator+=( const Point& toAdd ){

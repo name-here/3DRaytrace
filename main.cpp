@@ -1,7 +1,6 @@
 //#define MAKE_IMAGE_SEQUENCE
-#define USE_EMSCRIPTEN
 
-#ifdef USE_EMSCRIPTEN
+#ifdef WASM
 	#include <emscripten.h>
 	#include <emscripten/html5.h>
 #endif
@@ -68,7 +67,7 @@ void setup() {
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
 	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 1, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 65535 )  );//testBall1
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 50000, 65535 )  );//testBall1
 	//world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
 	//world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
 	/*int gridSize = 2;
@@ -125,7 +124,7 @@ void draw() {
 	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 4, 2, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, 2, 1, windowWidth, windowHeight-1, 0, 1 );
 }
 
 
@@ -164,7 +163,7 @@ void mainLoop(){
 		}
 		else if( event.type == SDL_MOUSEMOTION ){
 			if(doControl){
-				#ifdef USE_EMSCRIPTEN
+				#ifdef WASM
 					mouseX = event.motion.x-(windowWidth/2);
 					mouseY = -event.motion.y+(windowHeight/2);
 				#else
@@ -179,10 +178,10 @@ void mainLoop(){
 			mousePressed = true;
 			if( !doControl ){
 				doControl = true;
-				#ifdef USE_EMSCRIPTEN
+				#ifdef WASM
 					emscripten_request_pointerlock( "canvas", true );
 				#else
-					SDL_ShowCursor( SDL_ENABLE );
+					SDL_ShowCursor( SDL_DISABLE );
 				#endif
 			}
 		}
@@ -198,7 +197,7 @@ void mainLoop(){
 			else if( event.key.keysym.sym == SDLK_LSHIFT || event.key.keysym.sym == SDLK_RSHIFT ){ shiftDown = true; }
 			else if( event.key.keysym.sym == SDLK_ESCAPE ){
 				doControl = false;
-				#ifdef USE_EMSCRIPTEN
+				#ifdef WASM
 					emscripten_exit_pointerlock();
 				#else
 					SDL_ShowCursor( SDL_ENABLE );
@@ -262,14 +261,14 @@ int main(/*int argc, char* args[]*/) {
 			buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			setup();
 			if( doControl ){
-				#ifdef USE_EMSCRIPTEN
+				#ifdef WASM
 					emscripten_request_pointerlock( "canvas", true );
 				#else
 					SDL_ShowCursor( SDL_DISABLE );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Probably not needed when program is built around rendering engine
 				#endif
 			}
 
-			#ifdef USE_EMSCRIPTEN
+			#ifdef WASM
 				emscripten_set_main_loop( mainLoop, 0, 1 );
 			#else
 				while( !quit ){

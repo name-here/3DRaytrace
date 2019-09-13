@@ -1,18 +1,21 @@
-struct Point{//<<<<<<<<<<<<Maybe make into class?
-	double x;
-	double y;
-	double z;
-	Point( double setX = 0, double setY = 0, double setZ = 0 );
-	void set( double setX, double setY, double setZ );
-	void set();
-
-	Point& operator+=( const Point& toAdd );
-	Point& operator-=( const Point& toSub );
-	//Point& operator*=( const Point& toMult );
-	Point& operator*=( const double toMult );
-	Point& operator/=( const double toDiv );
-	double dot( const Point& vec );
-	Point& cross( const Point& vec );
+class Point{
+	public:
+		double x;
+		double y;
+		double z;
+		Point( double setX = 0, double setY = 0, double setZ = 0 );
+		void set( double setX, double setY, double setZ );
+		void set();
+		
+		double magnitude();
+		
+		Point& operator+=( const Point& toAdd );
+		Point& operator-=( const Point& toSub );
+		//Point& operator*=( const Point& toMult );
+		Point& operator*=( const double toMult );
+		Point& operator/=( const double toDiv );
+		double dot( const Point& vec );
+		Point& cross( const Point& vec );
 };
 
 inline Point operator+( Point pos1, const Point& pos2 ){
