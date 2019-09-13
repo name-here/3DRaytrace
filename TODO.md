@@ -27,6 +27,7 @@
 - Replace simple square root color nonlinearization to something more correct (Account for screen gama or whatever, LIKELY COMPLICATED)
 - Add complete list of dependencies to README
 - Make Fresnel stuff actually physically accurate
+- Fix having to press ESC twice to exit control on the web build
 
 ### Partially Done:
 
