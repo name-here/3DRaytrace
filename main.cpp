@@ -42,7 +42,7 @@ bool mousePressed;
 //int detail = 1;
 //int detailSq = detail*detail;
 
-bool doControl = false;
+bool doControl = false;//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<All these variables and related control code not needed when a program is built around this rendering engine
 bool wDown = false;
 bool aDown = false;
 bool sDown = false;
@@ -55,22 +55,27 @@ World world;
 
 void setup() {
 
+	world = World(  Color( 0 )  );//Color( 38400, 51200, 65535, 65535 ) for blue background
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(   new Camera(  Point( 0, UNIT, -UNIT*3 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0.05  )   );
+	world.addCam(   new Camera(  Point( 0, UNIT/2, UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  M_PI,  0,  0.05  )   );
 
+	world.addLight(  new Light( Point( -UNIT, UNIT*2, UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
+	world.addLight(  new Light( Point( UNIT*2, UNIT*2, UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
+	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
+	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
 
-	world.addLight(  new Light( Point( -UNIT, UNIT*2, -UNIT*2 ), Color( 65535, 65535, 65535 ) )  );//light1
+	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
+	world.addObj(  new Plane( 2, -UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
+	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	//world.addObj( new Ball( world.lightList[0]->pos, UNIT/10, Color( 65535, 0, 0 ), 0));//lightBall
-	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
-	world.addObj(  new Plane( 3, UNIT*2, UNIT/4, Color( 38400, 0, 38400, 65535 ), Color( 10000, 0, 20000 ) )  );//testPlane2
-	//world.addObj(  new Plane( 1, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535, 65535 ), 50000, 65535 )  );//testBall1
-	//world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 30000, 65535, 65535, 65535 ), 30000 )  );//testBall2
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535 ), true, 65535 )  );//testBall1
+	world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 20000, 65535, 65535 ) )  );//testBall2
+
 	//world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
-	/*int gridSize = 2;
+
+	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
 			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 30000 ) );//littleBall
@@ -105,10 +110,14 @@ void draw() {
 		}
 	}
 
+	//standard mouse control:
+	if( doControl ){
+		world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth  +  M_PI,  -M_PI*3/4 * mouseY / windowHeight  );
+	}
+
 	//world.camList[0]->move( Point( 0, UNIT, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
 	//camera.planeDist = windowWidth;//( 1 - (((double)mouseY) / windowHeight) ) * windowWidth;
 	//camera.rotate( 0, 0 );
-	world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth,  -M_PI*3/4 * mouseY / windowHeight  );
 	//world.camList[0]->distortion = (double)mouseX / windowWidth;
 
 	//camera.pos.z = -(mouseX+windowWidth/2)*4;
@@ -121,7 +130,7 @@ void draw() {
 	//static_cast<Ball*>(world.objList[0])->pos = world.lightList[0]->pos;//make lightBall follow the light
 
 	//GIF animation rotating:
-	//world.camList[0]->move( Point( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * -4 * abs( sin(frameCount*M_PI/30) ) ) );
+	//world.camList[0]->pos.set( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * 4 * abs( sin(frameCount*M_PI/30) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
 	world.draw( 0, pixels, windowWidth, windowHeight, 2, 1, windowWidth, windowHeight-1, 0, 1 );
@@ -176,7 +185,12 @@ void mainLoop(){
 		}
 		else if( event.type == SDL_MOUSEBUTTONDOWN ){
 			mousePressed = true;
-			if( !doControl ){
+			if( doControl ){
+				const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
+				SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
+				printf("Saved file %s\n", name);
+			}
+			else{
 				doControl = true;
 				#ifdef WASM
 					emscripten_request_pointerlock( "canvas", true );
@@ -218,7 +232,7 @@ void mainLoop(){
 				windowHeight = event.window.data2;
 				if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
 				else{ windowSmallDim = windowHeight; }
-				world.camList[0]->planeDist = windowSmallDim / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a specific instance of the Camera object)
+				world.camList[0]->planeDist = (double)windowSmallDim/2 / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a particular instance of the Camera object)
 				delete pixels;
 				pixels = new Uint32[ windowWidth * windowHeight ];
 				SDL_DestroyTexture( buffer );
@@ -240,8 +254,13 @@ int main(/*int argc, char* args[]*/) {
 	}
 	else{
 		SDL_GetCurrentDisplayMode( 0, &DM );
-		windowWidth = DM.w - 150;
-		windowHeight = DM.h - 150;
+		#ifdef WASM
+			windowWidth = DM.w;
+			windowHeight = DM.h;
+		#else
+			windowWidth = DM.w - 150;
+			windowHeight = DM.h - 150;
+		#endif
 		if( windowWidth < windowHeight ){
 			windowSmallDim = windowWidth;
 			windowHeight = windowWidth;
@@ -264,7 +283,7 @@ int main(/*int argc, char* args[]*/) {
 				#ifdef WASM
 					emscripten_request_pointerlock( "canvas", true );
 				#else
-					SDL_ShowCursor( SDL_DISABLE );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Probably not needed when program is built around rendering engine
+					SDL_ShowCursor( SDL_DISABLE );
 				#endif
 			}
 
@@ -278,7 +297,7 @@ int main(/*int argc, char* args[]*/) {
 		}
 	}
 	delete[] pixels;
-	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashes/crashed on this line on exit
+	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashed on this line on exit a couple times
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );
 	SDL_Quit();

@@ -26,28 +26,68 @@ inline double square( double num ){
 /*World::World(){
 	
 }*/
+World::World( Color setBackgroundColor ){
+	backgroundColor = setBackgroundColor;
+}
+
 /*void World::cast( int camNum, double screenX, double screenY ){
 	cast(camList[camNum]->getRay( CRay& ray, screenX, screenY ));
 }*/
+
 void World::cast( CRay& ray ){
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
 		(*i)->cast( ray, false );
 	}
 	//ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
-	ray.castSky(  Color( 38400, 51200, 65535, 65535 )  );
-	ray.finishCast( true, Color( 65535, 65535, 65535 ) );
-	if( !ray.escape ){
+	//ray.castBackground( backgroundColor );
+	ray.finishCast( true, false );
+	if( ray.escape ){
+		ray.finishCast( false, true );
+	}
+	else if( ray.objLastHit->doLighting ){
 		{//brackets are to tell compiler temp is no longer needed after this
 			Point temp = ray.ray.p1;
+			bool lightBlocked;
 			for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
-				ray.ray.p1 = lightList[0]->pos;
+				lightBlocked = false;
+				ray.ray.p1 = (*i)->pos;
 				//ray.setDist = F_INFINITY;
 				for( auto i = objList.begin(); i!=objList.end(); ++i ){
-					(*i)->cast( ray, true );
+					if(  (*i)->cast( ray, true )  ){//get rid of if(){} if possible (condition must somehow remain)
+						lightBlocked = true;
+					}
+				}
+				if( !lightBlocked ){
+					FloatColor lightColor = (*i)->color;
+					double lightAdjust = ray.ray.getLength() / UNIT; lightAdjust *= lightAdjust;//lightAdjust determines brightness adjustment of light based on distance to light source and angle of surface relative to light
+					double angleToNormal = dot(  (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(),  ray.normalVec  );
+					if( angleToNormal < 0 ){ angleToNormal = 0;}
+					lightAdjust /= angleToNormal;
+					/*Point test = (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength();
+					if( test != Point() && ray.normalVec != Point() ){
+						//printf("x: %f, y: %f, z: %f\n",test.x,test.y,test.z);
+						//printf("x: %f, y: %f, z: %f\n",ray.normalVec.x,ray.normalVec.y,ray.normalVec.z);
+						//printf("num: %f\n",dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec ));
+						//printf("temp: %f\n",temp);
+						//lightColor = FloatColor( 10 );
+					}
+					else{
+						ray.addColor( Color(65535) );
+					}*/
+					lightColor.r /= lightAdjust;
+					lightColor.g /= lightAdjust;
+					lightColor.b /= lightAdjust;
+					//temp /= abs(  dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec )  );
+					//lightColor.r *= dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec);
+					ray.addLight( lightColor );
+				}
+				else{
+					//ray.addLight( FloatColor( (*i)->color.r/50, (*i)->color.g/50, (*i)->color.b/50 ) );
 				}
 				//ray.finishCast( false );
 			}
 			ray.ray.p1 = temp;
+			ray.finishCast( false, true );
 		}
 		if( ray.color.a > 0 && ray.bounceCount<MAX_BOUNCES && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
 			ray.addColor(  Color(  0,  0,  0,  (uint16_t)( ray.objLastHit->fresnel  *  sqrt( dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec) ) )  )  );//Adds darkness to account for Fresnel equations stuff
@@ -58,11 +98,18 @@ void World::cast( CRay& ray ){
 				ray.ray.p1 = temp;
 			}
 			ray.bounceCount ++;
+			ray.lightColor.r = 0;
+			ray.lightColor.g = 0;
+			ray.lightColor.b = 0;
 			ray.normalVec = Point();
 			ray.setDist = F_INFINITY;
 			ray.escape = true;
 			this->cast( ray );
 		}
+	}
+	else{
+		ray.addLight(  FloatColor( 1 )  );
+		ray.finishCast( false, true );
 	}
 }
 

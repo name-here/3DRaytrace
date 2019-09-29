@@ -14,6 +14,16 @@ class Color{
 		Color();
 };
 
+class FloatColor{//used for colors with no maximum and/or minimum value
+	public:
+		double r;
+		double g;
+		double b;
+		FloatColor( double setR, double setG, double setB );
+		FloatColor( double brightness );
+		FloatColor();
+};
+
 
 class Ray{
 	public:
@@ -23,8 +33,12 @@ class Ray{
 		bool pointsAt( Point point );
 		bool inRange( Point point );
 		double getLength();
+		double cosAngleToUVec( Point normalRay );//used to get the cosine of the angle between this ray and a unit vector (vector of length 1), such as a normal vector
 		Ray& normalize();
 };
+
+double cosAngleBetween( Ray ray1, Ray ray2 );
+
 
 class CRay{//This type (casting ray) is used for casting out from the camera and checking against objects.  Its variables are used to keep track of relevant information.
 	Color setCastColor;
@@ -37,14 +51,17 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		Point setPos;
 		double setDist;
 		bool escape;
+		FloatColor lightColor;
 		uint32_t bounceCount;
 		Object* objLastHit;
 		Point normalVec;
 		CRay( Ray setRay = Ray() );
 		void intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec /*, bool ignoreDirection = false*/ );//previously returned whether or not there was an intersection
-		void castSky( Color skyColor );
-		void addColor( Color addColor, Color addColorLight = Color(65535, 65535, 65535) );
-		void finishCast( bool doSetPos, Color lightColor );
+		//for intersect(), toSet.a tells CRay how much of color could possibly be filled by other colors (ex. how much of the final color will come from following rendering passes)
+		void addLight( FloatColor addLightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
+		void castBackground( Color backgroundColor );
+		void addColor( Color addColor, FloatColor addLightColor = FloatColor( 1 ) );
+		void finishCast( bool doSetPos, bool doSetColor );
 };
 
 
