@@ -31,6 +31,7 @@
 - Change CRay::finishCast(), CRay::lightColor, and CRay::addLight so that light can go over camera's max exposure and overexpose pixels (LIKELY COMPLICATED)
 - Add HDR monitor support (MAYBE COMPLICATED)
 - Go through entire code base and tweak formatting to be consistent
+- Give objects textures
 
 ### Partially Done:
 
