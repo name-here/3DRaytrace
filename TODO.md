@@ -6,7 +6,6 @@
 - Find the normal of a triangle when it is created
 - Finish triangle.cast
 - Make triangle.cast work for shadows
-- Make shadows more realistic (add indirect lighting, integrate into normal cast)
 - Optimize getting rays for camera (maybe don't use sine/cosine)
 - Solve Camera funcs(see start of draw()) not working without another func after it
 - Optimize operator== on points if possible
@@ -28,6 +27,10 @@
 - Add complete list of dependencies to README
 - Make Fresnel stuff actually physically accurate
 - Fix having to press ESC twice to exit control on the web build
+- Move (some) constants to a separate constants file
+- Change CRay::finishCast(), CRay::lightColor, and CRay::addLight so that light can go over camera's max exposure and overexpose pixels (LIKELY COMPLICATED)
+- Add HDR monitor support (MAYBE COMPLICATED)
+- Go through entire code base and tweak formatting to be consistent
 
 ### Partially Done:
 
@@ -35,10 +38,10 @@
 - Optimize Plane::cast to not create new Point and Ray objects
 - Fix issue of no shadows on line of x=0 (Maybe done?, probably not)
 - Add cube object
-- Add movement controls
-- Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object  (also Camera.move)
-- Change instances of setting points by components to use Point.set() function
+- Optimize things like [variable] = Point() to set all of the values to 0 instead of constructing a new object, and replace similar constructions with Point.set() function  (also Camera.move)
+- Change all instances of setting points by components to use Point.set() function
 - Make used CRay(s) not part of main file (maybe put into Camera class)
+- Make shadows more realistic (add indirect lighting, integrate into normal cast)
 
 ### Done:
 
@@ -63,6 +66,7 @@
 - Make new file for world and make camera part of world class
 - Move Point object into separate file
 - Fix black lines between some pixels when pixelSize > 1
+- Add movement controls [for debug / testing]
 
 ### Maybe Do:
 
@@ -73,6 +77,7 @@
 - Move Color to new file
 - Move color setting into world.cast (??)
 - make Vector object (separate from Point object?) to distinguish between uses
-- Add player / first-person object which does camera controls
+- Add player / first-person object(class) which does camera controls
+- Have planes return opposite normal vector for rays coming from back side (make planes double sided in terms of normals)
 
 
