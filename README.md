@@ -1,5 +1,5 @@
 # 3DRaytrace
-The goal of this project is to create a 3D raytracer that can render various objects with reflections, refraction, and shadows.  In other words, it should be able to generate an image of a scene containing a variety of objects made of "materials" with different properties.  Unfortunately, most of these goals have not yet been achieved.
+The goal of this project is to create a 3D raytracer that can render various objects with reflections, refraction, and shadows.  In other words, it should be able to generate an image of a scene containing a variety of objects made of "materials" with different properties.
 
 ### Progress
 Currently, the program is able to render flat shaded and reflective spheres and planes with direct lighting and some reflection effects.  For now, all planes are confined to being aligned with one of the three axes.  A TODO list with features to add, bugs to fix, and things to finish can be found in [TODO.md](http://github.com/name-here/3DRaytrace/blob/master/TODO.md).  
