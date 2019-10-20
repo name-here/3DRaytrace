@@ -42,6 +42,7 @@ void World::cast( CRay& ray ){
 	//ray.castBackground( backgroundColor );
 	ray.finishCast( true, false );
 	if( ray.escape ){
+		ray.addColor( backgroundColor );
 		ray.finishCast( false, true );
 	}
 	else if( ray.objLastHit->doLighting ){
@@ -60,9 +61,9 @@ void World::cast( CRay& ray ){
 				if( !lightBlocked ){
 					FloatColor lightColor = (*i)->color;
 					double lightAdjust = ray.ray.getLength() / UNIT; lightAdjust *= lightAdjust;//lightAdjust determines brightness adjustment of light based on distance to light source and angle of surface relative to light
-					double angleToNormal = dot(  (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(),  ray.normalVec  );
-					if( angleToNormal < 0 ){ angleToNormal = 0;}
-					lightAdjust /= angleToNormal;
+					double cosAngleToNormal = dot(  (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(),  ray.normalVec  );
+					if( cosAngleToNormal < 0 ){ cosAngleToNormal = 0;}
+					lightAdjust /= cosAngleToNormal;
 					/*Point test = (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength();
 					if( test != Point() && ray.normalVec != Point() ){
 						//printf("x: %f, y: %f, z: %f\n",test.x,test.y,test.z);
@@ -74,9 +75,11 @@ void World::cast( CRay& ray ){
 					else{
 						ray.addColor( Color(65535) );
 					}*/
+
 					lightColor.r /= lightAdjust;
 					lightColor.g /= lightAdjust;
 					lightColor.b /= lightAdjust;
+
 					//temp /= abs(  dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec )  );
 					//lightColor.r *= dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec);
 					ray.addLight( lightColor );
@@ -90,7 +93,7 @@ void World::cast( CRay& ray ){
 			ray.finishCast( false, true );
 		}
 		if( ray.color.a > 0 && ray.bounceCount<MAX_BOUNCES && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
-			ray.addColor(  Color(  0,  0,  0,  (uint16_t)( ray.objLastHit->fresnel  *  sqrt( dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec) ) )  )  );//Adds darkness to account for Fresnel equations stuff
+			//ray.addColor(  Color(  0,  0,  0,  (uint16_t)( ray.objLastHit->fresnel  *  sqrt( dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec) ) )  )  );//Adds darkness to account for Fresnel equations stuff
 
 			{//brackets are here to tell compiler that temp is no longer needed after this
 				Point temp = ray.ray.p2;

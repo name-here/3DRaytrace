@@ -141,8 +141,8 @@ void CRay::addLight( FloatColor addLightColor ){
 	lightColor.b += addLightColor.b;
 }
 
-void CRay::castBackground( Color backgroundColor ){
-	if( /*setDist >= F_INFINITY*/ escape ){
+/*void CRay::castBackground( Color backgroundColor ){
+	if( escape ){//setDist >= F_INFINITY
 		objLastHit = nullptr;
 		normalVec.x = 0;
 		normalVec.y = 0;
@@ -150,7 +150,7 @@ void CRay::castBackground( Color backgroundColor ){
 		setCastColor = backgroundColor;
 		setCastColor.a = 65535;
 	}
-}
+}*/
 
 void CRay::addColor( Color addColor, FloatColor addLightColor ){
 	double temp = (uint64_t)addColor.r  *  addColor.a  *  color.a / 4294836225  *  addLightColor.r  +  color.r;

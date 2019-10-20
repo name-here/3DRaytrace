@@ -1,4 +1,4 @@
-//#define MAKE_IMAGE_SEQUENCE
+//#define MAKE_IMAGE_SEQUENCE //if set, generates
 
 #ifdef WASM
 	#include <emscripten.h>
@@ -53,27 +53,28 @@ bool shiftDown = false;
 World world;
 
 
+//setup function (called once before mainLoop starts being called)
 void setup() {
 
 	world = World(  Color( 0 )  );//Color( 38400, 51200, 65535, 65535 ) for blue background
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(   new Camera(  Point( 0, UNIT/2, UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  M_PI,  0,  0.05  )   );
+	world.addCam(   new Camera(  Point( 0, UNIT/2, -UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0.05  )   );
 
-	world.addLight(  new Light( Point( -UNIT, UNIT*2, UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
-	world.addLight(  new Light( Point( UNIT*2, UNIT*2, UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
+	world.addLight(  new Light( Point( UNIT, UNIT*2, -UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
+	world.addLight(  new Light( Point( -UNIT*2, UNIT*2, -UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
 	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
 	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
 
-	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ) )  );//testPlane1
-	world.addObj(  new Plane( 2, -UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
+	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ), true, 20000 )  );//testPlane1
+	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
 	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535 ), true, 65535 )  );//testBall1
-	world.addObj(  new Ball( Point( UNIT, UNIT, 0 ), UNIT/2, Color( 20000, 65535, 65535 ) )  );//testBall2
+	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ) )  );//testBall2
 
-	//world.addObj(  new AxisBox( Point( UNIT, UNIT, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
+	//world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
 
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
@@ -82,10 +83,11 @@ void setup() {
 		}
 	}*/
 
-	world.addObj(  new Tri( Point( -UNIT/2, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT/2, 0, 0 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
+	//world.addObj(  new Tri( Point( -UNIT/2, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT/2, 0, 0 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
 }
 
 
+//called once per frame, and deals with calling world.draw() and any logic other than rendeing
 void draw() {
 	//The following movement system should be improved to give same speed when moving forwad and sideways at the same time and when frame time is inconsistent
 	if( doControl ){
@@ -112,7 +114,8 @@ void draw() {
 
 	//standard mouse control:
 	if( doControl ){
-		world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth  +  M_PI,  -M_PI*3/4 * mouseY / windowHeight  );
+		world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth,  -M_PI*3/4 * mouseY / windowHeight  );
+		//static_cast<Plane*>(world.objList[3])->dist = mouseX;
 	}
 
 	//world.camList[0]->move( Point( 0, UNIT, ( (double)mouseY * 8 / windowHeight - 4 ) * UNIT  ) );
@@ -138,6 +141,7 @@ void draw() {
 
 
 
+//called repeatedly from main(), and handles calling draw(), drawing pixels[] to the screen, and input
 void mainLoop(){
 	if( SDL_GetTicks() != lastTime  ){
 		frameRate = 1000 / ( SDL_GetTicks() - lastTime );
@@ -240,8 +244,10 @@ void mainLoop(){
 			}
 		}
 	}
+
 }
 
+//main function (called once on program start)
 int main(/*int argc, char* args[]*/) {
 	//SDL_Window* window = nullptr;
 	//SDL_Renderer* renderer = nullptr;
@@ -304,11 +310,13 @@ int main(/*int argc, char* args[]*/) {
 	return 0;
 }
 
-void set( int x, int y, Color color ){
+
+//sets an individual pixel on the screen at position (x, y) to the given color---no longer used
+/*void set( int x, int y, Color color ){
 	if( x >= 0  &&  x < windowWidth  &&  y >= 0  &&  y < windowHeight  &&  (y*windowWidth)+x < windowWidth*windowHeight){
 		pixels[ y * windowWidth  +  x ] = ( ( (int)sqrt( color.r ) ) << 16 ) + ( ( (int)sqrt( color.g ) ) << 8 ) + ( (int)sqrt( color.b ) );
 	}
 	else{ printf( "Tried to draw pixel out of bounds at (%i, %i)\n", x, y ); }
-}
+}*/
 
 

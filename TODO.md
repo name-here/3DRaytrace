@@ -7,7 +7,6 @@
 - Finish triangle.cast
 - Make triangle.cast work for shadows
 - Optimize getting rays for camera (maybe don't use sine/cosine)
-- Solve Camera funcs(see start of draw()) not working without another func after it
 - Optimize operator== on points if possible
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
 - Have all variables set by the object hit by the ray be set only for that object instead of being set by each successive object until it gets to the right one.
@@ -32,6 +31,7 @@
 - Add HDR monitor support (MAYBE COMPLICATED)
 - Go through entire code base and tweak formatting to be consistent
 - Give objects textures
+- Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane
 
 ### Partially Done:
 
@@ -68,6 +68,8 @@
 - Move Point object into separate file
 - Fix black lines between some pixels when pixelSize > 1
 - Add movement controls [for debug / testing]
+- Solve Camera funcs(see start of draw()) not working without another func after it
+- add INTERSECT_ERR functionality to planes
 
 ### Maybe Do:
 
