@@ -50,44 +50,46 @@ void World::cast( CRay& ray ){
 			Point temp = ray.ray.p1;
 			bool lightBlocked;
 			for( auto i = lightList.begin(); i!=lightList.end(); ++i ){
-				lightBlocked = false;
-				ray.ray.p1 = (*i)->pos;
-				//ray.setDist = F_INFINITY;
-				for( auto i = objList.begin(); i!=objList.end(); ++i ){
-					if(  (*i)->cast( ray, true )  ){//get rid of if(){} if possible (condition must somehow remain)
-						lightBlocked = true;
+				//if(  Ray( ray.ray.p2, ray.ray.p2 + ray.normalVec ).pointsAt( (*i)->pos )  ){//may not actually improve performance, but is meant to (if it worked)
+					lightBlocked = false;
+					ray.ray.p1 = (*i)->pos;
+					//ray.setDist = F_INFINITY;
+					for( auto i = objList.begin(); i!=objList.end(); ++i ){
+						if(  (*i)->cast( ray, true )  ){//get rid of if(){} if possible (condition must somehow remain)
+							lightBlocked = true;
+						}
 					}
-				}
-				if( !lightBlocked ){
-					FloatColor lightColor = (*i)->color;
-					double lightAdjust = ray.ray.getLength() / UNIT; lightAdjust *= lightAdjust;//lightAdjust determines brightness adjustment of light based on distance to light source and angle of surface relative to light
-					double cosAngleToNormal = dot(  (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(),  ray.normalVec  );
-					if( cosAngleToNormal < 0 ){ cosAngleToNormal = 0;}
-					lightAdjust /= cosAngleToNormal;
-					/*Point test = (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength();
-					if( test != Point() && ray.normalVec != Point() ){
-						//printf("x: %f, y: %f, z: %f\n",test.x,test.y,test.z);
-						//printf("x: %f, y: %f, z: %f\n",ray.normalVec.x,ray.normalVec.y,ray.normalVec.z);
-						//printf("num: %f\n",dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec ));
-						//printf("temp: %f\n",temp);
-						//lightColor = FloatColor( 10 );
+					if( !lightBlocked ){
+						FloatColor lightColor = (*i)->color;
+						double lightAdjust = ray.ray.getLength() / UNIT; lightAdjust *= lightAdjust;//lightAdjust determines brightness adjustment of light based on distance to light source and angle of surface relative to light
+						double cosAngleToNormal = dot(  (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(),  ray.normalVec  );
+						if( cosAngleToNormal < 0 ){ cosAngleToNormal = 0;}
+						lightAdjust /= cosAngleToNormal;
+						/*Point test = (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength();
+						if( test != Point() && ray.normalVec != Point() ){
+							//printf("x: %f, y: %f, z: %f\n",test.x,test.y,test.z);
+							//printf("x: %f, y: %f, z: %f\n",ray.normalVec.x,ray.normalVec.y,ray.normalVec.z);
+							//printf("num: %f\n",dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec ));
+							//printf("temp: %f\n",temp);
+							//lightColor = FloatColor( 10 );
+						}
+						else{
+							ray.addColor( Color(65535) );
+						}*/
+
+						lightColor.r /= lightAdjust;
+						lightColor.g /= lightAdjust;
+						lightColor.b /= lightAdjust;
+
+						//temp /= abs(  dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec )  );
+						//lightColor.r *= dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec);
+						ray.addLight( lightColor );
 					}
-					else{
-						ray.addColor( Color(65535) );
+					/*else{
+						ray.addLight( FloatColor( (*i)->color.r/50, (*i)->color.g/50, (*i)->color.b/50 ) );
 					}*/
-
-					lightColor.r /= lightAdjust;
-					lightColor.g /= lightAdjust;
-					lightColor.b /= lightAdjust;
-
-					//temp /= abs(  dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec )  );
-					//lightColor.r *= dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec);
-					ray.addLight( lightColor );
-				}
-				else{
-					//ray.addLight( FloatColor( (*i)->color.r/50, (*i)->color.g/50, (*i)->color.b/50 ) );
-				}
-				//ray.finishCast( false );
+					//ray.finishCast( false );
+				//}
 			}
 			ray.ray.p1 = temp;
 			ray.finishCast( false, true );

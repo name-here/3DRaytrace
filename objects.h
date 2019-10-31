@@ -22,10 +22,18 @@ class Object{
 
 class Tri: public Object{
 	public:
+		//Point pos;
+		Point normal;
 		Point p1;
 		Point p2;
 		Point p3;
-		Point normal;
+
+		Point yVector;
+		Point xVector;
+		double length;
+		double p2Y;
+		double p3Y;
+
 		Color color;
 		Tri( Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setReflect = 0, uint16_t setFresnel = 49151 );
 		bool cast( CRay& ray, bool isShadow );

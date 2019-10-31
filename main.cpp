@@ -1,4 +1,4 @@
-//#define MAKE_IMAGE_SEQUENCE //if set, generates
+//#define MAKE_IMAGE_SEQUENCE //if set, generates...
 
 #ifdef WASM
 	#include <emscripten.h>
@@ -67,11 +67,11 @@ void setup() {
 	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
 	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
 
-	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 ), true, 20000 )  );//testPlane1
-	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
+	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 )/*, true, 40000*/ )  );//testPlane1
+	//world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 65535 ), true, 65535 )  );//testBall1
+	//world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0 ), true, 50000 )  );//testBall1
 	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ) )  );//testBall2
 
 	//world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
@@ -83,7 +83,11 @@ void setup() {
 		}
 	}*/
 
-	//world.addObj(  new Tri( Point( -UNIT/2, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT/2, 0, 0 ), Color( 25600, 25600, 25600, 65535 ) )  );//testTri
+	/*Tri triObj = */world.addObj(  new Tri( Point( UNIT/2, 0, 0 ), Point( 0, UNIT, UNIT/2 ), Point( UNIT*4/3, 0, 0 ), Color( 10000, 25600, 25600 ) )  );//testTri
+	//world.addObj(  new Ball( Point( UNIT/2, 0, 0 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex1
+	//world.addObj(  new Ball( Point( 0, UNIT, UNIT/2 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex2
+	//world.addObj(  new Ball( Point( UNIT*4/3, 0, 0 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex3
+	//world.addObj(  new Ball( static_cast<Tri*>(world.objList[4])->p1 + static_cast<Tri*>(world.objList[4])->normal*UNIT, UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriTest
 }
 
 

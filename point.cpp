@@ -21,6 +21,13 @@ double Point::magnitude(){
 	return sqrt( x*x + y*x + z*z );
 }
 
+Point& Point::normalize(){
+	this->x/=sqrt( x*x + y*x + z*z );
+	this->y/=sqrt( x*x + y*x + z*z );
+	this->z/=sqrt( x*x + y*x + z*z );
+	return *this;
+}
+
 Point& Point::operator+=( const Point& toAdd ){
 	x += toAdd.x;
 	y += toAdd.y;

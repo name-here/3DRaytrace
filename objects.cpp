@@ -30,7 +30,15 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLight
 	p1 = setP1;
 	p2 = setP2;
 	p3 = setP3;
-	normal = Point();//This should actually be calculated instead of being set to 0.
+	normal = ( p1 - p3 ).cross( p2 - p1 );
+	normal /= normal.magnitude();
+
+	yVector = p3 - p2;
+	xVector = cross( yVector,  normal );
+	length = ( p2 - p1 ).dot( xVector );
+	p2Y = ( p2 - p1 ).dot( yVector );
+	p3Y = ( p3 - p1 ).dot( yVector );
+
 	color = setColor;
 	doLighting = setDoLighting;
 	reflect = setReflect;
@@ -38,26 +46,32 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLight
 }
 
 bool Tri::cast( CRay& ray, bool isShadow ){
-	double pointX = ray.ray.p2.x;
-	double pointY = ray.ray.p2.y;
-	double triX1 = p1.x;
-	double triY1 = p1.y;
-	double triX2 = p2.x;
-	double triY2 = p2.y;
-	double triX3 = p3.x;
-	double triY3 = p3.y;//These represeent the points that make up the triangle when projected onto the plane of the triangle.
-						//They are not currently set right, and some of the calculations should be done when the triangle is created
-	if( 	!( (pointY-triY1 < (triY2-triY1)*(pointX-triX1)/(triX2-triX1))  ^  (triX2 < triX1) ) &&
-			!( (pointY-triY2 < (triY3-triY2)*(pointX-triX2)/(triX3-triX2))  ^  (triX3 < triX2) ) &&
-			!( (pointY-triY3 < (triY1-triY3)*(pointX-triX3)/(triX1-triX3))  ^  (triX1 < triX3) ) ){//This is temporary (not finished), and detects if
-		if(isShadow){
-			
+	if(  ray.ray.cosAngleToUVec( normal )  <=  0  ){
+		double rayLength = ray.ray.getLength();
+		Point rayUVec = (ray.ray.p2 - ray.ray.p1) / rayLength;//unit vector in direction of ray.ray (length 1)
+		double distance = ( p1 - ray.ray.p1 ).dot( normal )  /  rayUVec.dot( normal );
+		if( distance >= 0 ){//should be just ( distance > 0 ) ????
+			Point hit = ray.ray.p1 + (rayUVec * distance);
+			double pointX = ( hit - p1 ).dot( xVector );//(hit - p1).dot(p2 - p1);
+			double pointY = ( hit - p1 ).dot( yVector );//(hit - p1).dot(p3 - p1);//these two maybe could be using 2D operations somehow?
+
+			if(   ( pointX >= 0 )  !=  ( pointX >= length )   &&  ( pointY >= pointX * p2Y / length )  !=  ( pointY >= pointX * p3Y / length )   ){//checks if point in 2D plane is actually inside triangle (ie. does the ray hit the triangle?)
+			//stuff that doesn't work: (pointX > 0  &&  pointY > 0),   (pointX >= 0)  ==  (p2 - p1).dot(p3 - p1) >= 0 
+			//incomplete stuff: pointY > (p3 - p1).dot(p3 - p2) != pointY > (p2 - p1).dot(p3 - p2)  &&  pointX > 0 //!= could also be ^
+				if( !isShadow ){
+					//Point l1 = ( ray.ray.p2 - ray.ray.p1 );
+					//l1 /= l1.magnitude();
+					//double divisor = l1.dot( normal );
+					//double distance = ( p1 - ray.ray.p1 ).dot( normal )  /  divisor;
+					
+					ray.intersect(  this,  color,  hit,  distance,  normal  );
+					return true;
+				}
+				else if( distance <= rayLength - INTERSECT_ERR ){
+					return true;
+				}
+			}
 		}
-		else{
-			ray.intersect(  this,  color,  Point( F_INFINITY, F_INFINITY, F_INFINITY ),  F_INFINITY,  normal  );
-			ray.escape = false;
-		}
-		return true;
 	}
 	return false;
 }

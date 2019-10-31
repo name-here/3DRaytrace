@@ -8,6 +8,7 @@ class Point{
 		void set();
 		
 		double magnitude();
+		Point& normalize();
 		
 		Point& operator+=( const Point& toAdd );
 		Point& operator-=( const Point& toSub );
