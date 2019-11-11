@@ -22,9 +22,10 @@ double Point::magnitude(){
 }
 
 Point& Point::normalize(){
-	this->x/=sqrt( x*x + y*x + z*z );
-	this->y/=sqrt( x*x + y*x + z*z );
-	this->z/=sqrt( x*x + y*x + z*z );
+	double length = sqrt( x*x + y*x + z*z );
+	this->x/=length;
+	this->y/=length;
+	this->z/=length;
 	return *this;
 }
 

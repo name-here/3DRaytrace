@@ -12,7 +12,7 @@ Currently, the program is able to render flat shaded and reflective spheres and 
 - Color mixing
 
 ### How to Use
-Once built, just run the executable or load up the webpage.  Click on the window to start controlling the camera.  In this mode, move the mouse to look around, and use the W, S, A, and D keys to move the camera forward, backward, left, and right respectively.  Additionally, the SHIFT keys will move the camera vertically down, and the SPACE key will move the camera vertically up.  Also, clicking in control mode will save a screenshot as a .bmp .  Press the ESCAPE (ESC) key to exit camera control mode.  For the web build, you must press ESCAPE twice to fully exit camera control mode.  
+Once built, just run the executable or load up the webpage.  Click on the window to start controlling the camera.  In this mode, move the mouse to look around, and use the W, S, A, and D keys to move the camera forward, backward, left, and right respectively.  Additionally, the SHIFT keys will move the camera vertically down, and the SPACE key will move the camera vertically up.  Also, clicking in control mode will save a screenshot as a .bmp if the SAVE_IMAGE_ON_CLICK flag is set, or print the framerate to the console otherwise.  Press the ESCAPE (ESC) key to exit camera control mode.  For the web build, you must press ESCAPE twice to fully exit camera control mode.  
 
 ### Notes
 - Currently, there may be bugs if there are more objects loaded than the max int value, as each object has an ID, which is stored as an int.

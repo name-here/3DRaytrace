@@ -56,14 +56,14 @@ bool Tri::cast( CRay& ray, bool isShadow ){
 			double pointY = ( hit - p1 ).dot( yVector );//(hit - p1).dot(p3 - p1);//these two maybe could be using 2D operations somehow?
 
 			if(   ( pointX >= 0 )  !=  ( pointX >= length )   &&  ( pointY >= pointX * p2Y / length )  !=  ( pointY >= pointX * p3Y / length )   ){//checks if point in 2D plane is actually inside triangle (ie. does the ray hit the triangle?)
-			//stuff that doesn't work: (pointX > 0  &&  pointY > 0),   (pointX >= 0)  ==  (p2 - p1).dot(p3 - p1) >= 0 
+			//stuff that doesn't work: (pointX > 0  &&  pointY > 0),   (pointX >= 0)  ==  (p2 - p1).dot(p3 - p1) >= 0
 			//incomplete stuff: pointY > (p3 - p1).dot(p3 - p2) != pointY > (p2 - p1).dot(p3 - p2)  &&  pointX > 0 //!= could also be ^
 				if( !isShadow ){
 					//Point l1 = ( ray.ray.p2 - ray.ray.p1 );
 					//l1 /= l1.magnitude();
 					//double divisor = l1.dot( normal );
 					//double distance = ( p1 - ray.ray.p1 ).dot( normal )  /  divisor;
-					
+
 					ray.intersect(  this,  color,  hit,  distance,  normal  );
 					return true;
 				}

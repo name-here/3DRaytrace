@@ -3,9 +3,6 @@
 ### To Do:
 
 <!-- - classes.cpp line 182: add position to ball shadow casting(??) -->
-- Find the normal of a triangle when it is created
-- Finish triangle.cast
-- Make triangle.cast work for shadows
 - Optimize getting rays for camera (maybe don't use sine/cosine)
 - Optimize operator== on points if possible
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
@@ -32,6 +29,10 @@
 - Go through entire code base and tweak formatting to be consistent
 - Give objects textures
 - Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane
+- Use a specific variable to store intersection point on CRay instead of using its Ray
+- Restructure all Object Cast() functions to be more efficient
+- Optimize Triangle::cast(), especially with relation to calculations finding if and where ray hits plane (optimization could include precalculating more values/properties)
+- Optimize all calculations with Point objects (use special instructions that act on more than one number at once?)
 
 ### Partially Done:
 
@@ -43,6 +44,7 @@
 - Change all instances of setting points by components to use Point.set() function
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Make shadows more realistic (add indirect lighting, integrate into normal cast)
+- Prevent casts from checking direct light from light sources behind object hit by ray (use set normal?)
 
 ### Done:
 
@@ -70,6 +72,12 @@
 - Add movement controls [for debug / testing]
 - Solve Camera funcs(see start of draw()) not working without another func after it
 - add INTERSECT_ERR functionality to planes
+- Have planes return opposite normal vector for rays coming from back side (make planes double sided in terms of normals)
+- Find the normal of a triangle when it is created
+- Finish triangle.cast
+- Make triangle.cast work for shadows
+- Rewrite World::draw() and World::cast() to be less of a mess (try to make more readable, add comments)
+- Rename or remove functions that are basically just wrappers for Point::dot()
 
 ### Maybe Do:
 
@@ -81,6 +89,7 @@
 - Move color setting into world.cast (??)
 - make Vector object (separate from Point object?) to distinguish between uses
 - Add player / first-person object(class) which does camera controls
-- Have planes return opposite normal vector for rays coming from back side (make planes double sided in terms of normals)
+- Add a Point2D class with most of the same functions as Point (rename Point to Point3D?)
+- Use half-sphere version of brother's points on a sphere project (or at least the idea) to figure out how to randomly but evenly destribute directions to cast rays to calculate diffuse reflection and scattering
 
 

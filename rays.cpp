@@ -92,7 +92,7 @@ Ray& Ray::normalize(){
 }
 
 double Ray::cosAngleToUVec( Point normalRay ){
-	return dot(  ( p2 - p1 ) / getLength(),  normalRay  );
+	return dot(  ( p2 - p1 ) /= getLength(),  normalRay  );
 }
 
 double cosAngleBetween( Ray ray1, Ray ray2 ){

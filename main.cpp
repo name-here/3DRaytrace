@@ -1,4 +1,5 @@
-//#define MAKE_IMAGE_SEQUENCE //if set, generates...
+//#define MAKE_IMAGE_SEQUENCE = 60 //if set, generates an image sequence with a number of images equal to the value of MAKE_IMAGE_SEQUENCE
+//#define SAVE_IMAGE_ON_CLICK//if set, image saves an image of what is on screen on mouse click, or if not set, prints framerate to console on click
 
 #ifdef WASM
 	#include <emscripten.h>
@@ -71,7 +72,7 @@ void setup() {
 	//world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	//world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0 ), true, 50000 )  );//testBall1
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0 ), true, 50000 )  );//testBall1
 	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ) )  );//testBall2
 
 	//world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
@@ -84,10 +85,6 @@ void setup() {
 	}*/
 
 	/*Tri triObj = */world.addObj(  new Tri( Point( UNIT/2, 0, 0 ), Point( 0, UNIT, UNIT/2 ), Point( UNIT*4/3, 0, 0 ), Color( 10000, 25600, 25600 ) )  );//testTri
-	//world.addObj(  new Ball( Point( UNIT/2, 0, 0 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex1
-	//world.addObj(  new Ball( Point( 0, UNIT, UNIT/2 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex2
-	//world.addObj(  new Ball( Point( UNIT*4/3, 0, 0 ), UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriVertex3
-	//world.addObj(  new Ball( static_cast<Tri*>(world.objList[4])->p1 + static_cast<Tri*>(world.objList[4])->normal*UNIT, UNIT/30, Color( 65535, 65535, 0 ), false )  );//TriTest
 }
 
 
@@ -149,6 +146,9 @@ void draw() {
 void mainLoop(){
 	if( SDL_GetTicks() != lastTime  ){
 		frameRate = 1000 / ( SDL_GetTicks() - lastTime );
+		if( mousePressed ){
+			printf("Frame rate:%i\n", frameRate);
+		}
 	}
 	lastTime = SDL_GetTicks();
 	/*if( mousePressed ){
@@ -165,7 +165,7 @@ void mainLoop(){
 	frameCount ++;
 
 	#ifdef MAKE_IMAGE_SEQUENCE
-		if(frameCount<=61){//This saves frames for an animation
+		if(frameCount<=MAKE_IMAGE_SEQUENCE){//This saves frames for an animation
 			const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
 			SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
 			printf("Saved file %s\n", name);
@@ -194,9 +194,12 @@ void mainLoop(){
 		else if( event.type == SDL_MOUSEBUTTONDOWN ){
 			mousePressed = true;
 			if( doControl ){
-				const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
-				SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
-				printf("Saved file %s\n", name);
+				#ifdef SAVE_IMAGE_ON_CLICK
+					const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
+					SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
+					printf("Saved file %s\n", name);
+				#endif
+				//printf("Frame rate:%i\n", frameRate);
 			}
 			else{
 				doControl = true;
