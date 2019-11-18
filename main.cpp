@@ -84,7 +84,7 @@ void setup() {
 		}
 	}*/
 
-	/*Tri triObj = */world.addObj(  new Tri( Point( UNIT/2, 0, 0 ), Point( 0, UNIT, UNIT/2 ), Point( UNIT*4/3, 0, 0 ), Color( 10000, 25600, 25600 ) )  );//testTri
+	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
 }
 
 
@@ -115,7 +115,7 @@ void draw() {
 
 	//standard mouse control:
 	if( doControl ){
-		world.camList[0]->rotate(  -M_PI*3/4 * mouseX / windowWidth,  -M_PI*3/4 * mouseY / windowHeight  );
+		world.camList[0]->rotate(  M_PI*3/4 * mouseX / windowWidth,  M_PI*3/4 * mouseY / windowHeight  );
 		//static_cast<Plane*>(world.objList[3])->dist = mouseX;
 	}
 
