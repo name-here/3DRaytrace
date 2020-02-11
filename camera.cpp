@@ -36,22 +36,23 @@ void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	ray.color.r = 0;
 	ray.color.g = 0;
 	ray.color.b = 0;
-	ray.color.a = 65535;
 	ray.lightColor.r = 0;
 	ray.lightColor.g = 0;
 	ray.lightColor.b = 0;
 	double temp = planeDist*planeDist  -  ( screenX*screenX + screenY*screenY ) * distortion;//square of the distance to the sphere being projected onto
 	if( temp >= 0 ){
 		ray.ray.p2 = pos  +  front * sqrt( temp )  +  right * screenX  +  up * screenY;//this projects rays through a sphere instead of a plane
+		ray.colorMixLeft = 65535;
+
 	}
 	else{
 		ray.ray.p2 = pos;
-		ray.color.a = 0;
+		ray.colorMixLeft = 0;
 	}
-	ray.setPos.x = F_INFINITY;
-	ray.setPos.y = F_INFINITY;
-	ray.setPos.z = F_INFINITY;
-	ray.setDist = F_INFINITY;
+	ray.hitPos.x = F_INFINITY;
+	ray.hitPos.y = F_INFINITY;
+	ray.hitPos.z = F_INFINITY;
+	ray.hitDist = F_INFINITY;
 	ray.escape = true;
 	ray.bounceCount = 0;
 	ray.objLastHit = nullptr;

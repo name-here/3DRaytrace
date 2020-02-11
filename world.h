@@ -3,7 +3,7 @@
 
 const double UNIT = 100;//This is determines the size of the units used for size and positioning of all objects.
 const double INTERSECT_ERR = UNIT/10000;//Intersection margin of error (for shapes that need it).  Rays must start this distance away from an object to hit it, to avoid rays bouncing off the same point twice.
-const int MAX_BOUNCES = 15;//This is the maximum number of bounces the program will calculate.  Further potential reflections are ignored.
+const int MAX_DEPTH = 15;//This is the maximum number of bounces/reflections/refractions/iterations the program will calculate.  Further potential ray interactions are ignored.
 
 class Light;
 class Object;

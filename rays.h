@@ -1,28 +1,8 @@
 #include <cstdint>
+#include "color.h"//<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULDN'T BE HERE!!!
 
 class Object;
 
-
-class Color{
-	public:
-		uint16_t r;
-		uint16_t g;
-		uint16_t b;
-		uint16_t a;
-		Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA = 65535 );
-		Color( uint16_t brightness, uint16_t setA = 65535 );
-		Color();
-};
-
-class FloatColor{//used for colors with no maximum and/or minimum value
-	public:
-		double r;
-		double g;
-		double b;
-		FloatColor( double setR, double setG, double setB );
-		FloatColor( double brightness );
-		FloatColor();
-};
 
 
 class Ray{
@@ -41,27 +21,38 @@ double cosAngleBetween( Ray ray1, Ray ray2 );
 
 
 class CRay{//This type (casting ray) is used for casting out from the camera and checking against objects.  Its variables are used to keep track of relevant information.
-	Color setCastColor;
-	public:
+	public://<<<<<<<<<<<<<<<<<<<<<<<Should be a struct?
 		Ray ray;
+
+		Color castColor;//color gotten from casting against objects (color to be mixed in)
+		//uint16_t setCastColorAlpha;
 		Color color;
+		uint16_t colorMixLeft;//the amount of the ray's final color that is still left to be calculated and mixed in.  This is used to weight mixing more colors with the ray's current color variable.
+
 		//double length;
+
 		double currentIOR;//Index Of Refraction of the material the ray is currently in
 		double nextIOR;//used to get Index Of Refraction of next object to be in, and used with currentIOR to calculate reflections/refractions
-		Point setPos;
-		double setDist;
+
+		Point hitPos;
+		double hitDist;// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<These should be renamed (to better describe use/values, or should be made private)
+
 		bool escape;
+
 		FloatColor lightColor;
-		uint32_t bounceCount;
+
+		uint32_t bounceCount;//Make smaller to reflect max bounces (max possible value)?
+
 		Object* objLastHit;
 		Point normalVec;//normal vector of the last object hit (ObjLastHit) at the intersection point
+
 		CRay( Ray setRay = Ray() );
-		void intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec /*, bool ignoreDirection = false*/ );//previously returned whether or not there was an intersection
-		//for intersect(), toSet.a tells CRay how much of color could possibly be filled by other colors (ex. how much of the final color will come from following rendering passes)
-		void addLight( FloatColor addLightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
+		void intersect( Object* object, Color toSet, /*uint16_t toSetAlpha,*/ Point hit, double dist, Point objNormalVec /*, bool ignoreDirection = false*/ );//previously returned whether or not there was an intersection
+		//NO LONGER RELEVANT: for intersect(), toSet.a tells CRay how much of color could possibly be filled by other colors (ex. how much of the final color will come from following rendering passes)
+		void addLight( FloatColor lightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
 		void castBackground( Color backgroundColor );
-		void addColor( Color addColor, FloatColor addLightColor = FloatColor( 1 ) );
-		void finishCast( bool doSetPos, bool doSetColor );
+		void addColor( Color addColor, uint16_t addColorAlpha = 65535, FloatColor addLightColor = FloatColor( 1 ) );
+		//void finishCast( bool doSetPos, bool doSetColor );
 };
 
 

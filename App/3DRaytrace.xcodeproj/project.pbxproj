@@ -16,6 +16,7 @@
 		66D2163A2204D0E4006748DB /* world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66D216332204D0E4006748DB /* world.cpp */; };
 		66D216402204D14B006748DB /* SDL2.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66D2163F2204D14B006748DB /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		66D216412204D16C006748DB /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66D2163C2204D128006748DB /* SDL2.framework */; };
+		66F1421523F3324800A11CDF /* color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66F1421323F3324700A11CDF /* color.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +50,8 @@
 		66D216352204D0E4006748DB /* world.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = world.h; path = ../../world.h; sourceTree = "<group>"; };
 		66D2163C2204D128006748DB /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "SDL2 Development/SDL2.framework"; sourceTree = "<group>"; };
 		66D2163F2204D14B006748DB /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = "SDL2 Runtime/SDL2.framework"; sourceTree = "<group>"; };
+		66F1421323F3324700A11CDF /* color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = color.cpp; path = ../../color.cpp; sourceTree = "<group>"; };
+		66F1421423F3324800A11CDF /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../color.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +87,8 @@
 		66D2160D2204CFBB006748DB /* 3DRaytrace */ = {
 			isa = PBXGroup;
 			children = (
+				66F1421323F3324700A11CDF /* color.cpp */,
+				66F1421423F3324800A11CDF /* color.h */,
 				66AD55682322F2BF0099EB30 /* point.cpp */,
 				66AD55672322F2BF0099EB30 /* point.h */,
 				66D2162E2204D0E4006748DB /* camera.cpp */,
@@ -184,6 +189,7 @@
 				66D216362204D0E4006748DB /* objects.cpp in Sources */,
 				66AD55692322F2BF0099EB30 /* point.cpp in Sources */,
 				66D216392204D0E4006748DB /* main.cpp in Sources */,
+				66F1421523F3324800A11CDF /* color.cpp in Sources */,
 				66D216382204D0E4006748DB /* rays.cpp in Sources */,
 				66D2163A2204D0E4006748DB /* world.cpp in Sources */,
 			);

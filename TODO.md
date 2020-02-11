@@ -31,8 +31,13 @@
 - Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane
 - Use a specific variable to store intersection point on CRay instead of using its Ray
 - Restructure all Object Cast() functions to be more efficient
-- Optimize Triangle::cast(), especially with relation to calculations finding if and where ray hits plane (optimization could include precalculating more values/properties)
 - Optimize all calculations with Point objects (use special instructions that act on more than one number at once?)
+- Make casting skip objects that are behind the direction of the cast and too small to possibly be intersected with (also exclude objects too far to the side?)
+- Restructure so that only position and distance are calculated for each intersection with a particular ray, and then other properties are found after the closest intersection is known
+- Change CRay's color property to us floatColor because it represents an ammount of light (which has no upper bound)
+- Change doubles that should never be negative to be unsigned
+- Add ambient light (eventually incl. ambient occlusion)
+- Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )
 
 ### Partially Done:
 
@@ -45,6 +50,7 @@
 - Make used CRay(s) not part of main file (maybe put into Camera class)
 - Make shadows more realistic (add indirect lighting, integrate into normal cast)
 - Prevent casts from checking direct light from light sources behind object hit by ray (use set normal?)
+- Optimize Triangle::cast(), especially with relation to calculations finding if and where ray hits plane (optimization could include precalculating more values/properties)
 
 ### Done:
 
@@ -78,6 +84,9 @@
 - Make triangle.cast work for shadows
 - Rewrite World::draw() and World::cast() to be less of a mess (try to make more readable, add comments)
 - Rename or remove functions that are basically just wrappers for Point::dot()
+- Fix frameRate showing too high when faster than minFrameTicks
+- Make frameRate work if running at more than 1000fps
+- Rename addColorAlpha in CRay::addColor to be more accurately descriptive
 
 ### Maybe Do:
 
@@ -91,5 +100,7 @@
 - Add player / first-person object(class) which does camera controls
 - Add a Point2D class with most of the same functions as Point (rename Point to Point3D?)
 - Use half-sphere version of brother's points on a sphere project (or at least the idea) to figure out how to randomly but evenly destribute directions to cast rays to calculate diffuse reflection and scattering
+- Make objects first check normals (if applicable) to avoid checking objects that are not visible
+- Move setting CRay color from its castColor back to a function in CRay rather than a function in World
 
 

@@ -40,12 +40,15 @@ void World::cast( CRay& ray ){
 	}
 	//ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
 	//ray.castBackground( backgroundColor );
-	ray.finishCast( true, false );
+	//ray.finishCast( true, false );
+	ray.ray.p2 = ray.hitPos;
 	if( ray.escape ){
-		ray.addColor( backgroundColor );
-		ray.finishCast( false, true );
+		ray.addColor( backgroundColor, 65535 );
+		ray.addColor( ray.castColor, ray.colorMixLeft, ray.lightColor );
+		//ray.finishCast( false, true );
 	}
 	else if( ray.objLastHit->doLighting ){
+		//ray.addLight( FloatColor( 1 ) );
 		{//brackets are to tell compiler temp is no longer needed after this
 			Point temp = ray.ray.p1;
 			bool lightBlocked;
@@ -53,11 +56,9 @@ void World::cast( CRay& ray ){
 			//if(  dot( ((*i)->pos - ray.ray.p2), ray.normalVec )  >=  0  ){//may not actually improve performance, but is meant to
 				lightBlocked = false;
 				ray.ray.p1 = (*i)->pos;
-				//ray.setDist = F_INFINITY;
-				for( auto i = objList.begin(); i!=objList.end(); ++i ){
-					if(  (*i)->cast( ray, true )  ){//get rid of if(){} if possible (condition must somehow remain)
-						lightBlocked = true;
-					}
+				//ray.hitDist = F_INFINITY;
+				for( auto i = objList.begin(); !lightBlocked && i!=objList.end(); ++i ){//  If cast() needed to run for every object, this would need to be changed, and the line below set to: lightBlocked =  lightBlocked  ||  (*i)->cast( ray, true );
+					lightBlocked = (*i)->cast( ray, true );
 				}
 				if( !lightBlocked ){
 					FloatColor lightColor = (*i)->color;
@@ -92,9 +93,10 @@ void World::cast( CRay& ray ){
 			//}
 			}
 			ray.ray.p1 = temp;
-			ray.finishCast( false, true );
+			ray.addColor( ray.castColor, ray.colorMixLeft * (65535 - ray.objLastHit->reflect) / 65535, ray.lightColor );
+			//ray.finishCast( false, true );
 		}
-		if( ray.color.a > 0 && ray.bounceCount<MAX_BOUNCES && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
+		if( ray.colorMixLeft > 0 && ray.bounceCount<MAX_DEPTH && ray.normalVec!=Point() ){//Could also be reflect>0 if there are issues
 			//ray.addColor(  Color(  0,  0,  0,  (uint16_t)( ray.objLastHit->fresnel  *  sqrt( dot( (ray.ray.p1 - ray.ray.p2) / ray.ray.getLength(), ray.normalVec) ) )  )  );//Adds darkness to account for Fresnel equations stuff
 
 			{//brackets are here to tell compiler that temp is no longer needed after this
@@ -107,14 +109,16 @@ void World::cast( CRay& ray ){
 			ray.lightColor.g = 0;
 			ray.lightColor.b = 0;
 			ray.normalVec = Point();
-			ray.setDist = F_INFINITY;
+			ray.hitDist = F_INFINITY;
 			ray.escape = true;
 			this->cast( ray );
 		}
 	}
-	else{
+	else{//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<This shouldn't be here??
 		ray.addLight(  FloatColor( 1 )  );
-		ray.finishCast( false, true );
+		//ray.finishCast( false, true );
+		ray.addColor( ray.castColor, ray.colorMixLeft * (65535 - ray.objLastHit->reflect) / 65535, ray.lightColor );
+
 	}
 }
 

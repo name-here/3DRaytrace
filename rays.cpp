@@ -19,45 +19,6 @@ inline double dist3D( Point p1, Point p2 ){
 }
 
 
-Color::Color( uint16_t setR, uint16_t setG, uint16_t setB, uint16_t setA ){
-	r = setR;
-	g = setG;
-	b = setB;
-	a = setA;
-}
-
-Color::Color( uint16_t brightness, uint16_t setA ){
-	r = brightness;
-	g = brightness;
-	b = brightness;
-	a = setA;
-}
-
-Color::Color(){
-	r = 0;
-	g = 0;
-	b = 0;
-	a = 65535;
-}
-
-FloatColor::FloatColor( double setR, double setG, double setB ){
-	r = setR;
-	g = setG;
-	b = setB;
-}
-
-FloatColor::FloatColor( double brightness ){
-	r = brightness;
-	g = brightness;
-	b = brightness;
-}
-
-FloatColor::FloatColor(){
-	r = 0;
-	g = 0;
-	b = 0;
-}
-
 
 Ray::Ray( Point setP1, Point setP2 ){
 	p1 = setP1;
@@ -106,23 +67,24 @@ CRay::CRay( Ray setRay ){
 	color.r = 0;
 	color.g = 0;
 	color.b = 0;
-	color.a = 65535;
-	setPos.x = F_INFINITY;
-	setPos.y = F_INFINITY;
-	setPos.z = F_INFINITY;
-	setDist = F_INFINITY;
+	colorMixLeft = 65535;
+	hitPos.x = F_INFINITY;
+	hitPos.y = F_INFINITY;
+	hitPos.z = F_INFINITY;
+	hitDist = F_INFINITY;
 	escape = true;
 	bounceCount = 0;
 }
 
-void CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec/*, bool ignoreDirection*/ ){
+void CRay::intersect( Object* object, Color toSet, /*uint16_t toSetAlpha,*/ Point hit, double dist, Point objNormalVec/*, bool ignoreDirection*/ ){
 	//if( (ignoreDirection  ||  /*ray.pointsAt( hit )*/ true ) && //this line is probably unnecessary (if something fails this test, something probably went wrong elsewhere)
-	if( dist <= setDist ){
+	if( dist <= hitDist ){
 		objLastHit = object;
 		normalVec = objNormalVec;
-		setDist = dist;
-		setPos = hit;
-		setCastColor = toSet;
+		hitDist = dist;
+		hitPos = hit;
+		castColor = toSet;
+		//setCastColorAlpha = toSetAlpha;
 		/*//if( toSet.a > 0 ){
 			setCastColor.r = toSet.r;
 			setCastColor.g = toSet.g;
@@ -142,7 +104,7 @@ void CRay::addLight( FloatColor addLightColor ){
 }
 
 /*void CRay::castBackground( Color backgroundColor ){
-	if( escape ){//setDist >= F_INFINITY
+	if( escape ){//hitDist >= F_INFINITY
 		objLastHit = nullptr;
 		normalVec.x = 0;
 		normalVec.y = 0;
@@ -152,36 +114,39 @@ void CRay::addLight( FloatColor addLightColor ){
 	}
 }*/
 
-void CRay::addColor( Color addColor, FloatColor addLightColor ){
-	double temp = (uint64_t)addColor.r  *  addColor.a  *  color.a / 4294836225  *  addLightColor.r  +  color.r;
+void CRay::addColor( Color addColor, uint16_t addColorAlpha, FloatColor addLightColor ){
+	//if( addLightColor.r < 0 ){ addLightColor.r = 0; }//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<INEFFICIENT!!
+	//if( addLightColor.g < 0 ){ addLightColor.g = 0; }
+	//if( addLightColor.b < 0 ){ addLightColor.b = 0; }
+	double temp = (uint64_t)addColor.r  *  addColorAlpha  *  colorMixLeft / 4294836225  *  addLightColor.r  +  color.r;
 	if( temp >= 65535 ){ color.r = 65535; }
 	else{ color.r = (uint16_t)temp; }
 
-	temp = (uint64_t)addColor.g  *  addColor.a  *  color.a / 4294836225  *  addLightColor.g  +  color.g;
+	temp = (uint64_t)addColor.g  *  addColorAlpha  *  colorMixLeft / 4294836225  *  addLightColor.g  +  color.g;
 	if( temp >= 65535 ){ color.g = 65535; }
 	else{ color.g = (uint16_t)temp; }
 
-	temp = (uint64_t)addColor.b  *  addColor.a  *  color.a / 4294836225  *  addLightColor.b  +  color.b;
+	temp = (uint64_t)addColor.b  *  addColorAlpha  *  colorMixLeft / 4294836225  *  addLightColor.b  +  color.b;
 	if( temp >= 65535 ){ color.b = 65535; }
 	else{ color.b = (uint16_t)temp; }
-	//color.r +=  (uint16_t)(  (uint64_t)addColor.r  *  addColor.a  *  color.a / 4294836225  *  addLightColor.r  );
-	//color.g +=  (uint16_t)(  (uint64_t)addColor.g  *  addColor.a  *  color.a / 4294836225  *  addLightColor.g  );
-	//color.b +=  (uint16_t)(  (uint64_t)addColor.b  *  addColor.a  *  color.a / 4294836225  *  addLightColor.b  );
-	color.a =  (uint32_t)color.a  *  (65535 - addColor.a) / 65535;
+	//color.r +=  (uint16_t)(  (uint64_t)addColor.r  *  addColor.a  *  colorMixLeft / 4294836225  *  lightColor.r  );
+	//color.g +=  (uint16_t)(  (uint64_t)addColor.g  *  addColor.a  *  colorMixLeft / 4294836225  *  lightColor.g  );
+	//color.b +=  (uint16_t)(  (uint64_t)addColor.b  *  addColor.a  *  colorMixLeft / 4294836225  *  lightColor.b  );
+	colorMixLeft =  (uint32_t)colorMixLeft  *  (65535 - addColorAlpha) / 65535;
 }
 
-void CRay::finishCast( bool doSetPos, bool doSetColor ){
-	if( doSetPos ){
-		ray.p2 = setPos;
-	}
-	if( doSetColor ){
-		addColor( setCastColor, lightColor );
-	}
-	//color.r +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.r * setCastColor.a * color.a / 4294836225 ) * lightColor.r / 65535   /*+   (uint64_t)color.r * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-	//color.g +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.g * setCastColor.a * color.a / 4294836225 ) * lightColor.g / 65535   /*+   (uint64_t)color.g * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-	//color.b +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.b * setCastColor.a * color.a / 4294836225 ) * lightColor.b / 65535   /*+   (uint64_t)color.b * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-	//color.a = (uint32_t)color.a * (65535 - setCastColor.a) / 65535;
- 	 //if( setDist < F_INFINITY ){ escape = false; }
-}
+//void CRay::finishCast( bool doSetPos, bool doSetColor ){
+//	if( doSetPos ){
+//		ray.p2 = hitPos;
+//	}
+//	if( doSetColor ){
+//		addColor( setCastColor, setCastColorAlpha, lightColor );
+//	}
+//	//color.r +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.r * setCastColor.a * color.a / 4294836225 ) * lightColor.r / 65535   /*+   (uint64_t)color.r * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
+//	//color.g +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.g * setCastColor.a * color.a / 4294836225 ) * lightColor.g / 65535   /*+   (uint64_t)color.g * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
+//	//color.b +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.b * setCastColor.a * color.a / 4294836225 ) * lightColor.b / 65535   /*+   (uint64_t)color.b * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
+//	//color.a = (uint32_t)color.a * (65535 - setCastColor.a) / 65535;
+// 	 //if( hitDist < F_INFINITY ){ escape = false; }
+//}
 
 

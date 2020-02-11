@@ -15,6 +15,7 @@ class Object{
 		virtual ~Object() = default;
 		virtual bool cast( CRay& ray, bool isShadow ) = 0;//isShadow is used if only checking for intersection (used for lighting)
 		bool doLighting;
+
 		uint16_t reflect;//reflectiveness (0-65535)
 		uint16_t fresnel;//strength of effect making reflective objects darker for higher angles of incidence (0-65535, higher is darker)
 		double indexOfRefraction;//index of refraction of material
@@ -35,6 +36,8 @@ class Tri: public Object{
 		double p3Y;
 
 		Color color;
+		uint16_t opacity;
+
 		Tri( Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setReflect = 0, uint16_t setFresnel = 49151 );
 		bool cast( CRay& ray, bool isShadow );
 };
