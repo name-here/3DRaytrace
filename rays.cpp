@@ -76,25 +76,15 @@ CRay::CRay( Ray setRay ){
 	bounceCount = 0;
 }
 
-void CRay::intersect( Object* object, Color toSet, /*uint16_t toSetAlpha,*/ Point hit, double dist, Point objNormalVec/*, bool ignoreDirection*/ ){
-	//if( (ignoreDirection  ||  /*ray.pointsAt( hit )*/ true ) && //this line is probably unnecessary (if something fails this test, something probably went wrong elsewhere)
+void CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec ){
 	if( dist <= hitDist ){
 		objLastHit = object;
 		normalVec = objNormalVec;
 		hitDist = dist;
 		hitPos = hit;
 		castColor = toSet;
-		//setCastColorAlpha = toSetAlpha;
-		/*//if( toSet.a > 0 ){
-			setCastColor.r = toSet.r;
-			setCastColor.g = toSet.g;
-			setCastColor.b = toSet.b;
-		//}
-		setCastColor.a = toSet.a;*/
 		escape = false;
-		//return true;
 	}
-	//return false;
 }
 
 void CRay::addLight( FloatColor addLightColor ){
@@ -142,10 +132,7 @@ void CRay::addColor( Color addColor, uint16_t addColorAlpha, FloatColor addLight
 //	if( doSetColor ){
 //		addColor( setCastColor, setCastColorAlpha, lightColor );
 //	}
-//	//color.r +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.r * setCastColor.a * color.a / 4294836225 ) * lightColor.r / 65535   /*+   (uint64_t)color.r * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-//	//color.g +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.g * setCastColor.a * color.a / 4294836225 ) * lightColor.g / 65535   /*+   (uint64_t)color.g * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-//	//color.b +=/*removed stupid-seeming color mixing stuff and changed to +=*/ (uint32_t)( (uint64_t)setCastColor.b * setCastColor.a * color.a / 4294836225 ) * lightColor.b / 65535   /*+   (uint64_t)color.b * ( 4294836225  -  (uint32_t)setCastColor.a * color.a / 4294836225 )*/;
-//	//color.a = (uint32_t)color.a * (65535 - setCastColor.a) / 65535;
+//
 // 	 //if( hitDist < F_INFINITY ){ escape = false; }
 //}
 

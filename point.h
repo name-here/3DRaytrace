@@ -12,7 +12,6 @@ class Point{
 		
 		Point& operator+=( const Point& toAdd );
 		Point& operator-=( const Point& toSub );
-		//Point& operator*=( const Point& toMult );
 		Point& operator*=( const double toMult );
 		Point& operator/=( const double toDiv );
 		double dot( const Point& vec );
@@ -27,10 +26,6 @@ inline Point operator-( Point pos1, const Point& pos2 ){
 	pos1 -= pos2;
 	return pos1;
 }
-/*inline Point operator*( Point pos1, const Point& pos2 ){
-	pos1 *= pos2;
-	return pos1;
-}*/
 inline Point operator*( Point pos, const double& num ){
 	pos *= num;
 	return pos;

@@ -25,7 +25,6 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		Ray ray;
 
 		Color castColor;//color gotten from casting against objects (color to be mixed in)
-		//uint16_t setCastColorAlpha;
 		Color color;
 		uint16_t colorMixLeft;//the amount of the ray's final color that is still left to be calculated and mixed in.  This is used to weight mixing more colors with the ray's current color variable.
 
@@ -47,10 +46,9 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		Point normalVec;//normal vector of the last object hit (ObjLastHit) at the intersection point
 
 		CRay( Ray setRay = Ray() );
-		void intersect( Object* object, Color toSet, /*uint16_t toSetAlpha,*/ Point hit, double dist, Point objNormalVec /*, bool ignoreDirection = false*/ );//previously returned whether or not there was an intersection
-		//NO LONGER RELEVANT: for intersect(), toSet.a tells CRay how much of color could possibly be filled by other colors (ex. how much of the final color will come from following rendering passes)
+		void intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec );//previously returned whether or not there was an intersection
 		void addLight( FloatColor lightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
-		void castBackground( Color backgroundColor );
+		//void castBackground( Color backgroundColor );
 		void addColor( Color addColor, uint16_t addColorAlpha = 65535, FloatColor addLightColor = FloatColor( 1 ) );
 		//void finishCast( bool doSetPos, bool doSetColor );
 };

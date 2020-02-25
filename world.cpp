@@ -12,9 +12,9 @@
 inline double square( double num ){
 	return num*num;
 }
-/*inline?*/ double dmod(double num1, double num2) {
+/* double dmod(double num1, double num2) {// (should be inline?)
     return num1  -  (int)(num1 / num2) * num2;
-}
+} */
 
 /*World::World( std::vector<Object*>&& setObjList )
 	: objList( setObjList )
@@ -36,7 +36,7 @@ World::World( Color setBackgroundColor ){
 
 void World::cast( CRay& ray ){
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
-		(*i)->cast( ray, false );
+		(*i)->cast( ray, false );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS FUNCTION SHOULD USE THE BOOL RETURNED BY CAST!
 	}
 	//ray.intersect( 0, Color( 38400, 51200, 65535, 65535 ), Point( F_INFINITY, F_INFINITY, F_INFINITY ), F_INFINITY, Point(), true );
 	//ray.castBackground( backgroundColor );
@@ -145,13 +145,15 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 						bTotal += cRay.color.b;
 					}
 				}
-				/*if( pxlY > drawHeight/2 ){//if grayscale, set each color channel to the average of all color channels
-					uint64_t total = ( rTotal + gTotal + bTotal ) / 3;//total probably doesn't have to be 64 bits (otherwise could just put average in rTotal first and copy to other channels)
+
+				//if( pxlX > drawWidth/2 ){//if grayscale, set each color channel to the average of all color channels
+					/*uint64_t total = ( rTotal + gTotal + bTotal ) / 3;//total probably doesn't have to be 64 bits (otherwise could just put average in rTotal first and copy to other channels)
 					if( total > 4294967295 ){ total = 4294967295; }
-					rTotal = total;
-					gTotal = total;
-					bTotal = total;
-				}*/
+					rTotal = total * pxlX / drawWidth  -  rTotal * pxlX / drawWidth + rTotal;
+					gTotal = total * pxlX / drawWidth  -  gTotal * pxlX / drawWidth + gTotal;
+					bTotal = total * pxlX / drawWidth  -  bTotal * pxlX / drawWidth + bTotal;*/
+				//}
+
 				for( unsigned int setSubX = 0; setSubX < pixelSize; setSubX ++ ){
 					for( unsigned int setSubY = 0; setSubY < pixelSize; setSubY ++ ){
 						if( pxlX + setSubX < drawWidth  &&  pxlY + setSubY < drawHeight ){

@@ -138,15 +138,51 @@ bool Ball::cast( CRay& ray, bool isShadow ){
 
 AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, bool setDoLighting, uint16_t setReflect, uint16_t setFresnel ){
 	pos = setPos;
-	size = setSize;
+	size[0] = setSize.x;
+	size[1] = setSize.y;
+	size[2] = setSize.z;
 	color = setColor;
 	doLighting = setDoLighting;
 	reflect = setReflect;
 	fresnel = setFresnel;
 }
 
-bool AxisBox::cast( CRay& ray, bool isShadow ){
-	double totalDistOverLength = ( pos.z - ray.ray.p1.z ) / ( ray.ray.p2.z - ray.ray.p1.z );
+bool AxisBox::cast( CRay& ray, bool isShadow ){//replace this logic with looping through sideNormals[], and using cosAngleToUVec(normal) <= 0 check for each.
+	for( int i = 0; i < 3; i ++ ){
+		if(  castSidePair( ray, isShadow, i )  ){ return true; }
+	}
+	return false;
+
+
+
+	/*Point sideNormal;
+
+	if(  ( ray.ray.p2.x > ray.ray.p1.x )  ==  ( pos.x > ray.ray.p1.x )  ){
+		sideNormal.set( -1, 0, 0 );
+	}
+	else{
+		sideNormal.set( 1, 0, 0 );
+	}
+	if(  castSidePair( ray, isShadow, sideNormal )  ){ return true; }
+
+	if(  ( ray.ray.p2.y > ray.ray.p1.y )  ==  ( pos.y > ray.ray.p1.y )  ){
+		sideNormal.set( 0, -1, 0 );
+	}
+	else{
+		sideNormal.set( 0, 1, 0 );
+	}
+	if(  castSidePair( ray, isShadow, sideNormal )  ){ return true; }
+
+	if(  ( ray.ray.p2.z > ray.ray.p1.z )  ==  ( pos.z > ray.ray.p1.z )  ){
+		sideNormal.set( 0, 0, -1 );
+	}
+	else{
+		sideNormal.set( 0, 0, 1 );
+	}
+	if(  castSidePair( ray, isShadow, sideNormal )  ){ return true; }*/
+
+
+	/*double totalDistOverLength = ( pos.z - ray.ray.p1.z ) / ( ray.ray.p2.z - ray.ray.p1.z );
 	double hitX = ( ray.ray.p2.x - ray.ray.p1.x ) * totalDistOverLength + ray.ray.p1.x;
 	double hitY = ( ray.ray.p2.y - ray.ray.p1.y ) * totalDistOverLength + ray.ray.p1.y;
 	if(  abs( hitX - pos.x ) < size.x  &&  abs( hitY - pos.y ) < size.y  &&  abs(pos.z - ray.ray.p1.z) > INTERSECT_ERR  ){
@@ -159,6 +195,38 @@ bool AxisBox::cast( CRay& ray, bool isShadow ){
 		else if( ray.ray.pointsAt( intersection ) ){
 			ray.intersect(  this,  Color( color.r, color.g, color.b ),  intersection,  dist3D( ray.ray.p1, Point(hitX, hitY, pos.z) ),  Point( 0, 0, -1 )  );
 			return true;
+		}
+	}
+	return false;*/
+}
+
+bool AxisBox::castSidePair( CRay& ray, bool isShadow, unsigned char/*should just be int?*/ axis ){//<<<<<<largely copied from Tri::cast(), so should either have shared function, or optimize this using it's specific use for a cube
+	if( axis >= 3 ){ return false; }//prevent trying to read outside the array if given invalid input
+
+	Point sideNormal;
+	if(  ray.ray.cosAngleToUVec( sideNormals[axis] )  <=  0  ){
+		sideNormal = sideNormals[axis];
+	}
+	else{
+		sideNormal = sideNormals[axis] * -1;
+	}
+	Point sideCenter = pos + sideNormal * size[axis];
+
+	double rayLength = ray.ray.getLength();
+	Point rayUVec = (ray.ray.p2 - ray.ray.p1) / rayLength;//unit vector in direction of ray.ray (length 1)
+	double distance = (sideCenter - ray.ray.p1 ).dot( sideNormal )  /  rayUVec.dot( sideNormal );
+	if( distance >= 0 ){
+		Point hit = ray.ray.p1 + (rayUVec * distance);
+		double pointX = ( hit - sideCenter ).dot(  sideNormals[ (axis + 1) % 3 ]  );
+		double pointY = ( hit - sideCenter ).dot(  sideNormals[ (axis + 2) % 3 ]  );
+		if(  abs( pointX ) <= size[ (axis + 1) % 3 ]  &&  abs( pointY ) <= size[ (axis + 2) % 3 ]  ){
+			if( !isShadow ){
+				ray.intersect( this, color, hit, distance, sideNormal );
+				return true;
+			}
+			else if( distance <= rayLength - INTERSECT_ERR ){
+				return true;
+			}
 		}
 	}
 	return false;

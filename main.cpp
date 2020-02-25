@@ -29,24 +29,31 @@ SDL_Event event;
 int windowWidth = 100;//600
 int windowHeight = 100;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
-double FOVMultiplier = .5;//Multiplier for the field of view
-//float mouseMoveStepX = 0.375;
-//float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
+double FOVMultiplier = 0.5;//Multiplier for the field of view
+
+int defaultPixelSize = 4;//to store the pixelSize to change back to after releasing [Q] key
+int pixelSize = defaultPixelSize;//size of rendered pixels (number of (real) pixels across for chunky displayed pixels)
+int smallPixelSize = 1;//changed to after pressing [Q] key
+int detail = 1;//grid size of rendered points within each pixel, so the square of this number is the number of rays cast for each pixel — more is much slower, but makes edges smoother
 
 int frameCount = 0;
 Uint32 lastTicks;
 Uint32 thisTicks;
 Uint32 frameRate;
 Uint32 minFrameTicks = 40;//equivalent of capping framerate, but defined in ticks per frame
+
 int mouseX = 0;
 int mouseY = -windowHeight/2;
 bool mousePressed;
+//float mouseMoveStepX = 0.375;
+//float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
+
 //bool print;
 //int detail = 1;
 //int detailSq = detail*detail;
 
 bool doControl = false;//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<All these variables and related control code not needed when a program is built around this rendering engine
-bool qDown = false;
+//bool qDown = false;
 bool wDown = false;
 bool aDown = false;
 bool sDown = false;
@@ -68,28 +75,28 @@ void setup() {
 
 	world.addLight(  new Light( Point( UNIT, UNIT*2, -UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
 	world.addLight(  new Light( Point( -UNIT*2, UNIT*2, -UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
-	//world.addLight(  new Light( Point( 0, UNIT, -UNIT*5/2 ), FloatColor( -5 ) )  );//light3
+	//world.addLight(  new Light( Point( 0, UNIT, -UNIT*5/2 ), FloatColor( -2 ) )  );//light3
 	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
 	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
 	//world.addObj(  new Ball( world.lightList[2]->pos, UNIT/30, Color( 10000 ), false )  );//lightBall3
 
-	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 )/*, true, 40000*/ )  );//testPlane1
-	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
+	//world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 )/*, true, 40000*/ )  );//testPlane1
+	//world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
 	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0 ), true, 50000 )  );//testBall1
 	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ) )  );//testBall2
 
-	//world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT/2 ), Color( 10000, 0, 50000 ) )  );//testCube1
+	//world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
+
+	//world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT ), Color( 10000, 0, 50000 ) )  );//testCube1
 
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
-			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000, 65535 ), 30000 ) );//littleBall
+			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000 ), 30000 ) );//littleBall
 		}
 	}*/
-
-	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
 }
 
 
@@ -142,7 +149,7 @@ void draw() {
 	//world.camList[0]->pos.set( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * 4 * abs( sin(frameCount*M_PI/30) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, 1 + (!qDown)*3, 1, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight-1, 0, 1 );
 }
 
 
@@ -226,7 +233,10 @@ void mainLoop(){
 			mousePressed = false;
 		}
 		else if( event.type == SDL_KEYDOWN ){
-			if( event.key.keysym.sym == SDLK_q ){ qDown = true; }
+			if( event.key.keysym.sym == SDLK_q ){
+				pixelSize = smallPixelSize;
+				//detail = 2;
+			}
 			else if( event.key.keysym.sym == SDLK_w ){ wDown = true; }
 			else if( event.key.keysym.sym == SDLK_a ){ aDown = true; }
 			else if( event.key.keysym.sym == SDLK_s ){ sDown = true; }
@@ -243,7 +253,10 @@ void mainLoop(){
 			}
 		}
 		else if( event.type == SDL_KEYUP ){
-			if( event.key.keysym.sym == SDLK_q ){ qDown = false; }
+			if( event.key.keysym.sym == SDLK_q ){
+				pixelSize = defaultPixelSize;
+				//detail = 1;
+			}
 			else if( event.key.keysym.sym == SDLK_w ){ wDown = false; }
 			else if( event.key.keysym.sym == SDLK_a ){ aDown = false; }
 			else if( event.key.keysym.sym == SDLK_s ){ sDown = false; }

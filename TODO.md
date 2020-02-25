@@ -51,6 +51,7 @@
 - Make shadows more realistic (add indirect lighting, integrate into normal cast)
 - Prevent casts from checking direct light from light sources behind object hit by ray (use set normal?)
 - Optimize Triangle::cast(), especially with relation to calculations finding if and where ray hits plane (optimization could include precalculating more values/properties)
+- Make more variables unsigned that should be
 
 ### Done:
 

@@ -41,12 +41,6 @@ Point& Point::operator-=( const Point& toSub ){
 	z -= toSub.z;
 	return *this;
 }
-/*Point& Point::operator*=( const Point& toMult ){
-	x *= toMult.x;
-	y *= toMult.y;
-	z *= toMult.z;
-	return *this;
-}*/
 Point& Point::operator*=( const double toMult ){
 	x *= toMult;
 	y *= toMult;

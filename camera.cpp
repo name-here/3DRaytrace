@@ -23,16 +23,13 @@ void Camera::rotate( double setAngleX, double setAngleY ){//Can probably be opto
 	up.x = sin( setAngleX ) * cos( M_PI/2 + setAngleY );//up is a unit vector pointing directly up from the camera.
 	up.y = sin( M_PI/2 + setAngleY );
 	up.z = cos( setAngleX ) * cos( M_PI/2 + setAngleY );
-	//up.x = 0;
-	//up.y = 1;
-	//up.z = 0;
 	right.x = sin( setAngleX + M_PI/2 );//right is a unit vector pointing directly to the right the camera.
 	right.y = 0;
 	right.z = cos( setAngleX + M_PI/2 );
 }
 void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	ray.ray.p1 = pos;
-	ray.ray.p2 = pos  +  front * planeDist  +  right * screenX  +  up * screenY;
+	//ray.ray.p2 = pos  +  front * planeDist  +  right * screenX  +  up * screenY;
 	ray.color.r = 0;
 	ray.color.g = 0;
 	ray.color.b = 0;

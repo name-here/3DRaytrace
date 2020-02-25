@@ -53,12 +53,14 @@ class Ball: public Object{
 };
 
 class AxisBox: public Object{
+	Point sideNormals[3] = {  Point( 1, 0, 0 ),  Point( 0, 1, 0 ),  Point( 0, 0, 1 )  };//should be unit vectors, at least for a cube
 	public:
 		Point pos;//at the center of the cube
-		Point size;//x, y, and z distance from center to faces
+		double size[3];//x, y, and z distance from center to faces
 		Color color;
 		AxisBox( Point setPos = Point(), Point setSize = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setReflect = 0, uint16_t setFresnel = 49151 );
 		bool cast( CRay& ray, bool isShadow );
+		bool castSidePair( CRay& ray, bool isShadow, unsigned char axis );
 };
 
 class Plane: public Object{
