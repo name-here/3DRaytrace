@@ -38,7 +38,7 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 
 		bool escape;
 
-		FloatColor lightColor;
+		//FloatColor lightColor;
 
 		uint32_t bounceCount;//Make smaller to reflect max bounces (max possible value)?
 
@@ -47,7 +47,7 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 
 		CRay( Ray setRay = Ray() );
 		void intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec );//previously returned whether or not there was an intersection
-		void addLight( FloatColor lightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
+		//void addLight( FloatColor lightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
 		//void castBackground( Color backgroundColor );
 		void addColor( Color addColor, uint16_t addColorAlpha = 65535, FloatColor addLightColor = FloatColor( 1 ) );
 		//void finishCast( bool doSetPos, bool doSetColor );

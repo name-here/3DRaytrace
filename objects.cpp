@@ -26,7 +26,7 @@ Light::Light( Point setPos, FloatColor setColor ){
 
 
 
-Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLighting, uint16_t setReflect, uint16_t setFresnel ){
+Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){
 	p1 = setP1;
 	p2 = setP2;
 	p3 = setP3;
@@ -41,8 +41,9 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLight
 
 	color = setColor;
 	doLighting = setDoLighting;
-	reflect = setReflect;
-	fresnel = setFresnel;
+	roughness = setRoughness;
+	opacity = setOpacity;
+	IOR = setIOR;
 }
 
 bool Tri::cast( CRay& ray, bool isShadow ){
@@ -77,14 +78,15 @@ bool Tri::cast( CRay& ray, bool isShadow ){
 }
 
 
-Ball::Ball( Point setPos, double setRadius, Color setColor, bool setDoLighting, uint16_t setReflect, uint16_t setFresnel ){
+Ball::Ball( Point setPos, double setRadius, Color setColor, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){
 	pos = setPos;
 	radius = setRadius;
 	radiusSq = setRadius*setRadius;
 	color = setColor;
 	doLighting = setDoLighting;
-	reflect = setReflect;
-	fresnel = setFresnel;
+	roughness = setRoughness;
+	opacity = setOpacity;
+	IOR = setIOR;
 }
 bool Ball::cast( CRay& ray, bool isShadow ){
 	double lineX1 = dist3D( ray.ray.p1, pos );
@@ -123,9 +125,9 @@ bool Ball::cast( CRay& ray, bool isShadow ){
 				}
 			}
 			else if( dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				ray.intersect(  this,  Color( color.r, color.g, color.b),  hit,  distance,  Point( (hit - pos) / radius )  );
-				//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-reflect ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
-				/*if( reflect > 0 ){
+				ray.intersect(  this,  color,  hit,  distance,  Point( (hit - pos) / radius )  );
+				//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-roughness ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
+				/*if( roughness > 0 ){
 					return Point( (hit-pos) / radius );
 				}*/  //no longer returned this way.
 				return true;
@@ -136,15 +138,16 @@ bool Ball::cast( CRay& ray, bool isShadow ){
 }
 
 
-AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, bool setDoLighting, uint16_t setReflect, uint16_t setFresnel ){
+AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){
 	pos = setPos;
 	size[0] = setSize.x;
 	size[1] = setSize.y;
 	size[2] = setSize.z;
 	color = setColor;
 	doLighting = setDoLighting;
-	reflect = setReflect;
-	fresnel = setFresnel;
+	roughness = setRoughness;
+	opacity = setOpacity;
+	IOR = setIOR;
 }
 
 bool AxisBox::cast( CRay& ray, bool isShadow ){//replace this logic with looping through sideNormals[], and using cosAngleToUVec(normal) <= 0 check for each.
@@ -233,15 +236,16 @@ bool AxisBox::castSidePair( CRay& ray, bool isShadow, unsigned char/*should just
 }
 
 
-Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColor1, Color setColor2, bool setDoLighting, uint16_t setReflect, uint16_t setFresnel ){
+Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColor1, Color setColor2, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){
 	axis = setAxis;
 	dist = setDist;
 	gridSize = setGridSize;
 	color1 = setColor1;
 	color2 = setColor2;
 	doLighting = setDoLighting;
-	reflect = setReflect;
-	fresnel = setFresnel;
+	roughness = setRoughness;
+	opacity = setOpacity;
+	IOR = setIOR;
 }
 
 bool Plane::cast( CRay& ray, bool isShadow ){
@@ -303,7 +307,7 @@ bool Plane::cast( CRay& ray, bool isShadow ){
 				return true;
 			}
 		}
-		/*if( reflect > 0 ){
+		/*if( roughness > 0 ){
 			if( axis == 0 ){
 				return Point( 1, 0, 0 );
 			}

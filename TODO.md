@@ -12,7 +12,7 @@
 - Find way of updating all relevant planeDist on window resize (difficult if multiple cameras)
 - Add textured objects (texture system, textures maybe as part of generic Object?)
 - Use square of distance to check closest to save sqrt() call
-- Add multithreading (COMPLICATED)
+- Add multithreading (COMPLICATED?)
 - Don't include same inline functions in multiple files
 - Add high DPI capability
 - Move all global variables into main() or other functions
@@ -38,6 +38,7 @@
 - Change doubles that should never be negative to be unsigned
 - Add ambient light (eventually incl. ambient occlusion)
 - Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )
+- Add a Material object, and have each Object have a pointer to a Material  (Alternatively, could have Objects, which have pointers both to a Material and a Geometry object, which would be the particular shape)
 
 ### Partially Done:
 
@@ -97,11 +98,13 @@
 - Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
 - Move Color to new file
 - Move color setting into world.cast (??)
-- make Vector object (separate from Point object?) to distinguish between uses
+- Make Vector object (separate from Point object?) to distinguish between uses
 - Add player / first-person object(class) which does camera controls
 - Add a Point2D class with most of the same functions as Point (rename Point to Point3D?)
 - Use half-sphere version of brother's points on a sphere project (or at least the idea) to figure out how to randomly but evenly destribute directions to cast rays to calculate diffuse reflection and scattering
 - Make objects first check normals (if applicable) to avoid checking objects that are not visible
 - Move setting CRay color from its castColor back to a function in CRay rather than a function in World
+- Rename Point to Vector
+- Make CRay.color and related colors use FloatColor
 
 

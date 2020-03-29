@@ -16,13 +16,23 @@ class World{
 		std::vector<Object*> objList;
 		std::vector<Camera*> camList;
 		Color backgroundColor;
+
 		//World( std::vector<Object*>&& setObjList );
 		//World();
 		World( Color setBackgroundColor = Color() );
+
 		void addObj( Object* object );
 		void addLight( Light* light );
 		void addCam( Camera* camera );//these add functions should return a pointer to the thing added, or an ID for accessing or removing it.
+
 		void cast( CRay& ray );
+		void recast( CRay& ray );
+
+		void doDifuseReflect( CRay& ray );
+		void doRefractReflect( CRay& ray );
+		void doDirectLight( CRay& ray, uint16_t mixAmount );
+		void doReflect( CRay& ray );
+
 		void draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsigned int height, unsigned int pixelSize = 1, unsigned int detail = 1, unsigned int drawWidth = 0, unsigned int drawHeight = 0, unsigned int startX = 0, unsigned int startY = 0 );
 		~World();
 };

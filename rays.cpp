@@ -87,11 +87,11 @@ void CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point
 	}
 }
 
-void CRay::addLight( FloatColor addLightColor ){
+/*void CRay::addLight( FloatColor addLightColor ){
 	lightColor.r += addLightColor.r;
 	lightColor.g += addLightColor.g;
 	lightColor.b += addLightColor.b;
-}
+}*/
 
 /*void CRay::castBackground( Color backgroundColor ){
 	if( escape ){//hitDist >= F_INFINITY
