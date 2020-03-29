@@ -107,7 +107,7 @@ void World::doRefractReflect( CRay& ray ){
 		}
 
 
-		Point refractDir = ;//direction of ray after refraction
+		//Point refractDir = ;//direction of ray after refraction
 
 		Point offset = (ray.hitPos - ray.ray.p1) / ray.hitDist * INTERSECT_ERR * 2;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
 		ray.ray.p2 =  ray.hitPos * 2  -  ray.ray.p1;
