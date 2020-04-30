@@ -11,6 +11,7 @@ class Color{
 		Color();
 };
 
+
 class FloatColor{//used for colors with no maximum and/or minimum value
 	public:
 		double r;
@@ -19,4 +20,33 @@ class FloatColor{//used for colors with no maximum and/or minimum value
 		FloatColor( double setR, double setG, double setB );
 		FloatColor( double brightness );
 		FloatColor();
+
+		FloatColor& operator+=( const FloatColor& toAdd );
+		FloatColor& operator-=( const FloatColor& toSub );
+		FloatColor& operator*=( const FloatColor& toMult );
+		FloatColor& operator*=( const double toMult );
+		FloatColor& operator/=( const double toDiv );
 };
+
+inline FloatColor operator+( FloatColor color1, const FloatColor& color2 ){
+	color1 += color2;
+	return color1;
+}
+inline FloatColor operator-( FloatColor color1, const FloatColor& color2 ){
+	color1 -= color2;
+	return color1;
+}
+inline FloatColor operator*( FloatColor color1, const FloatColor& color2 ){
+	color1 *= color2;
+	return color1;
+}
+inline FloatColor operator*( FloatColor color, const double& num ){
+	color *= num;
+	return color;
+}
+inline FloatColor operator/( FloatColor color, const double& num ){
+	color /= num;
+	return color;
+}
+
+

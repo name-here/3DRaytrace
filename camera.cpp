@@ -36,6 +36,8 @@ void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	//ray.lightColor.r = 0;
 	//ray.lightColor.g = 0;
 	//ray.lightColor.b = 0;
+	ray.currentIOR = 1;
+	ray.nextIOR = 1;
 	double temp = planeDist*planeDist  -  ( screenX*screenX + screenY*screenY ) * distortion;//square of the distance to the sphere being projected onto
 	if( temp >= 0 ){
 		ray.ray.p2 = pos  +  front * sqrt( temp )  +  right * screenX  +  up * screenY;//this projects rays through a sphere instead of a plane

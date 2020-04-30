@@ -68,6 +68,8 @@ CRay::CRay( Ray setRay ){
 	color.g = 0;
 	color.b = 0;
 	colorMixLeft = 65535;
+	currentIOR = 1;
+	nextIOR = 1;
 	hitPos.x = F_INFINITY;
 	hitPos.y = F_INFINITY;
 	hitPos.z = F_INFINITY;

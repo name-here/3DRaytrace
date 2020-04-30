@@ -21,6 +21,7 @@ Color::Color(){
 }
 
 
+
 FloatColor::FloatColor( double setR, double setG, double setB ){
 	r = setR;
 	g = setG;
@@ -38,3 +39,41 @@ FloatColor::FloatColor(){
 	g = 0;
 	b = 0;
 }
+
+
+FloatColor& FloatColor::operator+=( const FloatColor& toAdd ){
+	r += toAdd.r;
+	g += toAdd.g;
+	b += toAdd.b;
+	return *this;
+}
+
+FloatColor& FloatColor::operator-=( const FloatColor& toSub ){
+	r -= toSub.r;
+	g -= toSub.g;
+	b -= toSub.b;
+	return *this;
+}
+
+FloatColor& FloatColor::operator*=( const FloatColor& toMult ){
+	r *= toMult.r;
+	g *= toMult.g;
+	b *= toMult.b;
+	return *this;
+}
+
+FloatColor& FloatColor::operator*=( const double toMult ){
+	r *= toMult;
+	g *= toMult;
+	b *= toMult;
+	return *this;
+}
+
+FloatColor& FloatColor::operator/=( const double toDiv ){
+	r /= toDiv;
+	g /= toDiv;
+	b /= toDiv;
+	return *this;
+}
+
+

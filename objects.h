@@ -13,7 +13,7 @@ class Light{
 class Object{
 	public:
 		virtual ~Object() = default;
-		virtual bool cast( CRay& ray, bool isShadow ) = 0;//isShadow is used if only checking for intersection (used for lighting)
+		virtual bool cast( CRay& ray, bool isShadow = false, bool isInside = false ) = 0;//isShadow is used if only checking for intersection (used for lighting), and isInside is used for checking intersections 
 		bool doLighting;
 
 		uint16_t roughness;//roughness of the object (0-65535, where 0 is totally specular and 65535 is totally diffuse)
@@ -41,7 +41,7 @@ class Tri: public Object{
 		Color color;
 
 		Tri( Point setP1 = Point(), Point setP2 = Point(), Point setP3 = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
-		bool cast( CRay& ray, bool isShadow );
+		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 };
 
 class Ball: public Object{
@@ -51,7 +51,7 @@ class Ball: public Object{
 		double radiusSq;
 		Color color;
 		Ball( Point setPos = Point(), double setRadius = 0, Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
-		bool cast( CRay& ray, bool isShadow );
+		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 };
 
 class AxisBox: public Object{
@@ -61,8 +61,8 @@ class AxisBox: public Object{
 		double size[3];//x, y, and z distance from center to faces
 		Color color;
 		AxisBox( Point setPos = Point(), Point setSize = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
-		bool cast( CRay& ray, bool isShadow );
-		bool castSidePair( CRay& ray, bool isShadow, unsigned char axis );
+		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
+		bool castSidePair( CRay& ray, unsigned char axis, bool isShadow = false, bool isInside = false );
 };
 
 class Plane: public Object{
@@ -73,7 +73,7 @@ class Plane: public Object{
 		Color color1;
 		Color color2;
 		Plane( uint8_t setAxis = 0, double setDist = 0, double setGridSize = 1, Color setColor1 = Color(), Color setColor2 = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
-		bool cast( CRay& ray, bool isShadow );
+		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 };
 
 

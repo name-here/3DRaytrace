@@ -42,7 +42,7 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 
 		uint32_t bounceCount;//Make smaller to reflect max bounces (max possible value)?
 
-		Object* objLastHit;
+		Object* objLastHit = nullptr;
 		Point normalVec;//normal vector of the last object hit (ObjLastHit) at the intersection point
 
 		CRay( Ray setRay = Ray() );

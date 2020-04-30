@@ -26,8 +26,9 @@ inline double square( double num ){
 /*World::World(){
 	
 }*/
-World::World( Color setBackgroundColor ){
+World::World( Color setBackgroundColor, double setAirIOR ){
 	backgroundColor = setBackgroundColor;
+	airIOR = setAirIOR;
 }
 
 
@@ -38,11 +39,18 @@ World::World( Color setBackgroundColor ){
 
 void World::cast( CRay& ray ){
 	if( ray.colorMixLeft > 0 ){
+
 		for( auto i = objList.begin(); i!=objList.end(); ++i ){
 			(*i)->cast( ray, false );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Either World::cast() should use the bool returned by cast (removing need for CRay.escape?), or it should probably return void!
 		}
 
-		ray.ray.p2 = ray.hitPos;
+		if(  ray.objLastHit != nullptr  &&  ray.objLastHit->opacity < 65535  &&  ray.objLastHit->doLighting  ){
+			if( ray.objLastHit->cast( ray, false, true ) ){
+				ray.nextIOR = airIOR;
+			}
+		}
+
+		ray.ray.p2 = ray.hitPos;//is this necessary?  Should other things be updated to use hitPos instead?
 
 		if( ray.escape ){
 			ray.addColor( backgroundColor );
@@ -50,6 +58,7 @@ void World::cast( CRay& ray ){
 		}
 
 		else if( ray.objLastHit->doLighting ){
+			ray.nextIOR = ray.objLastHit->IOR;
 			if( ray.objLastHit->opacity == 65535 ){//is opaque
 				doDifuseReflect( ray );
 			}
@@ -72,6 +81,7 @@ void World::recast( CRay& ray ){
 	//ray.lightColor.r = 0;
 	//ray.lightColor.g = 0;
 	//ray.lightColor.b = 0;
+	ray.currentIOR = ray.nextIOR;
 	ray.normalVec = Point();
 	ray.hitDist = F_INFINITY;
 	ray.escape = true;
@@ -91,8 +101,9 @@ void World::doDifuseReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 void World::doRefractReflect( CRay& ray ){
 	if(  ray.bounceCount < MAX_DEPTH  /*&&  ray.objLastHit->roughness == 0  This is the only case that's being calculated, but no need to do nothing just because we have other values*/  ){
+		uint16_t reflectAmmount = 0;
 		if( ray.objLastHit->opacity > 0 ){
-			Ray originalRay = ray.ray;
+			/*Ray originalRay = ray.ray;
 			Point originalHit = ray.hitPos;
 			double originalHitDist = ray.hitDist;
 
@@ -103,14 +114,33 @@ void World::doRefractReflect( CRay& ray ){
 
 			ray.ray = originalRay;
 			ray.hitPos = originalHit;
-			ray.hitDist = originalHitDist;
+			ray.hitDist = originalHitDist;*/
+
+			reflectAmmount = ray.objLastHit->opacity;//this should be properly calculated, taking angle into account
+
+			CRay reflectRay = CRay();
+			reflectRay.ray = ray.ray;
+			reflectRay.normalVec = ray.normalVec;
+
+			uint32_t keepBounces = (uint64_t)( MAX_DEPTH - ray.bounceCount )  *  ( 65535 - reflectAmmount) / 65535;
+			reflectRay.bounceCount = ray.bounceCount + keepBounces;
+
+			doReflect( reflectRay );
+
+			ray.bounceCount = reflectRay.bounceCount - keepBounces;
 		}
 
 
-		//Point refractDir = ;//direction of ray after refraction
+		double IORRatio = (ray.currentIOR / ray.nextIOR);
+		Point rayDir = (ray.hitPos - ray.ray.p1) / ray.hitDist;//direction of ray before refraction
 
-		Point offset = (ray.hitPos - ray.ray.p1) / ray.hitDist * INTERSECT_ERR * 2;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
-		ray.ray.p2 =  ray.hitPos * 2  -  ray.ray.p1;
+		double c1 = -dot( ray.normalVec, rayDir );
+		double c2 = sqrt(  1  -  IORRatio*IORRatio * ( 1 - c1*c1 )  )  ;//*  -1 * (c1 < 0);//last bit is to correct the sometimes inverted output.  I'm not sure if this is right, since I didn't derive the equations, but it's definately wrong without it.
+		Point refractDir = IORRatio  *  (  rayDir  +  ray.normalVec * c1  )  -  ray.normalVec * c2;//direction of ray after refraction
+
+		Point offset = refractDir * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
+		
+		ray.ray.p2 =  ray.hitPos + refractDir;
 		ray.ray.p1 =  ray.hitPos  +  offset;
 		recast( ray );
 	}

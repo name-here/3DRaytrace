@@ -29,16 +29,23 @@
 - Go through entire code base and tweak formatting to be consistent
 - Give objects textures
 - Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane
-- Use a specific variable to store intersection point on CRay instead of using its Ray
 - Restructure all Object Cast() functions to be more efficient
 - Optimize all calculations with Point objects (use special instructions that act on more than one number at once?)
 - Make casting skip objects that are behind the direction of the cast and too small to possibly be intersected with (also exclude objects too far to the side?)
 - Restructure so that only position and distance are calculated for each intersection with a particular ray, and then other properties are found after the closest intersection is known
-- Change CRay's color property to us floatColor because it represents an ammount of light (which has no upper bound)
+- Change CRay's color property to use FloatColor because it represents an ammount of light (which has no upper bound)
 - Change doubles that should never be negative to be unsigned
 - Add ambient light (eventually incl. ambient occlusion)
 - Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )
 - Add a Material object, and have each Object have a pointer to a Material  (Alternatively, could have Objects, which have pointers both to a Material and a Geometry object, which would be the particular shape)
+- COLOR MIXING WITH FOR REFLECTION AND TRANSMISSION SHOULD MULTIPLY THE COLOR OF THE OBJECT (to tint) INSTEAD OF ADDING IT.  ALSO, GENERALLY FIX COLOR MIXING AND MAKE IT USE THE RIGHT COLOR VARIABLE TYPES
+  - Change CRay to have tintColor by which gets any color from lights gets multiplied when adding to the ray, and which gets multiplied by the color of things the ray passes through or is reflected by.
+  - Remove colorMixLeft and replace any logic that uses it
+- Add ammount reflected to World::doRefractReflect() (make it actually use the reflected ray), including adding total internal reflection
+- Finish making all Object::cast() functions actually use isInside
+- Rename Point to Vector3
+- Make CRay.color and related colors use FloatColor
+- Replace Color and FloatColor with Vector3 (renamed Point) and some sort of IntVector3
 
 ### Partially Done:
 
@@ -89,10 +96,13 @@
 - Fix frameRate showing too high when faster than minFrameTicks
 - Make frameRate work if running at more than 1000fps
 - Rename addColorAlpha in CRay::addColor to be more accurately descriptive
+- Separate alpha from color object (not needed for some uses of Color)
+- Use a specific variable to store intersection point on CRay instead of using its Ray
+- Remove Ray::CosAngleToUVec(), and redo some of the Tri::cast() code
+- Find and fix any and all possible divisions by 0
 
 ### Maybe Do:
 
-- Separate alpha from color object (not needed for some uses of Color)
 - Add and impliment/use ray.length
 - Optimize cross and dot products
 - Find way not to trust passed width and height values (bad values could allow for overflow and potential security vulnerability)
@@ -104,7 +114,5 @@
 - Use half-sphere version of brother's points on a sphere project (or at least the idea) to figure out how to randomly but evenly destribute directions to cast rays to calculate diffuse reflection and scattering
 - Make objects first check normals (if applicable) to avoid checking objects that are not visible
 - Move setting CRay color from its castColor back to a function in CRay rather than a function in World
-- Rename Point to Vector
-- Make CRay.color and related colors use FloatColor
 
 

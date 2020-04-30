@@ -46,8 +46,9 @@ Tri::Tri( Point setP1, Point setP2, Point setP3, Color setColor, bool setDoLight
 	IOR = setIOR;
 }
 
-bool Tri::cast( CRay& ray, bool isShadow ){
-	if(  ray.ray.cosAngleToUVec( normal )  <=  0  ){
+bool Tri::cast( CRay& ray, bool isShadow, bool isInside ){
+	//int normalFlip = isInside * 2  -  1;
+	if(  ray.ray.cosAngleToUVec( normal ) * ( 1 - isInside*2 )  <=  0  ){
 		double rayLength = ray.ray.getLength();
 		Point rayUVec = (ray.ray.p2 - ray.ray.p1) / rayLength;//unit vector in direction of ray.ray (length 1)
 		double distance = ( p1 - ray.ray.p1 ).dot( normal )  /  rayUVec.dot( normal );
@@ -88,7 +89,7 @@ Ball::Ball( Point setPos, double setRadius, Color setColor, bool setDoLighting, 
 	opacity = setOpacity;
 	IOR = setIOR;
 }
-bool Ball::cast( CRay& ray, bool isShadow ){
+bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 	double lineX1 = dist3D( ray.ray.p1, pos );
 	double dist1Sq = dist3DSq(pos, ray.ray.p2); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
 	double dist2 = dist3D( ray.ray.p1, ray.ray.p2 );
@@ -150,9 +151,9 @@ AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, bool setDoLightin
 	IOR = setIOR;
 }
 
-bool AxisBox::cast( CRay& ray, bool isShadow ){//replace this logic with looping through sideNormals[], and using cosAngleToUVec(normal) <= 0 check for each.
+bool AxisBox::cast( CRay& ray, bool isShadow, bool isInside ){//replace this logic with looping through sideNormals[], and using cosAngleToUVec(normal) <= 0 check for each.
 	for( int i = 0; i < 3; i ++ ){
-		if(  castSidePair( ray, isShadow, i )  ){ return true; }
+		if(  castSidePair( ray, i, isShadow, isInside )  ){ return true; }
 	}
 	return false;
 
@@ -203,7 +204,7 @@ bool AxisBox::cast( CRay& ray, bool isShadow ){//replace this logic with looping
 	return false;*/
 }
 
-bool AxisBox::castSidePair( CRay& ray, bool isShadow, unsigned char/*should just be int?*/ axis ){//<<<<<<largely copied from Tri::cast(), so should either have shared function, or optimize this using it's specific use for a cube
+bool AxisBox::castSidePair( CRay& ray, unsigned char axis/*should just be int?*/, bool isShadow, bool isInside ){//<<<<<<largely copied from Tri::cast(), so should either have shared function, or optimize this using it's specific use for a cube
 	if( axis >= 3 ){ return false; }//prevent trying to read outside the array if given invalid input
 
 	Point sideNormal;
@@ -213,7 +214,7 @@ bool AxisBox::castSidePair( CRay& ray, bool isShadow, unsigned char/*should just
 	else{
 		sideNormal = sideNormals[axis] * -1;
 	}
-	Point sideCenter = pos + sideNormal * size[axis];
+	Point sideCenter = pos + sideNormal * size[axis] * ( 1 - isInside*2 );
 
 	double rayLength = ray.ray.getLength();
 	Point rayUVec = (ray.ray.p2 - ray.ray.p1) / rayLength;//unit vector in direction of ray.ray (length 1)
@@ -248,7 +249,7 @@ Plane::Plane( uint8_t setAxis, double setDist, double setGridSize, Color setColo
 	IOR = setIOR;
 }
 
-bool Plane::cast( CRay& ray, bool isShadow ){
+bool Plane::cast( CRay& ray, bool isShadow, bool isInside ){
 	Ray rotateRay;
 	if( axis == 0 ){
 		rotateRay = ray.ray;

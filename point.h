@@ -30,6 +30,10 @@ inline Point operator*( Point pos, const double& num ){
 	pos *= num;
 	return pos;
 }
+inline Point operator*( const double& num, Point pos ){
+	pos *= num;
+	return pos;
+}
 inline Point operator/( Point pos, const double& num ){
 	pos /= num;
 	return pos;

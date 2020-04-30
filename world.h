@@ -3,7 +3,7 @@
 
 const double UNIT = 100;//This is determines the size of the units used for size and positioning of all objects.
 const double INTERSECT_ERR = UNIT/10000;//Intersection margin of error (for shapes that need it).  Rays must start this distance away from an object to hit it, to avoid rays bouncing off the same point twice.
-const int MAX_DEPTH = 15;//This is the maximum number of bounces/reflections/refractions/iterations the program will calculate.  Further potential ray interactions are ignored.
+const uint32_t MAX_DEPTH = 15;//This is the maximum number of bounces/reflections/refractions/iterations the program will calculate.  Further potential ray interactions are ignored.
 
 class Light;
 class Object;
@@ -15,11 +15,13 @@ class World{
 		std::vector<Light*> lightList;
 		std::vector<Object*> objList;
 		std::vector<Camera*> camList;
+
 		Color backgroundColor;
+		double airIOR;//the index of refraction of the air (assumed to be the same everywhere)
 
 		//World( std::vector<Object*>&& setObjList );
 		//World();
-		World( Color setBackgroundColor = Color() );
+		World( Color setBackgroundColor = Color(), double setAirIOR = 1 );
 
 		void addObj( Object* object );
 		void addLight( Light* light );

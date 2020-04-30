@@ -71,7 +71,7 @@ void setup() {
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(   new Camera(  Point( 0, UNIT/2, -UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0.05  )   );
+	world.addCam(   new Camera(  Point( 0, UNIT/2, -UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0/*was 0.05*/  )   );
 
 	world.addLight(  new Light( Point( UNIT, UNIT*2, -UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
 	world.addLight(  new Light( Point( -UNIT*2, UNIT*2, -UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
@@ -91,7 +91,8 @@ void setup() {
 
 	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
 
-	world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
+	world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT ), Color( 10000, 2000, 10000 ), true, 0, 1000, 1.5 )  );//testBox1
+	world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/3, UNIT/3, UNIT*2/3 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 1 )  );//testBox2
 
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
