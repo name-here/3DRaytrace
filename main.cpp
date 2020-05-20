@@ -91,8 +91,8 @@ void setup() {
 
 	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
 
-	world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/2, UNIT/2, UNIT ), Color( 10000, 2000, 10000 ), true, 0, 1000, 1.5 )  );//testBox1
-	world.addObj(  new AxisBox( Point( -UNIT, 0, 0 ), Point( UNIT/3, UNIT/3, UNIT*2/3 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 1 )  );//testBox2
+	world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
+	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
