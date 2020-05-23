@@ -40,14 +40,18 @@ World::World( Color setBackgroundColor, double setAirIOR ){
 void World::cast( CRay& ray ){
 	if( ray.colorMixLeft > 0 ){
 
-		for( auto i = objList.begin(); i!=objList.end(); ++i ){
-			(*i)->cast( ray, false );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Either World::cast() should use the bool returned by cast (removing need for CRay.escape?), or it should probably return void!
+		bool refractOut = false;
+		if(  ray.objLastHit != nullptr  &&  ray.objLastHit->opacity < 65535  &&  ray.objLastHit->doLighting  ){
+			if( ray.objLastHit->cast( ray, false, true ) ){//this logic does not work for multiple intersecting refractive objects (might be fine, though)
+				ray.nextIOR = airIOR;
+				refractOut = true;
+			}
 		}
 
-		if(  ray.objLastHit != nullptr  &&  ray.objLastHit->opacity < 65535  &&  ray.objLastHit->doLighting  ){
-			if( ray.objLastHit->cast( ray, false, true ) ){
-				ray.nextIOR = airIOR;
-			}
+		for( auto i = objList.begin(); i!=objList.end(); ++i ){
+			//if(  (*i) != ray.objLastHit  ){
+				(*i)->cast( ray, false );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Either World::cast() should use the bool returned by cast (removing need for CRay.escape?), or it should probably return void!
+			//}
 		}
 
 		ray.ray.p2 = ray.hitPos;//is this necessary?  Should other things be updated to use hitPos instead?
@@ -58,11 +62,13 @@ void World::cast( CRay& ray ){
 		}
 
 		else if( ray.objLastHit->doLighting ){
-			ray.nextIOR = ray.objLastHit->IOR;
 			if( ray.objLastHit->opacity == 65535 ){//is opaque
 				doDifuseReflect( ray );
 			}
 			else{
+				if( !refractOut ){
+					ray.nextIOR = ray.objLastHit->IOR;
+				}
 				doRefractReflect( ray );
 			}
 		}
@@ -116,6 +122,13 @@ void World::doRefractReflect( CRay& ray ){
 			ray.hitPos = originalHit;
 			ray.hitDist = originalHitDist;*/
 
+			if( false ){//if refraction is not needed (total internal reflection case)
+				ray.nextIOR = ray.currentIOR;
+				ray.normalVec *= -1;
+				doReflect( ray );
+				return;
+			}
+
 			reflectAmmount = ray.objLastHit->opacity;//this should be properly calculated, taking angle into account
 
 			CRay reflectRay = CRay();
@@ -128,6 +141,8 @@ void World::doRefractReflect( CRay& ray ){
 			doReflect( reflectRay );
 
 			ray.bounceCount = reflectRay.bounceCount - keepBounces;
+
+			ray.addColor( reflectRay.color, reflectAmmount );
 		}
 
 
@@ -148,6 +163,9 @@ void World::doRefractReflect( CRay& ray ){
 
 
 void World::doDirectLight( CRay& ray, uint16_t mixAmount ){
+	//ray.addColor( Color( (uint16_t)((ray.hitPos.x - ray.ray.p1.x)/UNIT*65535), (uint16_t)((ray.hitPos.y - ray.ray.p1.y)/UNIT*65535), (uint16_t)((ray.hitPos.z - ray.ray.p1.z)/UNIT*65535) ), mixAmount );
+	//return;//these 2 lines make it just show x, y, and z distance instead of doing lighting
+
 	Point temp = ray.ray.p1;
 	bool lightBlocked;
 	FloatColor lightTotal;
@@ -190,7 +208,7 @@ void World::doReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	{//brackets are here to tell compiler that temp is no longer needed after this
 		Point temp = ray.ray.p2;
 		ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
-		ray.ray.p1 = temp;
+		ray.ray.p1 = temp  +  (ray.ray.p2 - temp) * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully outside the shape (to prevent double intersections)
 	}
 	recast( ray );
 }
@@ -214,6 +232,8 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 				for( unsigned int subX = 0; subX < detail; subX ++ ){
 					for( unsigned int subY = 0; subY < detail; subY ++ ){
 						camList[camNum]->getRay( cRay,  pxlX  -  (double)drawWidth/2  +  (double)subX / detail,  pxlY  -  (double)drawHeight/2  +  (double)subY / detail );
+						cRay.currentIOR = airIOR;
+						cRay.nextIOR = airIOR;
 						this->cast( cRay );
 						rTotal += cRay.color.r;
 						gTotal += cRay.color.g;
