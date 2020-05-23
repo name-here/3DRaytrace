@@ -86,12 +86,12 @@ void setup() {
 	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 30000 ), true, 0 )  );//testBall1
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 30000 ), true, 0, 0, 1.5 )  );//testBall1
 	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ), true )  );//testBall2
 
 	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
 
-	world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
+	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
 	/*int gridSize = 3;
@@ -152,7 +152,7 @@ void draw() {
 	//world.camList[0]->pos.set( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * 4 * abs( sin(frameCount*M_PI/30) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight-1, 0, 1 );
+	world.draw( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 0, 1 );
 }
 
 
