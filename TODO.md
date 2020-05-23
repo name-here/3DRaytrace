@@ -46,6 +46,9 @@
 - Rename Point to Vector3
 - Make CRay.color and related colors use FloatColor
 - Replace Color and FloatColor with Vector3 (renamed Point) and some sort of IntVector3
+- Make CRay objects start witht the right IOR for initial interactions (should start with currentIOR same as World::airIOR)
+- Make Camera::getRay() be for Ray instead of CRay, and move other setting of variables elsewhere
+- Add getLight( Point ) function that takes a Point (in 3D space) and returns a FloatColor corresponding to the light level at that Point
 
 ### Partially Done:
 
