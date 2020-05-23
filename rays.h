@@ -46,7 +46,7 @@ class CRay{//This type (casting ray) is used for casting out from the camera and
 		Point normalVec;//normal vector of the last object hit (ObjLastHit) at the intersection point
 
 		CRay( Ray setRay = Ray() );
-		void intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec );//previously returned whether or not there was an intersection
+		bool intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec );//previously returned whether or not there was an intersection
 		//void addLight( FloatColor lightColor );//adds light for the current cast ( to be added with finishCast(___, true) )
 		//void castBackground( Color backgroundColor );
 		void addColor( Color addColor, uint16_t addColorAlpha = 65535, FloatColor addLightColor = FloatColor( 1 ) );

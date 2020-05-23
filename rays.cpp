@@ -78,7 +78,7 @@ CRay::CRay( Ray setRay ){
 	bounceCount = 0;
 }
 
-void CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec ){
+bool CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point objNormalVec ){
 	if( dist <= hitDist ){
 		objLastHit = object;
 		normalVec = objNormalVec;
@@ -86,7 +86,9 @@ void CRay::intersect( Object* object, Color toSet, Point hit, double dist, Point
 		hitPos = hit;
 		castColor = toSet;
 		escape = false;
+		return true;
 	}
+	return false;
 }
 
 /*void CRay::addLight( FloatColor addLightColor ){

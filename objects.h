@@ -13,13 +13,13 @@ class Light{
 class Object{
 	public:
 		virtual ~Object() = default;
-		virtual bool cast( CRay& ray, bool isShadow = false, bool isInside = false ) = 0;//isShadow is used if only checking for intersection (used for lighting), and isInside is used for checking intersections 
-		bool doLighting;
+		virtual bool cast( CRay& ray, bool isShadow = false, bool isInside = false ) = 0;//isShadow is used if only checking for intersection (used for lighting), and isInside is used for checking intersections
+		//uint64_t id = 0;
 
+		bool doLighting;
 		uint16_t roughness;//roughness of the object (0-65535, where 0 is totally specular and 65535 is totally diffuse)
 		//uint16_t fresnel;//strength of effect making reflective objects darker for higher angles of incidence (0-65535, higher is darker)
 		//^^^^^^^^^^^^^^^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<This is probably unnecessary, or at least should have different name/effect
-
 		uint16_t opacity;
 		double IOR;//index of refraction of material
 };

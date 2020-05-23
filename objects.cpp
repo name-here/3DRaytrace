@@ -66,8 +66,7 @@ bool Tri::cast( CRay& ray, bool isShadow, bool isInside ){
 					//double divisor = l1.dot( normal );
 					//double distance = ( p1 - ray.ray.p1 ).dot( normal )  /  divisor;
 
-					ray.intersect( this, color, hit, distance, normal );
-					return true;
+					return ray.intersect( this, color, hit, distance, normal );
 				}
 				else if( distance <= rayLength - INTERSECT_ERR ){
 					return true;
@@ -90,10 +89,11 @@ Ball::Ball( Point setPos, double setRadius, Color setColor, bool setDoLighting, 
 	IOR = setIOR;
 }
 bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
+	char flipNormals = 1 - isInside*2;
 	double lineX1 = dist3D( ray.ray.p1, pos );
 	double dist1Sq = dist3DSq(pos, ray.ray.p2); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
-	double dist2 = dist3D( ray.ray.p1, ray.ray.p2 );
-	double lineX2 = /*abs(*/( dist1Sq - (dist2*dist2) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	double rayLength = dist3D( ray.ray.p1, ray.ray.p2 );
+	double lineX2 = /*abs(*/( dist1Sq - (rayLength*rayLength) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
 	double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
 	double num1;
 	double num2;
@@ -103,12 +103,18 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 		num2 = num1*num1+1;
 		num3 = (num2*radiusSq) - (lineX1*lineX1);
 	}
-	if(/*if ray hits 2D circle (slice of sphere)*/lineY2==0 || num3>=0){
+	if(  ( lineX1 >= radius  ||  isInside )/*This check should maybe be earlier?*/  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere)
 		double num4;
-		if( lineY2 == 0 ){ num4 = radius; }
-		else{ num4 = ((-lineX1*num1) - sqrt(num3)) / (num2); }
-		double distance = sqrt( square( lineX1-sqrt( radiusSq - (num4*num4) ) ) + (num4*num4) );
-		double scale = distance / dist3D(ray.ray.p1, ray.ray.p2);// could also be "/ray.ray.length" if ray.length gets implemented.
+		double distance;
+		if( lineY2 == 0 ){
+			num4 = radius;
+			distance = lineX1 - radius;
+		}
+		else{
+			num4 =  (   -lineX1 * num1  -  sqrt( num3 ) * flipNormals   )   /   num2;
+			distance = sqrt(   square( num1 * num4 )  +  num4 * num4   );
+		}
+		double scale = distance / rayLength;// could also be "/ ray.ray.length" if Ray.length gets implemented.
 		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
 		if( dist3DSq( pos, hit ) - radiusSq <= INTERSECT_ERR ){//<<<<<<<<<<<<<<<<<<<<<<<<<<<figure out what this does!!
 			if(isShadow){
@@ -126,12 +132,11 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 				}
 			}
 			else if( dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				ray.intersect(  this,  color,  hit,  distance,  Point( (hit - pos) / radius )  );
 				//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-roughness ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
 				/*if( roughness > 0 ){
 					return Point( (hit-pos) / radius );
 				}*/  //no longer returned this way.
-				return true;
+				return ray.intersect(  this,  color,  hit,  distance,  (hit - pos) / radius * flipNormals  );
 			}
 		}
 	}
@@ -225,8 +230,7 @@ bool AxisBox::castSidePair( CRay& ray, unsigned char axis/*should just be int?*/
 		double pointY = ( hit - sideCenter ).dot(  sideNormals[ (axis + 2) % 3 ]  );
 		if(  abs( pointX ) <= size[ (axis + 1) % 3 ]  &&  abs( pointY ) <= size[ (axis + 2) % 3 ]  ){
 			if( !isShadow ){
-				ray.intersect( this, color, hit, distance, sideNormal );
-				return true;
+				return ray.intersect( this, color, hit, distance, sideNormal );
 			}
 			else if( distance <= rayLength - INTERSECT_ERR ){
 				return true;
@@ -282,30 +286,24 @@ bool Plane::cast( CRay& ray, bool isShadow, bool isInside ){
 		char normalFlip = 2 * ( rotateRay.p1.x > dist )  -  1;
 		if(  (int)(planeX/gridSize)%2 == 0  ^  (int)(planeY/gridSize)%2 == 0  ^  planeX > 0  ^  planeY > 0  ){
 			if( axis == 0 ){
-				ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( dist, planeY, planeX ),  dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ),  Point( 1, 0, 0 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( dist, planeY, planeX ),  dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ),  Point( 1, 0, 0 ) * normalFlip  );
 			}
 			else if( axis == 1 ){
-				ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( planeX, dist, planeY ),  dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ),  Point( 0, 1, 0 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( planeX, dist, planeY ),  dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ),  Point( 0, 1, 0 ) * normalFlip  );
 			}
 			else{
-				ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( planeY, planeX, dist ),  dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ),  Point( 0, 0, 1 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color1.r, color1.g, color1.b ),  Point( planeY, planeX, dist ),  dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ),  Point( 0, 0, 1 ) * normalFlip  );
 			}
 		}
 		else{
 			if( axis == 0 ){
-				ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( dist, planeY, planeX ),  dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ),  Point( 1, 0, 0 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( dist, planeY, planeX ),  dist3D( ray.ray.p1, Point( dist, planeY, planeX ) ),  Point( 1, 0, 0 ) * normalFlip  );
 			}
 			else if( axis == 1 ){
-				ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( planeX, dist, planeY ),  dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ),  Point( 0, 1, 0 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( planeX, dist, planeY ),  dist3D( ray.ray.p1, Point( planeX, dist, planeY ) ),  Point( 0, 1, 0 ) * normalFlip  );
 			}
 			else{
-				ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( planeY, planeX, dist ),  dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ),  Point( 0, 0, 1 ) * normalFlip  );
-				return true;
+				return ray.intersect(  this,  Color( color2.r, color2.g, color2.b ),  Point( planeY, planeX, dist ),  dist3D( ray.ray.p1, Point( planeY, planeX, dist ) ),  Point( 0, 0, 1 ) * normalFlip  );
 			}
 		}
 		/*if( roughness > 0 ){
