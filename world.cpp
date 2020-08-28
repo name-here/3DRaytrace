@@ -49,7 +49,7 @@ void World::cast( CRay& ray ){
 		}
 
 		for( auto i = objList.begin(); i!=objList.end(); ++i ){
-			//if(  (*i) != ray.objLastHit  ){
+			//if(  (*i) != ray.objLastHit  ){ //removed because it's unnecessary
 				(*i)->cast( ray, false );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Either World::cast() should use the bool returned by cast (removing need for CRay.escape?), or it should probably return void!
 			//}
 		}
@@ -278,7 +278,7 @@ void World::addCam( Camera* camera ){
 }
 
 
-World::~World(){
+World::~World(){//this segfaults if the object was deleted by something else first
 	for( auto i = objList.begin(); i!=objList.end(); ++i ){
 		delete *i;
 	}

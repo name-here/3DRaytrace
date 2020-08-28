@@ -88,12 +88,13 @@ Ball::Ball( Point setPos, double setRadius, Color setColor, bool setDoLighting, 
 	opacity = setOpacity;
 	IOR = setIOR;
 }
+
 bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 	char flipNormals = 1 - isInside*2;
 	double lineX1 = dist3D( ray.ray.p1, pos );
-	double dist1Sq = dist3DSq(pos, ray.ray.p2); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
+	double dist1Sq = dist3DSq( pos, ray.ray.p2 ); //square( pos.x - ray.ray.p2.x )  +  square( pos.y - ray.ray.p2.y )  +  square( pos.z - ray.ray.p2.z );
 	double rayLength = dist3D( ray.ray.p1, ray.ray.p2 );
-	double lineX2 = /*abs(*/( dist1Sq - (rayLength*rayLength) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 /*and lineX2*/, define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	double lineX2 = /*abs(*/( dist1Sq - (rayLength*rayLength) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 (coordinates chosen so Y1 is 0), define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
 	double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
 	double num1;
 	double num2;
@@ -116,7 +117,8 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 		}
 		double scale = distance / rayLength;// could also be "/ ray.ray.length" if Ray.length gets implemented.
 		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
-		if( dist3DSq( pos, hit ) - radiusSq <= INTERSECT_ERR ){//<<<<<<<<<<<<<<<<<<<<<<<<<<<figure out what this does!!
+
+		if(  abs( dist3DSq( pos, hit ) - radiusSq )  <=  INTERSECT_ERR  ){ //Avoids intersections behind the camera by making sure hit point is within INTERSECT_ERR of the surface
 			if(isShadow){
 				/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
 				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
@@ -131,7 +133,7 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 					return true;
 				}
 			}
-			else if( dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			else{ //if(  ray.objLastHit != this  ||  dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR  ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 				//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-roughness ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
 				/*if( roughness > 0 ){
 					return Point( (hit-pos) / radius );
@@ -142,6 +144,183 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 	}
 	return false;
 }
+
+
+Tube::Tube( Ray setLine, double setRadius, Color setColor, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){
+	this->setLine( setLine );
+	radius = setRadius;
+	radiusSq = setRadius*setRadius;
+	color = setColor;
+	doLighting = setDoLighting;
+	roughness = setRoughness;
+	opacity = setOpacity;
+	IOR = setIOR;
+}
+
+void Tube::setLine( Ray setLine ){
+	line = setLine;
+	lineVec = line.p2 - line.p1;
+	length = lineVec.magnitude();
+	if( length >= INTERSECT_ERR ){
+		lineVec /= length;
+	}
+	else{
+		length = 0;
+	}
+}
+
+/*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
+	double hitX = 
+}*/
+
+bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
+	Point p1Vec = ray.ray.p1 - line.p1;
+	Point p2Vec = ray.ray.p2 - line.p1;//vectors pointing from p1 of cylinder to p1 and p2 of ray
+	Point axisY = Point(0, UNIT, 0);//cross( p1Vec, lineVec ).normalize();
+	Point axisX = Point(UNIT, 0, 0);//cross( lineVec, axisY ).normalize();
+
+	double lineX1 = p1Vec.x;//dot( axisX );
+	double lineX2 = p2Vec.x;//dot( axisX );
+	double lineY2 = p2Vec.y;//dot( axisY );
+
+	double hit2DY = lineY2 / (lineX1 - lineX2) * lineX1;//Y position of the intersection in the axes defined above
+	double dist2Dsq = lineX1*lineX1 + hit2DY*hit2DY;
+	//double dist2D = sqrt( dist2Dsq );
+	double hitDistZ =   ray.ray.p1.dot( lineVec )   +   ( ray.ray.p2 - ray.ray.p1 ).dot( lineVec )  /  ( lineX1 - lineX2 )  *  lineX1;  //  /  sqrt( square(lineX2 - lineX1) + lineY2*lineY2 )  *  sqrt( lineX1*lineX1 + hit2DY*hit2DY );
+
+	if(  abs(hit2DY) < radius  &&  (lineX1 - lineX2 > 0) == (lineX1 > 0)  ){
+		if( isShadow ){
+			return (lineX1 > 0) != (lineX2 > 0);
+		}
+		else{
+			double distance = sqrt( dist2Dsq + hitDistZ*hitDistZ );
+			return ray.intersect(  this,  Color( (uint16_t)(lineY2/UNIT/10*65535), (uint16_t)(lineY2/UNIT/10*65535), (uint16_t)(lineY2/UNIT/10*65535) ),  ray.ray.p1 + (ray.ray.p2 - ray.ray.p1) / ray.ray.getLength() * distance,  distance,  axisX  );
+		}
+	}
+	return false;
+}
+
+/*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){
+	char flipNormals = 1 - isInside*2;
+
+	Point p1Vec = ray.ray.p1 - line.p1;
+	Point p2Vec = ray.ray.p2 - line.p1;//vectors pointing from p1 of cylinder to p1 and p2 of ray
+	Point axisY = cross( p1Vec, lineVec ).normalize();
+	Point axisX = cross( lineVec, axisY ).normalize();
+	
+	//double dist1Sq = dist3DSq( line.p1, ray.ray.p2 );
+	//double rayLength = dist3D( ray.ray.p1, ray.ray.p2 );
+	//double lineX1 = dist3D( ray.ray.p1, line.p1 );
+	//double lineX2 = ( dist1Sq - (rayLength*rayLength) + (lineX1*lineX1) )  /  ( lineX1*2 );
+	//double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
+
+	double lineX1 = p1Vec.dot( axisX );
+	double lineX2 = p2Vec.dot( axisX );
+	double lineY2 = p2Vec.dot( axisY );
+	//printf( "lineX1 - lineX2: %f\n", lineX1 - lineX2 );
+	//The above X1, X2, and Y2 (coordinates chosen so Y1 is 0), define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the tube.  The 2D plane is the plane that intersects the center of the tube and both points on the 3D ray.
+	
+	double num1;
+	double num2;
+	double num3;//optimize these by creating the variables with the object (maybe, since won't work for multithreading)
+	if(lineY2!=0){
+		num1 = (lineX2-lineX1) / lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
+		num2 = num1*num1+1;
+		num3 = (num2*radiusSq) - (lineX1*lineX1);
+	}
+	if(  ( lineX1 >= radius  ||  isInside )  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere).  Check of ( lineX1 >= radius  ||  isInside ) should maybe be earlier?
+		double num4;
+		double distance;
+		if( lineY2 == 0 ){
+			num4 = radius;
+			distance = lineX1 - radius;
+		}
+		else{
+			num4 =  (   -lineX1 * num1  -  sqrt( num3 ) * flipNormals   )   /   num2;
+			distance = sqrt(   square( num1 * num4 )  +  num4 * num4   );
+		}
+		double scale =  distance  /  ( ray.ray.p2 - ray.ray.p1 ).magnitude();// could also be "/ ray.ray.length" if Ray.length gets implemented.
+		Point hit =  ray.ray.p1  +  ( (ray.ray.p2 - ray.ray.p1) * scale );
+		Point hitVec = hit - line.p1;//vector pointing from p1 of cylinder to ray intersection
+		double distAlong = hitVec.dot( lineVec );//distance along the center line of the tube from line.p1 to hit
+		if(   distAlong >= 0  &&  distAlong <= length   &&   abs(  square( hit.dot(axisX) ) + square( hit.dot(axisY) )  -  radiusSq  )  <=  INTERSECT_ERR   ){ //Avoids intersections behind the camera by making sure hit point is within INTERSECT_ERR of the surface (maybe INTERSECT_ERR should be squared?)
+			if(isShadow){
+				//The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.
+				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) &&
+						( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) &&
+						( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) &&
+						dist3DSq( hit, ray.ray.p2 ) >= INTERSECT_ERR ){
+
+					return true;
+				}
+			}
+			else{ //if( dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				//printf( "Should be true: %i\n", lineX1 > lineX2 || lineX1 < radius );
+				Point normal = ( axisX * hitVec.dot(axisX) + axisY * hitVec.dot(axisY) ).normalize() * flipNormals;
+				return ray.intersect(  this,  Color( (uint16_t)(normal.x*65535), (uint16_t)(normal.y*65535), (uint16_t)(normal.z*65535) ),  hit,  distance,  normal  );
+			}
+		}
+	}
+	return false;
+}*/
+
+/*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){
+	char flipNormals = 1 - isInside*2;
+
+	Point p1Vec = ray.ray.p1 - line.p1;
+	Point p2Vec = ray.ray.p2 - line.p1;//vectors pointing from p1 of cylinder to p1 and p2 of ray
+	Point axisY = cross( p1Vec, lineVec ).normalize();
+	Point axisX = cross( axisY, lineVec ).normalize();
+
+	double lineX1 = p1Vec.dot( axisX );
+	double lineX2 = p2Vec.dot( axisX );
+	double lineY2 = p2Vec.dot( axisY );
+	//The above X1, X2, and Y2 (coordinates chosen so Y1 is 0), define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the tube.  The 2D plane is the plane that intersects the center of the tube and both points on the 3D ray.
+
+	//double lineX1 = dist3D( ray.ray.p1, line.p1 );
+	//double dist1Sq = dist3DSq( line.p1, ray.ray.p2 );
+	double rayLength = dist3D( ray.ray.p1, ray.ray.p2 );
+	//double lineX2 = ( dist1Sq - (rayLength*rayLength) + (lineX1*lineX1) )  /  ( lineX1*2 ); //this x and y, along with lineX1 (coordinates chosen so Y1 is 0), define a ray in a 2D space that will actually be used to calculate the intersection between the original ray and the sphere.  The 2D plane is the plane that intersects the center of the sphere and both points on the 3D ray.
+	//double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
+	double num1;
+	double num2;
+	double num3;//optimize these by creating the variables with the object (maybe, since won't work for multithreading)
+	if(lineY2!=0){
+		num1 = (lineX2-lineX1) / lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
+		num2 = num1*num1+1;
+		num3 = (num2*radiusSq) - (lineX1*lineX1);
+	}
+	if(  ( lineX1 >= radius  ||  isInside )  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere).  Check of ( lineX1 >= radius  ||  isInside ) should maybe be earlier?
+		double num4;
+		double distance;
+		if( lineY2 == 0 ){
+			num4 = radius;
+			distance = lineX1 - radius;
+		}
+		else{
+			num4 =  (   -lineX1 * num1  -  sqrt( num3 ) * flipNormals   )   /   num2;
+			distance = sqrt(   square( num1 * num4 )  +  num4 * num4   );
+		}
+		double scale = distance / rayLength;// could also be "/ ray.ray.length" if Ray.length gets implemented.
+		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
+
+		//if(  abs( dist3DSq( line.p1, hit ) - radiusSq )  <=  INTERSECT_ERR  ){ //Avoids intersections behind the camera by making sure hit point is within INTERSECT_ERR of the surface
+			if(isShadow){
+				//The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.
+				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) &&
+						( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) &&
+						( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) &&
+						dist3DSq( hit, ray.ray.p2 ) >= INTERSECT_ERR ){
+					return true;
+				}
+			}
+			else if(  ray.objLastHit != this  ||  dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR  ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				return ray.intersect(  this,  Color( (uint16_t)(hit.x/UNIT*65535), (uint16_t)(hit.y/UNIT*65535), (uint16_t)(hit.z/UNIT*65535) ),  hit,  distance,  (hit - line.p1) / radius * flipNormals  );
+			}
+		//}
+	}
+	return false;
+}*/
 
 
 AxisBox::AxisBox( Point setPos, Point setSize, Color setColor, bool setDoLighting, uint16_t setRoughness, uint16_t setOpacity, double setIOR ){

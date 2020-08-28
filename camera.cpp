@@ -30,30 +30,45 @@ void Camera::rotate( double setAngleX, double setAngleY ){//Can probably be opto
 void Camera::getRay( CRay& ray, double screenX, double screenY ){
 	ray.ray.p1 = pos;
 	//ray.ray.p2 = pos  +  front * planeDist  +  right * screenX  +  up * screenY;
-	ray.color.r = 0;
-	ray.color.g = 0;
-	ray.color.b = 0;
-	//ray.lightColor.r = 0;
-	//ray.lightColor.g = 0;
-	//ray.lightColor.b = 0;
-	ray.currentIOR = 1;
-	ray.nextIOR = 1;
+
 	double temp = planeDist*planeDist  -  ( screenX*screenX + screenY*screenY ) * distortion;//square of the distance to the sphere being projected onto
 	if( temp >= 0 ){
-		ray.ray.p2 = pos  +  front * sqrt( temp )  +  right * screenX  +  up * screenY;//this projects rays through a sphere instead of a plane
+		ray.ray.p2 = ray.ray.p1  +  front * sqrt( temp )  +  right * screenX  +  up * screenY;//this projects rays through a sphere instead of a plane
+		
 		ray.colorMixLeft = 65535;
 
 	}
 	else{
 		ray.ray.p2 = pos;
+
 		ray.colorMixLeft = 0;
 	}
+
+	/*ray.ray.p1 = pos  +  right * screenX  +  up * screenY;
+	ray.ray.p2 = ray.ray.p1  +  front * planeDist;
+
+	ray.colorMixLeft = 65535;*/
+
+	ray.color.r = 0;
+	ray.color.g = 0;
+	ray.color.b = 0;
+
+	//ray.lightColor.r = 0;
+	//ray.lightColor.g = 0;
+	//ray.lightColor.b = 0;
+
+	ray.currentIOR = 1;
+	ray.nextIOR = 1;
+
 	ray.hitPos.x = F_INFINITY;
 	ray.hitPos.y = F_INFINITY;
 	ray.hitPos.z = F_INFINITY;
 	ray.hitDist = F_INFINITY;
+
 	ray.escape = true;
+
 	ray.bounceCount = 0;
+
 	ray.objLastHit = nullptr;
 }
 

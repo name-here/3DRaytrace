@@ -86,19 +86,72 @@ void setup() {
 	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 30000 ), true, 0, 0, 1.5 )  );//testBall1
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 30000 ), true, 0 )  );//testBall1
 	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ), true )  );//testBall2
 
-	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*3/2 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ) )  );//testTri
+	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*9/10 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ), true, 0 )  );//testTri
 
 	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
+
+	world.addObj(   new Tube(  Ray( Point(0, 0, UNIT*-3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535, 0, 32767 ),  false  )   );//testTube
+
+	//testTriCube:
+	/*world.addObj(  new Tri( Point( 0, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT, UNIT, 0 ) )  );
+	world.addObj(  new Tri( Point( 0, 0, 0 ), Point( UNIT, UNIT, 0 ), Point( UNIT, 0, 0 ) )  );
+	world.addObj(  new Tri( Point( UNIT, 0, 0 ), Point( UNIT, UNIT, 0 ), Point( UNIT, UNIT, UNIT ) )  );
+	world.addObj(  new Tri( Point( UNIT, 0, 0 ), Point( UNIT, UNIT, UNIT ), Point( UNIT, 0, UNIT ) )  );
+	world.addObj(  new Tri( Point( UNIT, 0, UNIT ), Point( UNIT, UNIT, UNIT ), Point( 0, UNIT, UNIT ) )  );
+	world.addObj(  new Tri( Point( UNIT, 0, UNIT ), Point( 0, UNIT, UNIT ), Point( 0, 0, UNIT ) )  );
+	world.addObj(  new Tri( Point( 0, 0, UNIT ), Point( 0, UNIT, UNIT ), Point( 0, UNIT, 0 ) )  );
+	world.addObj(  new Tri( Point( 0, 0, UNIT ), Point( 0, UNIT, 0 ), Point( 0, 0, 0 ) )  );
+	world.addObj(  new Tri( Point( 0, UNIT, 0 ), Point( 0, UNIT, UNIT ), Point( UNIT, UNIT, UNIT ) )  );
+	world.addObj(  new Tri( Point( 0, UNIT, 0 ), Point( UNIT, UNIT, UNIT ), Point( UNIT, UNIT, 0 ) )  );
+	world.addObj(  new Tri( Point( 0, 0, UNIT ), Point( 0, 0, 0 ), Point( UNIT, 0, 0 ) )  );
+	world.addObj(  new Tri( Point( 0, 0, UNIT ), Point( UNIT, 0, 0 ), Point( UNIT, 0, UNIT ) )  );*/
 
 	/*int gridSize = 3;
 	for( int x = 0; x<gridSize; x ++){
 		for( int y = 0; y<gridSize; y ++){
 			world.addObj( new Ball( Point( -UNIT/2+(x+0.5)*UNIT/gridSize, -UNIT/2+(y+0.5)*UNIT/gridSize, UNIT*1.5 ), UNIT/gridSize/2, Color( x*65535/gridSize, y*65535/gridSize, 30000 ), 30000 ) );//littleBall
 		}
+	}*/
+
+	
+	//the following code traces out a ray and adds tube shapes
+	/*int segments = 1;
+
+	world.addCam(  new Camera( Point(0, UNIT/2, -UNIT*4), UNIT, 0, -M_PI/20 )  );
+	CRay testRay;
+	world.camList[1]->getRay( testRay, 0, 0 );
+	Ball* points[segments+1];
+	Tube* lines[segments];
+
+	for( int i = 0; i < segments+1; i ++ ){
+		points[i] = new Ball( Point(), UNIT/10, Color( 0, 65535, 0 ), false );
+	}
+	for( int i = 0; i < segments; i ++ ){
+		lines[i] = new Tube( Ray(), UNIT/10, Color( 65535, 0, 0 ), false );
+	}
+
+	testRay.bounceCount = MAX_DEPTH;
+	world.cast( testRay );
+	lines[0]->setLine(  Ray( testRay.ray.p1, testRay.hitPos )  );
+	points[0]->pos = testRay.ray.p1;
+	points[1]->pos = testRay.hitPos;
+
+	for( int i = 1; i < segments; i ++){
+		testRay.bounceCount = MAX_DEPTH - 2;
+		world.recast( testRay );
+		lines[i]->setLine(  Ray( lines[i-1]->line.p2, testRay.hitPos )  );
+		points[i+1]->pos = testRay.hitPos;
+	}
+
+	for( int i = 0; i < segments+1; i ++){
+		//world.addObj( points[i] );
+	}
+	for( int i = 0; i < segments; i ++ ){
+		world.addObj( lines[i] );
 	}*/
 }
 

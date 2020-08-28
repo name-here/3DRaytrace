@@ -49,6 +49,9 @@
 - Make CRay objects start witht the right IOR for initial interactions (should start with currentIOR same as World::airIOR)
 - Make Camera::getRay() be for Ray instead of CRay, and move other setting of variables elsewhere
 - Add getLight( Point ) function that takes a Point (in 3D space) and returns a FloatColor corresponding to the light level at that Point
+- Make 2D circle check its own function since it's used for both Ball::cast() and Tube::cast()
+- Make some attempt to optimize Tube::cast()
+- Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp)
 
 ### Partially Done:
 

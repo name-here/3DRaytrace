@@ -50,7 +50,22 @@ class Ball: public Object{
 		double radius;
 		double radiusSq;
 		Color color;
+
 		Ball( Point setPos = Point(), double setRadius = 0, Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
+		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
+};
+
+class Tube: public Object{
+	Point lineVec;//unit vector along the center line of the cylinder
+	double length;
+	public:
+		Ray line;//stores the end points of the cylinder
+		double radius;
+		double radiusSq;
+		Color color;
+
+		Tube( Ray setLine = Ray(), double setRadius = 0, Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
+		void setLine( Ray setLine = Ray() );
 		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 };
 
@@ -60,6 +75,7 @@ class AxisBox: public Object{
 		Point pos;//at the center of the cube
 		double size[3];//x, y, and z distance from center to faces
 		Color color;
+
 		AxisBox( Point setPos = Point(), Point setSize = Point(), Color setColor = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
 		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 		bool castSidePair( CRay& ray, unsigned char axis, bool isShadow = false, bool isInside = false );
@@ -72,6 +88,7 @@ class Plane: public Object{
 		double gridSize;
 		Color color1;
 		Color color2;
+
 		Plane( uint8_t setAxis = 0, double setDist = 0, double setGridSize = 1, Color setColor1 = Color(), Color setColor2 = Color( 65535 ), bool setDoLighting = true, uint16_t setRoughness = 65535, uint16_t setOpacity = 65535, double setIOR = 1 );
 		bool cast( CRay& ray, bool isShadow = false, bool isInside = false );
 };
