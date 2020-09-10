@@ -215,26 +215,25 @@ void World::doReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 
-void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsigned int height, unsigned int pixelSize, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY ){
-	if( drawWidth == 0 ){ drawWidth = width; }
-	if( drawHeight == 0 ){drawHeight = height; }
-	unsigned int detailSq = detail * detail;
+void World::draw( WorldDrawArgs args ){
+	unsigned int detailSq = args.detail * args.detail;
 	CRay cRay;
 	uint32_t rTotal;
 	uint32_t gTotal;
 	uint32_t bTotal;
-	for( unsigned int pxlX = 0; pxlX < drawWidth; pxlX += pixelSize ){
-		for( unsigned int pxlY = 0; pxlY < drawHeight; pxlY += pixelSize ){
-			if(   pxlX + startX < width  &&  pxlY + startY < height  &&  ( (pxlY + startY) * width) + pxlX + startX < width * height   ){
+	for( unsigned int pxlX = 0; pxlX < args.drawWidth; pxlX += args.pixelSize ){
+		for( unsigned int pxlY = 0; pxlY < args.drawHeight; pxlY += args.pixelSize ){
+			if(   pxlX + args.startX < args.textureWidth  &&  pxlY + args.startY < args.textureHeight  &&  ( (pxlY + args.startY) * args.textureWidth) + pxlX + args.startX < args.textureWidth * args.textureHeight   ){
 				rTotal = 0;
 				gTotal = 0;
 				bTotal = 0;
-				for( unsigned int subX = 0; subX < detail; subX ++ ){
-					for( unsigned int subY = 0; subY < detail; subY ++ ){
-						camList[camNum]->getRay( cRay,  pxlX  -  (double)drawWidth/2  +  (double)subX / detail,  pxlY  -  (double)drawHeight/2  +  (double)subY / detail );
-						cRay.currentIOR = airIOR;
-						cRay.nextIOR = airIOR;
-						this->cast( cRay );
+				for( unsigned int subX = 0; subX < args.detail; subX ++ ){
+					for( unsigned int subY = 0; subY < args.detail; subY ++ ){
+						//camList[args.camNum]->getRay( cRay,  pxlX  -  (double)args.drawWidth/2  +  (double)subX / args.detail,  (double)args.drawHeight/2  -  pxlY  +  (double)subY / args.detail );
+						args.world->camList[args.camNum]->getRay( cRay,  (args.centerView ? 0 : args.startX)  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
+						cRay.currentIOR = args.world->airIOR;
+						cRay.nextIOR = args.world->airIOR;
+						args.world->cast( cRay );
 						rTotal += cRay.color.r;
 						gTotal += cRay.color.g;
 						bTotal += cRay.color.b;
@@ -249,17 +248,36 @@ void World::draw( unsigned int camNum, Uint32* pixels, unsigned int width, unsig
 					bTotal = total * pxlX / drawWidth  -  bTotal * pxlX / drawWidth + bTotal;*/
 				//}
 
-				for( unsigned int setSubX = 0; setSubX < pixelSize; setSubX ++ ){
-					for( unsigned int setSubY = 0; setSubY < pixelSize; setSubY ++ ){
-						if( pxlX + setSubX < drawWidth  &&  pxlY + setSubY < drawHeight ){
-							pixels[  (height - pxlY - startY - setSubY) * width  +  pxlX + startX + setSubX  ] =
-								( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );
-						}
+				for(  unsigned int setSubX = 0;  setSubX < args.pixelSize  &&  pxlX + setSubX < args.drawWidth  &&  args.startX + pxlX + setSubX < args.textureWidth;  setSubX ++  ){
+					for(  unsigned int setSubY = 0;  setSubY < args.pixelSize  &&  pxlY + setSubY < args.drawHeight  &&  args.startY + pxlY + setSubY < args.textureHeight;  setSubY ++  ){
+						args.texture[  (args.startY + pxlY + setSubY) * args.textureWidth  +  args.startX + pxlX + setSubX  ] =
+							( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );//Should the inner (int) casts be (uint16_t) instead?
 					}
 				}
 			}
 		}
 	}
+}
+
+
+void World::drawExpanded( unsigned int camNum, Uint32* texture, unsigned int textureWidth, unsigned int textureHeight, unsigned int pixelSize, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY, bool centerView ){
+	WorldDrawArgs args;
+	args.world = this;
+	args.camNum = camNum;
+	args.texture = texture;
+	args.textureWidth = textureWidth;
+	args.textureHeight = textureHeight;
+	args.pixelSize = pixelSize;
+	args.detail = detail;
+	if( drawWidth == 0 ){ args.drawWidth = textureWidth; }
+	else{ args.drawWidth = drawWidth; }
+	if( drawHeight == 0 ){ args.drawHeight = textureHeight; }
+	else{ args.drawHeight = drawHeight; }
+	args.startX = startX;
+	args.startY = startY;
+	args.centerView = centerView;
+
+	draw( args );
 }
 
 

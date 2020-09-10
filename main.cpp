@@ -6,6 +6,7 @@
 	#include <emscripten/html5.h>
 #endif
 #include <SDL2/SDL.h>
+#include <thread>
 #include <cstdio>
 #include <iostream>
 #include <cstdint>
@@ -91,10 +92,10 @@ void setup() {
 
 	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*9/10 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ), true, 0 )  );//testTri
 
-	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
+	world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
-	world.addObj(   new Tube(  Ray( Point(0, 0, UNIT*-3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535, 0, 32767 ),  false  )   );//testTube
+	//world.addObj(   new Tube(  Ray( Point(0, 0, UNIT*-3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535, 0, 32767 ),  false  )   );//testTube
 
 	//testTriCube:
 	/*world.addObj(  new Tri( Point( 0, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT, UNIT, 0 ) )  );
@@ -205,7 +206,36 @@ void draw() {
 	//world.camList[0]->pos.set( UNIT * 4 * cos(frameCount*M_PI/30), UNIT, UNIT * 4 * abs( sin(frameCount*M_PI/30) ) );
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
-	world.draw( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 0, 1 );
+
+	WorldDrawArgs args;
+	args.world = &world;
+	args.camNum = 0;
+	args.texture = pixels;
+	args.textureWidth = windowWidth;
+	args.textureHeight = windowHeight;
+	args.pixelSize = pixelSize;
+	args.detail = detail;
+	args.centerView = false;
+
+	int xGrid = 3;
+	int yGrid = 3;
+	std::thread** drawThreads = new std::thread*[ xGrid * yGrid ];
+	for( int x = 0; x < xGrid; x ++ ){
+		for( int y = 0; y < yGrid; y ++){
+			args.startX = windowWidth * x / xGrid;
+			args.startY = windowWidth * y / yGrid;
+			args.drawWidth = windowWidth * (x+1) / xGrid  -  args.startX;
+			args.drawHeight = windowHeight * (y+1) / yGrid  -  args.startY;
+			drawThreads[ y * xGrid  +  x ] = new std::thread( world.draw, args );
+			//std::thread drawThread( world.draw, args );
+		}
+	}
+
+	for( int i = 0; i < xGrid * yGrid; i ++){
+		drawThreads[i]->join();
+	}
+
+	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail );
 }
 
 

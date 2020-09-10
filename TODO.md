@@ -3,6 +3,7 @@
 ### To Do:
 
 <!-- - classes.cpp line 182: add position to ball shadow casting(??) -->
+
 - Optimize getting rays for camera (maybe don't use sine/cosine)
 - Optimize operator== on points if possible
 - Optimize various functions in objects.cpp (cast functions) to use -=, +=, etc.
@@ -11,8 +12,8 @@
 - Make lists in World object private and create some other way of changing the properties of objects in them (add functions should return pointer/id)
 - Find way of updating all relevant planeDist on window resize (difficult if multiple cameras)
 - Add textured objects (texture system, textures maybe as part of generic Object?)
+	- Add a Material object, and have each Object have a pointer to a Material  (Alternatively, could have Objects, which have pointers both to a Material and a Geometry object, which would be the particular shape)
 - Use square of distance to check closest to save sqrt() call
-- Add multithreading (COMPLICATED?)
 - Don't include same inline functions in multiple files
 - Add high DPI capability
 - Move all global variables into main() or other functions
@@ -27,31 +28,26 @@
 - Change CRay::finishCast(), CRay::lightColor, and CRay::addLight so that light can go over camera's max exposure and overexpose pixels (LIKELY COMPLICATED)
 - Add HDR monitor support (MAYBE COMPLICATED)
 - Go through entire code base and tweak formatting to be consistent
-- Give objects textures
-- Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane
 - Restructure all Object Cast() functions to be more efficient
 - Optimize all calculations with Point objects (use special instructions that act on more than one number at once?)
 - Make casting skip objects that are behind the direction of the cast and too small to possibly be intersected with (also exclude objects too far to the side?)
 - Restructure so that only position and distance are calculated for each intersection with a particular ray, and then other properties are found after the closest intersection is known
 - Change CRay's color property to use FloatColor because it represents an ammount of light (which has no upper bound)
-- Change doubles that should never be negative to be unsigned
 - Add ambient light (eventually incl. ambient occlusion)
-- Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )
-- Add a Material object, and have each Object have a pointer to a Material  (Alternatively, could have Objects, which have pointers both to a Material and a Geometry object, which would be the particular shape)
 - COLOR MIXING WITH FOR REFLECTION AND TRANSMISSION SHOULD MULTIPLY THE COLOR OF THE OBJECT (to tint) INSTEAD OF ADDING IT.  ALSO, GENERALLY FIX COLOR MIXING AND MAKE IT USE THE RIGHT COLOR VARIABLE TYPES
-  - Change CRay to have tintColor by which gets any color from lights gets multiplied when adding to the ray, and which gets multiplied by the color of things the ray passes through or is reflected by.
-  - Remove colorMixLeft and replace any logic that uses it
+	- Change CRay to have tintColor by which gets any color from lights gets multiplied when adding to the ray, and which gets multiplied by the color of things the ray passes through or is reflected by.
+	- Remove colorMixLeft and replace any logic that uses it
 - Add ammount reflected to World::doRefractReflect() (make it actually use the reflected ray), including adding total internal reflection
 - Finish making all Object::cast() functions actually use isInside
 - Rename Point to Vector3
 - Make CRay.color and related colors use FloatColor
 - Replace Color and FloatColor with Vector3 (renamed Point) and some sort of IntVector3
-- Make CRay objects start witht the right IOR for initial interactions (should start with currentIOR same as World::airIOR)
 - Make Camera::getRay() be for Ray instead of CRay, and move other setting of variables elsewhere
 - Add getLight( Point ) function that takes a Point (in 3D space) and returns a FloatColor corresponding to the light level at that Point
-- Make 2D circle check its own function since it's used for both Ball::cast() and Tube::cast()
+- Make Tube::cast() actually work
+- Make 2D circle check its own function since it is (or at least will be) used for both Ball::cast() and Tube::cast()
 - Make some attempt to optimize Tube::cast()
-- Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp)
+- Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp to see the problem)
 
 ### Partially Done:
 
@@ -66,6 +62,9 @@
 - Prevent casts from checking direct light from light sources behind object hit by ray (use set normal?)
 - Optimize Triangle::cast(), especially with relation to calculations finding if and where ray hits plane (optimization could include precalculating more values/properties)
 - Make more variables unsigned that should be
+	- Change doubles that should never be negative to be unsigned
+- Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane (MIGHT BE FIXED?)
+- Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )  (PROBABLY FIXED?)
 
 ### Done:
 
@@ -106,6 +105,8 @@
 - Use a specific variable to store intersection point on CRay instead of using its Ray
 - Remove Ray::CosAngleToUVec(), and redo some of the Tri::cast() code
 - Find and fix any and all possible divisions by 0
+- Add multithreading (COMPLICATED?)
+- Make CRay objects start witht the right IOR for initial interactions (should start with currentIOR same as World::airIOR)
 
 ### Maybe Do:
 
@@ -120,5 +121,6 @@
 - Use half-sphere version of brother's points on a sphere project (or at least the idea) to figure out how to randomly but evenly destribute directions to cast rays to calculate diffuse reflection and scattering
 - Make objects first check normals (if applicable) to avoid checking objects that are not visible
 - Move setting CRay color from its castColor back to a function in CRay rather than a function in World
+- In pixel-setting loop in World::draw(), inner (int) casts should maybe be (uint16_t) instead?
 
 
