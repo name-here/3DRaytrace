@@ -221,38 +221,36 @@ void World::draw( WorldDrawArgs args ){
 	uint32_t rTotal;
 	uint32_t gTotal;
 	uint32_t bTotal;
-	for( unsigned int pxlX = 0; pxlX < args.drawWidth; pxlX += args.pixelSize ){
-		for( unsigned int pxlY = 0; pxlY < args.drawHeight; pxlY += args.pixelSize ){
-			if(   pxlX + args.startX < args.textureWidth  &&  pxlY + args.startY < args.textureHeight  &&  ( (pxlY + args.startY) * args.textureWidth) + pxlX + args.startX < args.textureWidth * args.textureHeight   ){
-				rTotal = 0;
-				gTotal = 0;
-				bTotal = 0;
-				for( unsigned int subX = 0; subX < args.detail; subX ++ ){
-					for( unsigned int subY = 0; subY < args.detail; subY ++ ){
-						//camList[args.camNum]->getRay( cRay,  pxlX  -  (double)args.drawWidth/2  +  (double)subX / args.detail,  (double)args.drawHeight/2  -  pxlY  +  (double)subY / args.detail );
-						args.world->camList[args.camNum]->getRay( cRay,  (!args.centerView) * args.startX  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
-						cRay.currentIOR = args.world->airIOR;
-						cRay.nextIOR = args.world->airIOR;
-						args.world->cast( cRay );
-						rTotal += cRay.color.r;
-						gTotal += cRay.color.g;
-						bTotal += cRay.color.b;
-					}
+	for(   unsigned int pxlX = 0;   pxlX < args.drawWidth  &&  pxlX + args.startX < args.textureWidth;   pxlX += args.pixelSize   ){
+		for(   unsigned int pxlY = 0;   pxlY < args.drawHeight  &&  pxlY + args.startY < args.textureHeight;   pxlY += args.pixelSize   ){
+			rTotal = 0;
+			gTotal = 0;
+			bTotal = 0;
+			for( unsigned int subX = 0; subX < args.detail; subX ++ ){
+				for( unsigned int subY = 0; subY < args.detail; subY ++ ){
+					//camList[args.camNum]->getRay( cRay,  pxlX  -  (double)args.drawWidth/2  +  (double)subX / args.detail,  (double)args.drawHeight/2  -  pxlY  +  (double)subY / args.detail );
+					args.world->camList[args.camNum]->getRay( cRay,  (!args.centerView) * args.startX  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
+					cRay.currentIOR = args.world->airIOR;
+					cRay.nextIOR = args.world->airIOR;
+					args.world->cast( cRay );
+					rTotal += cRay.color.r;
+					gTotal += cRay.color.g;
+					bTotal += cRay.color.b;
 				}
+			}
 
-				//if( pxlX > drawWidth/2 ){//if grayscale, set each color channel to the average of all color channels
-					/*uint64_t total = ( rTotal + gTotal + bTotal ) / 3;//total probably doesn't have to be 64 bits (otherwise could just put average in rTotal first and copy to other channels)
-					if( total > 4294967295 ){ total = 4294967295; }
-					rTotal = total * pxlX / drawWidth  -  rTotal * pxlX / drawWidth + rTotal;
-					gTotal = total * pxlX / drawWidth  -  gTotal * pxlX / drawWidth + gTotal;
-					bTotal = total * pxlX / drawWidth  -  bTotal * pxlX / drawWidth + bTotal;*/
-				//}
+			//if( pxlX > drawWidth/2 ){//if grayscale, set each color channel to the average of all color channels
+				/*uint64_t total = ( rTotal + gTotal + bTotal ) / 3;//total probably doesn't have to be 64 bits (otherwise could just put average in rTotal first and copy to other channels)
+				if( total > 4294967295 ){ total = 4294967295; }
+				rTotal = total * pxlX / drawWidth  -  rTotal * pxlX / drawWidth + rTotal;
+				gTotal = total * pxlX / drawWidth  -  gTotal * pxlX / drawWidth + gTotal;
+				bTotal = total * pxlX / drawWidth  -  bTotal * pxlX / drawWidth + bTotal;*/
+			//}
 
-				for(  unsigned int setSubX = 0;  setSubX < args.pixelSize  &&  pxlX + setSubX < args.drawWidth  &&  args.startX + pxlX + setSubX < args.textureWidth;  setSubX ++  ){
-					for(  unsigned int setSubY = 0;  setSubY < args.pixelSize  &&  pxlY + setSubY < args.drawHeight  &&  args.startY + pxlY + setSubY < args.textureHeight;  setSubY ++  ){
-						args.texture[  (args.startY + pxlY + setSubY) * args.textureWidth  +  args.startX + pxlX + setSubX  ] =
-							( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );//Should the inner (int) casts be (uint16_t) instead?
-					}
+			for(  unsigned int setSubX = 0;  setSubX < args.pixelSize  &&  pxlX + setSubX < args.drawWidth  &&  args.startX + pxlX + setSubX < args.textureWidth;  setSubX ++  ){
+				for(  unsigned int setSubY = 0;  setSubY < args.pixelSize  &&  pxlY + setSubY < args.drawHeight  &&  args.startY + pxlY + setSubY < args.textureHeight;  setSubY ++  ){
+					args.texture[  (args.startY + pxlY + setSubY) * args.textureWidth  +  args.startX + pxlX + setSubX  ] =
+						( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );//Should the inner (int) casts be (uint16_t) instead?
 				}
 			}
 		}

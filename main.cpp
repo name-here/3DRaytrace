@@ -208,8 +208,8 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
 
-	int xGrid = 1;
-	int yGrid = 1;
+	int xGrid = 3;
+	int yGrid = 3;
 	//WorldDrawArgs* args = new WorldDrawArgs[ xGrid * yGrid ];
 	WorldDrawArgs args;
 	args.world = &world;
@@ -227,10 +227,10 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 		for( int x = 0; x < xGrid; x ++ ){
 			int index = y * xGrid  +  x;
 			args.startX = windowWidth * x / xGrid;
-			args.startY = windowWidth * y / yGrid;
+			args.startY = windowHeight * y / yGrid;
 			args.drawWidth = windowWidth * (x+1) / xGrid  -  args.startX;
 			args.drawHeight = windowHeight * (y+1) / yGrid  -  args.startY;
-			//printf( "Rendering thread #%i now\n", index+1 );
+			//printf( "Starting rendering on thread #%i now\n", index+1 );
 			drawThreads[ index ] = new std::thread( world.draw, args );
 			//std::thread drawThread( world.draw, args );
 		}
@@ -238,7 +238,7 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 
 	for( int i = 0; i < xGrid * yGrid; i ++){
 		drawThreads[i]->join();
-		//printf( "Done rendering thread #%i now\n", i+1 );
+		//printf( "Done rendering on thread #%i now\n", i+1 );
 	}
 
 	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 100000, 0, false );
