@@ -39,9 +39,9 @@ int detail = 1;//grid size of rendered points within each pixel, so the square o
 
 int frameCount = 0;
 Uint32 lastTicks;
-Uint32 thisTicks;
+Uint32 tickDelta;
 Uint32 frameRate;
-Uint32 minFrameTicks = 40;//equivalent of capping framerate, but defined in ticks per frame
+Uint32 minFrameTicks = 20;//equivalent of capping framerate, but defined in ticks per frame
 
 int mouseX = 0;
 int mouseY = -windowHeight/2;
@@ -92,7 +92,7 @@ void setup() {
 
 	world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*9/10 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ), true, 0 )  );//testTri
 
-	world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
+	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
 	//world.addObj(   new Tube(  Ray( Point(0, 0, UNIT*-3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535, 0, 32767 ),  false  )   );//testTube
@@ -158,27 +158,28 @@ void setup() {
 
 
 //called once per frame, and deals with calling world.draw() and any logic other than rendeing
-void draw() {
+void draw( int delta ) {//delta gives the time in milliseconds since the last frame
 	//The following movement system should be improved to give same speed when moving forwad and sideways at the same time and when frame time is inconsistent
 	if( doControl ){
 		//Point moveFront = world.camList[0]->front * UNIT/10; moveFront.y = 0;
+		double moveDist = UNIT*delta/200.0;
 		if( wDown ){
-			world.camList[0]->pos += ( world.camList[0]->front * UNIT/10 );
+			world.camList[0]->pos += ( world.camList[0]->front * moveDist );
 		}
 		if( sDown ){
-			world.camList[0]->pos -= ( world.camList[0]->front * UNIT/10 );
+			world.camList[0]->pos -= ( world.camList[0]->front * moveDist );
 		}
 		if( dDown ){
-			world.camList[0]->pos += ( world.camList[0]->right * UNIT/10 );
+			world.camList[0]->pos += ( world.camList[0]->right * moveDist );
 		}
 		if( aDown ){
-			world.camList[0]->pos -= ( world.camList[0]->right * UNIT/10 );
+			world.camList[0]->pos -= ( world.camList[0]->right * moveDist );
 		}
 		if( spaceDown ){
-			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y + UNIT/10, world.camList[0]->pos.z );//Alternatively, pos += Point(0, UNIT/10, 0)
+			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y + moveDist, world.camList[0]->pos.z );//Alternatively, pos += Point(0, UNIT/10, 0)
 		}
 		if( shiftDown ){
-			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y - UNIT/10, world.camList[0]->pos.z );
+			world.camList[0]->pos.set(  world.camList[0]->pos.x, world.camList[0]->pos.y - moveDist, world.camList[0]->pos.z );
 		}
 	}
 
@@ -207,6 +208,9 @@ void draw() {
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
 
+	int xGrid = 1;
+	int yGrid = 1;
+	//WorldDrawArgs* args = new WorldDrawArgs[ xGrid * yGrid ];
 	WorldDrawArgs args;
 	args.world = &world;
 	args.camNum = 0;
@@ -217,67 +221,34 @@ void draw() {
 	args.detail = detail;
 	args.centerView = false;
 
-	int xGrid = 3;
-	int yGrid = 3;
 	std::thread** drawThreads = new std::thread*[ xGrid * yGrid ];
-	for( int x = 0; x < xGrid; x ++ ){
-		for( int y = 0; y < yGrid; y ++){
+
+	for( int y = 0; y < yGrid; y ++){
+		for( int x = 0; x < xGrid; x ++ ){
+			int index = y * xGrid  +  x;
 			args.startX = windowWidth * x / xGrid;
 			args.startY = windowWidth * y / yGrid;
 			args.drawWidth = windowWidth * (x+1) / xGrid  -  args.startX;
 			args.drawHeight = windowHeight * (y+1) / yGrid  -  args.startY;
-			drawThreads[ y * xGrid  +  x ] = new std::thread( world.draw, args );
+			printf( "Rendering thread #%i now\n", index+1 );
+			drawThreads[ index ] = new std::thread( world.draw, args );
 			//std::thread drawThread( world.draw, args );
 		}
 	}
 
 	for( int i = 0; i < xGrid * yGrid; i ++){
 		drawThreads[i]->join();
+		printf( "Done rendering thread #%i now\n", i+1 );
 	}
 
-	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail );
+	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 100000, 0, false );
 }
 
 
 
 //called repeatedly from main(), and handles calling draw(), drawing pixels[] to the screen, and input
 void mainLoop(){
-	thisTicks = SDL_GetTicks();
-	if( thisTicks != lastTicks  ){
-		frameRate = 1000 / ( thisTicks - lastTicks );
-		if( mousePressed ){
-			printf("Max potential frame rate:%i\n", frameRate);
-		}
-	}
-	if( thisTicks - lastTicks  <  minFrameTicks ){//if() around delay may not be necessary
-		SDL_Delay( minFrameTicks + lastTicks - thisTicks );
-	}
-	/*else{
-		printf("FrameTicks:%i\n", thisTicks - lastTicks);
-	}*/
-	lastTicks = SDL_GetTicks();
-	/*if( mousePressed ){
-		printf("Frame Rate:%i\n", frameRate);
-	}*///<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<print framerate if mouse pressed
-
-	draw();
-
-	SDL_UpdateTexture( buffer, NULL, pixels, windowWidth * sizeof(Uint32) );
-	SDL_RenderClear( renderer );
-	SDL_RenderCopy( renderer, buffer, NULL, NULL );
-	SDL_RenderPresent( renderer );
-
-	frameCount ++;
-
-	#ifdef MAKE_IMAGE_SEQUENCE
-		if(frameCount<=MAKE_IMAGE_SEQUENCE){//This saves frames for an animation
-			const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
-			SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
-			printf("Saved file %s\n", name);
-		}
-		else{quit = true;}
-	#endif
-
+	//take input
 	while( SDL_PollEvent( &event ) != 0 ){
 		if( event.type == SDL_QUIT ){
 			quit = true;
@@ -364,6 +335,46 @@ void mainLoop(){
 			}
 		}
 	}
+
+	
+	draw( tickDelta );
+
+	SDL_UpdateTexture( buffer, NULL, pixels, windowWidth * sizeof(Uint32) );
+	SDL_RenderClear( renderer );
+	SDL_RenderCopy( renderer, buffer, NULL, NULL );
+	SDL_RenderPresent( renderer );
+
+	frameCount ++;
+
+	#ifdef MAKE_IMAGE_SEQUENCE
+		if(frameCount<=MAKE_IMAGE_SEQUENCE){//This saves frames for an animation
+			const char* name = ("frame_"+std::to_string(frameCount)+".bmp").c_str();
+			SDL_SaveBMP(SDL_CreateRGBSurfaceFrom(pixels, windowWidth, windowHeight, 32, windowWidth*4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000), name);
+			printf("Saved file %s\n", name);
+		}
+		else{quit = true;}
+	#endif
+
+	//thisTicks = SDL_GetTicks();
+	if( SDL_GetTicks() != lastTicks  ){
+		if( mousePressed ){
+			printf(  "Max potential frame rate:%i\n",  1000 / (SDL_GetTicks() - lastTicks)  );
+		}
+	}
+	if( SDL_GetTicks() - lastTicks  <  minFrameTicks ){//if() around delay may not be necessary
+		SDL_Delay( minFrameTicks + lastTicks - SDL_GetTicks() );
+	}
+	/*else{
+		printf("FrameTicks:%i\n", thisTicks - lastTicks);
+	}*/
+	if( SDL_GetTicks() != lastTicks  ){
+		frameRate = 1000 / ( SDL_GetTicks() - lastTicks );
+	}
+	tickDelta = SDL_GetTicks() - lastTicks;
+	lastTicks = SDL_GetTicks();
+	/*if( mousePressed ){
+		printf("Frame Rate:%i\n", frameRate);
+	}*///<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<print framerate if mouse pressed
 
 }
 

@@ -230,7 +230,7 @@ void World::draw( WorldDrawArgs args ){
 				for( unsigned int subX = 0; subX < args.detail; subX ++ ){
 					for( unsigned int subY = 0; subY < args.detail; subY ++ ){
 						//camList[args.camNum]->getRay( cRay,  pxlX  -  (double)args.drawWidth/2  +  (double)subX / args.detail,  (double)args.drawHeight/2  -  pxlY  +  (double)subY / args.detail );
-						args.world->camList[args.camNum]->getRay( cRay,  (args.centerView ? 0 : args.startX)  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
+						args.world->camList[args.camNum]->getRay( cRay,  (!args.centerView) * args.startX  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
 						cRay.currentIOR = args.world->airIOR;
 						cRay.nextIOR = args.world->airIOR;
 						args.world->cast( cRay );
