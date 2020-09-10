@@ -230,7 +230,7 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 			args.startY = windowWidth * y / yGrid;
 			args.drawWidth = windowWidth * (x+1) / xGrid  -  args.startX;
 			args.drawHeight = windowHeight * (y+1) / yGrid  -  args.startY;
-			printf( "Rendering thread #%i now\n", index+1 );
+			//printf( "Rendering thread #%i now\n", index+1 );
 			drawThreads[ index ] = new std::thread( world.draw, args );
 			//std::thread drawThread( world.draw, args );
 		}
@@ -238,7 +238,7 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 
 	for( int i = 0; i < xGrid * yGrid; i ++){
 		drawThreads[i]->join();
-		printf( "Done rendering thread #%i now\n", i+1 );
+		//printf( "Done rendering thread #%i now\n", i+1 );
 	}
 
 	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 100000, 0, false );
