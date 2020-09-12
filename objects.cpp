@@ -98,13 +98,13 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 	double lineY2 = sqrt( dist1Sq - (lineX2*lineX2) );
 	double num1;
 	double num2;
-	double num3;//optimize these by creating the variables with the object (maybe, since won't work for multithreading)
+	double num3;
 	if(lineY2!=0){
 		num1 = (lineX2-lineX1) / lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
 		num2 = num1*num1+1;
 		num3 = (num2*radiusSq) - (lineX1*lineX1);
 	}
-	if(  ( lineX1 >= radius  ||  isInside )/*This check should maybe be earlier?*/  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere)
+	if(  lineX1 > lineX2/*Avoids intersections behind the camera*/  &&  ( lineX1 >= radius  ||  isInside )/*This check should maybe be earlier?*/  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere)
 		double num4;
 		double distance;
 		if( lineY2 == 0 ){
@@ -118,28 +118,15 @@ bool Ball::cast( CRay& ray, bool isShadow, bool isInside ){
 		double scale = distance / rayLength;// could also be "/ ray.ray.length" if Ray.length gets implemented.
 		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
 
-		if(  abs( dist3DSq( pos, hit ) - radiusSq )  <=  INTERSECT_ERR  ){ //Avoids intersections behind the camera by making sure hit point is within INTERSECT_ERR of the surface
-			if(isShadow){
-				/*The followint "if" statement determines if the hit location is actually between the light source and the point to cast the shadow on.*/
-				if( 	( (hit.x > ray.ray.p1.x)  !=  (hit.x > ray.ray.p2.x) ) && //abs(hit.x-ray.ray.p2.x)>0.01 &&
-						( (hit.y > ray.ray.p1.y)  !=  (hit.y > ray.ray.p2.y) ) && //abs(hit.y-ray.ray.p2.y)>0.01 &&
-						( (hit.z > ray.ray.p1.z)  !=  (hit.z > ray.ray.p2.z) ) && //abs(hit.z-ray.ray.p2.z)>0.01 ){
-						dist3DSq( hit, ray.ray.p2 ) >= INTERSECT_ERR ){
-					//ray.intersect(0, 0, 0, 255, ray.ray.p2, 0, true);//The position for this should actually be set, but isn't yet
-					//ray.color.r = (ray.color.r + color.r)/2;
-					//ray.color.g = (ray.color.g + color.g)/2;
-					//ray.color.b = (ray.color.b + color.b)/2;
-
-					return true;
-				}
-			}
-			else{ //if(  ray.objLastHit != this  ||  dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR  ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-roughness ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
-				/*if( roughness > 0 ){
-					return Point( (hit-pos) / radius );
-				}*/  //no longer returned this way.
-				return ray.intersect(  this,  color,  hit,  distance,  (hit - pos) / radius * flipNormals  );
-			}
+		if(isShadow){// The stuff in here can be simplified, and all the stuff for calculating the 3D intersection can be moved into the else{}
+			return dist3DSq( hit, ray.ray.p2 ) >= INTERSECT_ERR;
+		}
+		else{ //if(  ray.objLastHit != this  ||  dist3DSq( hit, ray.ray.p1 ) >= INTERSECT_ERR  ){//This if statement may not even be needed!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			//ray.intersect( this, Color( (hit.x+1)*65535, (hit.y+1)*65535, (hit.z+1)*65535, color.a * ( 65535-roughness ) / 65535 ), hit, distance, Point( (hit - pos) / radius ), false );
+			/*if( roughness > 0 ){
+				return Point( (hit-pos) / radius );
+			}*/  //no longer returned this way.
+			return ray.intersect(  this,  color,  hit,  distance,  (hit - pos) / radius * flipNormals  );
 		}
 	}
 	return false;
@@ -169,11 +156,79 @@ void Tube::setLine( Ray setLine ){
 	}
 }
 
-/*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
-	double hitX = 
-}*/
-
 bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
+	char flipNormals = 1 - isInside*2;
+
+	double lineX1Sq = square(ray.ray.p1.x) + square(ray.ray.p1.y);//b^2
+	double lineX1 = sqrt( lineX1Sq );
+	double distSq = square(ray.ray.p2.x) + square(ray.ray.p2.y);//a^2
+	double rayLength2DSq = square(ray.ray.p2.x - ray.ray.p1.x) + square(ray.ray.p2.y - ray.ray.p1.y);//c^2
+	/*Working out math:
+	x^2 + y^2 = a^2
+	(b-x)^2 + y^2 = c^2
+	b^2 - 2bx + x^2 + y^2 = c^2
+	2bx - b^2 = a^2 - c^2
+	2bx = a^2 - c^2 + b^2
+	x = (a^2 - c^2 + b^2) / 2b   OR   x= (a^2 - c^2)/2b + b/2*/
+	double lineX2 =  ( distSq - rayLength2DSq + lineX1Sq )  /  (lineX1 * 2);//x
+	double lineY2 = sqrt( distSq - lineX2*lineX2 );//y
+
+	double num1;
+	double num2;
+	double num3;
+	if(lineY2!=0){
+		num1 = (lineX2-lineX1) / lineY2;//The num+[number] variables store numbers that are used more than once, so that they don't have to be calculated 2 or 3 times.
+		num2 = num1*num1+1;
+		num3 = (num2*radiusSq) - (lineX1*lineX1);
+	}
+
+	if(  lineX1 > lineX2/*Avoids intersections behind the camera*/  &&  ( lineX1 >= radius  ||  isInside )/*This check should maybe be earlier?*/  &&  ( lineY2 == 0  ||  num3 >= 0 )  ){//This checks if ray hits 2D circle (slice of sphere)
+		if( isShadow ){
+			return  /*[distance away from surface]*/lineX2 <= INTERSECT_ERR  ||  ( lineX2 <= 0 && ray.objLastHit != this );
+		}
+		else{
+			double num4;
+			double dist2DSq;
+			if( lineY2 == 0 ){
+				num4 = radius;
+				dist2DSq = square( lineX1 - radius );
+			}
+			else{
+				num4 =  (   -lineX1 * num1  -  sqrt( num3 ) * flipNormals   )   /   num2;
+				dist2DSq = square(num1 * num4)  +  num4*num4;
+			}
+			double scale = sqrt(dist2DSq) / sqrt( rayLength2DSq );
+			Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
+			double distance = dist3D( hit, ray.ray.p1 );
+			Point normal = hit;
+			normal.z = 0;
+			normal.normalize();
+			return ray.intersect(  this,  color,  hit,  distance,  normal  );
+		}
+	}
+	return false;
+
+	//Calculates intersections as if the cylinder was a place facing towards ray.ray.p1
+	/*if(   lineX1 > lineX2   &&   ( lineX1 >= radius  ||  isInside )   &&   lineY2 * lineX1 / (lineX1 - lineX2)  <  radius   ){
+		if( isShadow ){
+			return  lineX2 <= INTERSECT_ERR  ||  ( lineX2 <= 0 && ray.objLastHit != this );
+		}
+		else{
+			//double rayLength2D = sqrt( rayLength2DSq );
+			//double dist2D = rayLength2D * lineX1 / (lineX1 - lineX2);
+			double scale = lineX1 / (lineX1 - lineX2);
+			double distance = ray.ray.getLength() * scale;
+			Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
+			Point normal = ray.ray.p1 - line.p1;
+			normal.z = 0;
+			normal.normalize();
+			return ray.intersect(  this,  color,  hit,  distance,  normal  );
+		}
+	}
+	return false;*/
+}
+
+/*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
 	Point p1Vec = ray.ray.p1 - line.p1;
 	Point p2Vec = ray.ray.p2 - line.p1;//vectors pointing from p1 of cylinder to p1 and p2 of ray
 	Point axisY = Point(0, UNIT, 0);//cross( p1Vec, lineVec ).normalize();
@@ -198,7 +253,7 @@ bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test versio
 		}
 	}
 	return false;
-}
+}*/
 
 /*bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){
 	char flipNormals = 1 - isInside*2;

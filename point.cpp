@@ -18,14 +18,14 @@ void Point::set(){
 }
 
 double Point::magnitude(){
-	return sqrt( x*x + y*x + z*z );
+	return sqrt( x*x + y*y + z*z );
 }
 
 Point& Point::normalize(){
-	double length = sqrt( x*x + y*x + z*z );
-	this->x/=length;
-	this->y/=length;
-	this->z/=length;
+	double length = sqrt( x*x + y*y + z*z );
+	x /= length;
+	y /= length;
+	z /= length;
 	return *this;
 }
 
