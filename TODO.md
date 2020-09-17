@@ -48,6 +48,7 @@
 - Make 2D circle check its own function since it is (or at least will be) used for both Ball::cast() and Tube::cast()
 - Make some attempt to optimize Tube::cast()
 - Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp to see the problem)
+- Add an object that that is a distorted plane, like that visualizing forces from charges in my ChargeGraph program
 
 ### Partially Done:
 

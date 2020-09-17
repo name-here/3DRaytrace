@@ -156,7 +156,7 @@ void World::doRefractReflect( CRay& ray ){
 		Point offset = refractDir * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
 		
 		ray.ray.p2 =  ray.hitPos + refractDir;
-		ray.ray.p1 =  ray.hitPos  +  offset;
+		ray.ray.p1 =  ray.hitPos + offset;
 		recast( ray );
 	}
 }
@@ -208,7 +208,7 @@ void World::doReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	{//brackets are here to tell compiler that temp is no longer needed after this
 		Point temp = ray.ray.p2;
 		ray.ray.p2 +=   ray.ray.p2 - ray.ray.p1  -  ray.normalVec * 2 * dot(ray.ray.p2 - ray.ray.p1, ray.normalVec);
-		ray.ray.p1 = temp  +  (ray.ray.p2 - temp) * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully outside the shape (to prevent double intersections)
+		ray.ray.p1 = temp;//  +  (ray.ray.p2 - temp) * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully outside the shape (to prevent double intersections)
 	}
 	recast( ray );
 }

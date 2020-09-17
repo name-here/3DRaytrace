@@ -76,11 +76,11 @@ void setup() {
 
 	world.addLight(  new Light( Point( UNIT, UNIT*2, -UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
 	world.addLight(  new Light( Point( -UNIT*2, UNIT*2, -UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
-	//world.addLight(  new Light( Point( -UNIT/5, UNIT/4, UNIT ), FloatColor( 1, 1, 0.1 ) )  );//light3
+	world.addLight(  new Light( Point( 0, UNIT/4, UNIT ), FloatColor( 1, 1, 0.1 ) )  );//light3
 	//world.addLight(  new Light( Point( 0, UNIT, -UNIT*5/2 ), FloatColor( -2 ) )  );//light4
 	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
 	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
-	//world.addObj(  new Ball( world.lightList[2]->pos, UNIT/30, Color( 65535, 65535, 0 ), false )  );//lightBall3
+	world.addObj(  new Ball( world.lightList[2]->pos, UNIT/30, Color( 65535, 65535, 0 ), false )  );//lightBall3
 	//world.addObj(  new Ball( world.lightList[3]->pos, UNIT/30, Color( 10000 ), false )  );//lightBall3
 
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 )/*, true, 40000*/ )  );//testPlane1
@@ -95,7 +95,7 @@ void setup() {
 	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
-	world.addObj(   new Tube(  Ray( Point(0, 0, UNIT*-3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535 ),  true  )   );//testTube
+	world.addObj(   new Tube(  Ray( Point(0, 0, -UNIT*3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535 ),  true  )   );//testTube
 
 	//testTriCube:
 	/*world.addObj(  new Tri( Point( 0, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT, UNIT, 0 ) )  );
