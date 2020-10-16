@@ -107,7 +107,7 @@ void World::doDifuseReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 void World::doRefractReflect( CRay& ray ){
 	if(  ray.bounceCount < MAX_DEPTH  /*&&  ray.objLastHit->roughness == 0  This is the only case that's being calculated, but no need to do nothing just because we have other values*/  ){
-		uint16_t reflectAmmount = 0;
+		//uint16_t reflectAmmount = 0;
 		if( ray.objLastHit->opacity > 0 ){
 			/*Ray originalRay = ray.ray;
 			Point originalHit = ray.hitPos;
@@ -129,7 +129,7 @@ void World::doRefractReflect( CRay& ray ){
 				return;
 			}
 
-			reflectAmmount = ray.objLastHit->opacity;//this should be properly calculated, taking angle into account
+			uint16_t reflectAmmount = ray.objLastHit->opacity;//this should be properly calculated, taking angle into account
 
 			CRay reflectRay = CRay();
 			reflectRay.ray = ray.ray;
@@ -146,17 +146,19 @@ void World::doRefractReflect( CRay& ray ){
 		}
 
 
-		double IORRatio = (ray.currentIOR / ray.nextIOR);
-		Point rayDir = (ray.hitPos - ray.ray.p1) / ray.hitDist;//direction of ray before refraction
+		{//None of these variables are needed once the new ray is constructed, so limit their scope
+			double IORRatio = (ray.currentIOR / ray.nextIOR);
+			Point rayDir = (ray.hitPos - ray.ray.p1) / ray.hitDist;//direction of ray before refraction
 
-		double c1 = -dot( ray.normalVec, rayDir );
-		double c2 = sqrt(  1  -  IORRatio*IORRatio * ( 1 - c1*c1 )  )  ;//*  -1 * (c1 < 0);//last bit is to correct the sometimes inverted output.  I'm not sure if this is right, since I didn't derive the equations, but it's definately wrong without it.
-		Point refractDir = IORRatio  *  (  rayDir  +  ray.normalVec * c1  )  -  ray.normalVec * c2;//direction of ray after refraction
+			double c1 = -dot( ray.normalVec, rayDir );
+			double c2 = sqrt(  1  -  IORRatio*IORRatio * ( 1 - c1*c1 )  )  ;//*  -1 * (c1 < 0);//last bit is to correct the sometimes inverted output.  I'm not sure if this is right, since I didn't derive the equations, but it's definately wrong without it.
+			Point refractDir = IORRatio  *  (  rayDir  +  ray.normalVec * c1  )  -  ray.normalVec * c2;//direction of ray after refraction
 
-		Point offset = refractDir * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
+			Point offset = refractDir * INTERSECT_ERR/* *2 */;//used to offset the ray so that it is fully inside the shape (to prevent double intersections)
 		
-		ray.ray.p2 =  ray.hitPos + refractDir;
-		ray.ray.p1 =  ray.hitPos + offset;
+			ray.ray.p2 =  ray.hitPos + refractDir;
+			ray.ray.p1 =  ray.hitPos + offset;
+		}
 		recast( ray );
 	}
 }

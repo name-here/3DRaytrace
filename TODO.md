@@ -44,9 +44,7 @@
 - Replace Color and FloatColor with Vector3 (renamed Point) and some sort of IntVector3
 - Make Camera::getRay() be for Ray instead of CRay, and move other setting of variables elsewhere
 - Add getLight( Point ) function that takes a Point (in 3D space) and returns a FloatColor corresponding to the light level at that Point
-- Make Tube::cast() actually work
-- Make 2D circle check its own function since it is (or at least will be) used for both Ball::cast() and Tube::cast()
-- Make some attempt to optimize Tube::cast()
+- Make 2D circle check its own function since it is used for both Ball::cast() and Tube::cast()
 - Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp to see the problem)
 - Add an object that that is a distorted plane, like that visualizing forces from charges in my ChargeGraph program
 
@@ -66,6 +64,7 @@
 	- Change doubles that should never be negative to be unsigned
 - Fix sparkles (random pixels or short lines of pixels lighting up) when looking up at bottom of reflective plane (MIGHT BE FIXED?)
 - Fix black line at the top of window with some pixel sizes (pixelSize in World::draw() )  (PROBABLY FIXED?)
+- Make some attempt to optimize Tube::cast()
 
 ### Done:
 
@@ -108,6 +107,7 @@
 - Find and fix any and all possible divisions by 0
 - Add multithreading (COMPLICATED?)
 - Make CRay objects start witht the right IOR for initial interactions (should start with currentIOR same as World::airIOR)
+- Make Tube::cast() actually work
 
 ### Maybe Do:
 

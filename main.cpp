@@ -44,7 +44,7 @@ Uint32 frameRate;
 Uint32 minFrameTicks = 20;//equivalent of capping framerate, but defined in ticks per frame
 
 int mouseX = 0;
-int mouseY = -windowHeight/2;
+int mouseY = 0;
 bool mousePressed;
 //float mouseMoveStepX = 0.375;
 //float mouseMoveStepY = 0.5;//These >>>>>>>will<<<<<<< determine the number of degrees of camera movement that correspond to 1 pixel of mouse movement
@@ -72,30 +72,31 @@ void setup() {
 
 
 	//The second paramater in Camera()--planeDist--is the only property of something in the world that should be set based on the actual screen.
-	world.addCam(   new Camera(  Point( 0, UNIT/2, -UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  0,  0,  0/*was 0.05*/  )   );
+	world.addCam(   new Camera(  Point( UNIT, UNIT/2, -UNIT*4 ),  (double)windowSmallDim/2 / FOVMultiplier,  -M_PI/8,  -M_PI/20,  0/*was 0.05*/  )   );
 
 	world.addLight(  new Light( Point( UNIT, UNIT*2, -UNIT*2 ), FloatColor( 1, 1, 3.5 ) )  );//light1
 	world.addLight(  new Light( Point( -UNIT*2, UNIT*2, -UNIT*3 ), FloatColor( 6, 2, 1 ) )  );//light2
-	world.addLight(  new Light( Point( 0, UNIT/4, UNIT ), FloatColor( 1, 1, 0.1 ) )  );//light3
+	//world.addLight(  new Light( Point( 0, UNIT/4, UNIT ), FloatColor( 1, 1, 0.1 ) )  );//light3
 	//world.addLight(  new Light( Point( 0, UNIT, -UNIT*5/2 ), FloatColor( -2 ) )  );//light4
 	world.addObj(  new Ball( world.lightList[0]->pos, UNIT/30, Color( 18724, 18724, 65535 ), false )  );//lightBall1
 	world.addObj(  new Ball( world.lightList[1]->pos, UNIT/30, Color( 65535, 21845, 10923 ), false )  );//lightBall2
-	world.addObj(  new Ball( world.lightList[2]->pos, UNIT/30, Color( 65535, 65535, 0 ), false )  );//lightBall3
+	//world.addObj(  new Ball( world.lightList[2]->pos, UNIT/30, Color( 65535, 65535, 0 ), false )  );//lightBall3
 	//world.addObj(  new Ball( world.lightList[3]->pos, UNIT/30, Color( 10000 ), false )  );//lightBall3
 
 	world.addObj(  new Plane( 1, -UNIT, UNIT/4, Color( 65535, 65535, 65535 ), Color( 50000, 50000, 50000 )/*, true, 40000*/ )  );//testPlane1
 	world.addObj(  new Plane( 2, UNIT*2, UNIT/4, Color( 38400, 0, 38400 ), Color( 10000, 0, 20000 ) )  );//testPlane2
 	//world.addObj(  new Plane( 2, UNIT*3, UNIT/4, Color( 0, 38400, 38400, 65535 ), Color( 0, 10000, 20000, 65535 ) )  );//testPlane3
 
-	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 30000 ), true, 0 )  );//testBall1
-	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ), true )  );//testBall2
+	world.addObj(  new Ball( Point( 0, 0, 0 ), UNIT/2, Color( 0 ), true, 0, 0, 1.5 )  );//testBall1
+	world.addObj(  new Ball( Point( -UNIT, UNIT, 0 ), UNIT/2, Color( 65535 ) )  );//testBall2
+	world.addObj(  new Ball( Point( UNIT*3/20, UNIT*2/5, UNIT ), UNIT/4, Color( 0 ), true, 0 )  );//testBall3
 
 	//world.addObj(  new Tri( Point( UNIT/2, 0, UNIT ), Point( 0, UNIT, UNIT*9/10 ), Point( UNIT*4/3, 0, UNIT ), Color( 10000, 25600, 25600 ), true, 0 )  );//testTri
 
 	//world.addObj(  new AxisBox( Point( -UNIT, 0, -UNIT ), Point( UNIT/2, UNIT/2, UNIT/5 ), Color( 10000, 2000, 10000 ), true, 0, 5000, 1.5 )  );//testBox1
 	//world.addObj(  new AxisBox( Point( -UNIT/2, 0, -UNIT ), Point( UNIT/4, UNIT/4, UNIT/4 ), Color( 10000, 2000, 10000 ), true, 0, 1000, 2 )  );//testBox2
 
-	world.addObj(   new Tube(  Ray( Point(0, 0, -UNIT*3), Point(0, 0, UNIT*-2) ),  UNIT/5,  Color( 65535 ),  true  )   );//testTube
+	//world.addObj(   new Tube(  Ray( Point(UNIT/2, -UNIT/3, -UNIT*4), Point(-UNIT/2, 0, UNIT*3/2) ),  UNIT/5,  Color( 65535 ),  true  )   );//testTube
 
 	//testTriCube:
 	/*world.addObj(  new Tri( Point( 0, 0, 0 ), Point( 0, UNIT, 0 ), Point( UNIT, UNIT, 0 ) )  );
@@ -120,19 +121,20 @@ void setup() {
 
 	
 	//the following code traces out a ray and adds tube shapes
-	/*int segments = 1;
+	const int segments = 4;
 
-	world.addCam(  new Camera( Point(0, UNIT/2, -UNIT*4), UNIT, 0, -M_PI/20 )  );
+	world.addCam(  new Camera( Point(0, UNIT/2, -UNIT*4), 500, M_PI/100, -M_PI/40 )  );
 	CRay testRay;
 	world.camList[1]->getRay( testRay, 0, 0 );
 	Ball* points[segments+1];
 	Tube* lines[segments];
 
-	for( int i = 0; i < segments+1; i ++ ){
-		points[i] = new Ball( Point(), UNIT/10, Color( 0, 65535, 0 ), false );
+	points[0] = new Ball( Point(), UNIT/20, Color( 0, 0, 65535 ), false );
+	for( int i = 1; i < segments+1; i ++ ){
+		points[i] = new Ball( Point(), UNIT/20, Color( 0, 65535, 0 ), false );
 	}
 	for( int i = 0; i < segments; i ++ ){
-		lines[i] = new Tube( Ray(), UNIT/10, Color( 65535, 0, 0 ), false );
+		lines[i] = new Tube( Ray(), UNIT/30, Color( 45000, 0, 0 ), false );
 	}
 
 	testRay.bounceCount = MAX_DEPTH;
@@ -149,11 +151,11 @@ void setup() {
 	}
 
 	for( int i = 0; i < segments+1; i ++){
-		//world.addObj( points[i] );
+		world.addObj( points[i] );
 	}
 	for( int i = 0; i < segments; i ++ ){
 		world.addObj( lines[i] );
-	}*/
+	}
 }
 
 
@@ -208,8 +210,8 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
 
-	int xGrid = 3;
-	int yGrid = 3;
+	const int xGrid = 3;
+	const int yGrid = 3;
 	//WorldDrawArgs* args = new WorldDrawArgs[ xGrid * yGrid ];
 	WorldDrawArgs args;
 	args.world = &world;
@@ -283,6 +285,7 @@ void mainLoop(){
 					emscripten_request_pointerlock( "canvas", true );
 				#else
 					SDL_ShowCursor( SDL_DISABLE );
+					SDL_WarpMouseInWindow( window, windowWidth/2, windowHeight/2 );
 				#endif
 			}
 		}
@@ -328,7 +331,7 @@ void mainLoop(){
 				if( windowWidth < windowHeight ){ windowSmallDim = windowWidth; }
 				else{ windowSmallDim = windowHeight; }
 				world.camList[0]->planeDist = (double)windowSmallDim/2 / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a particular instance of the Camera object)
-				delete pixels;
+				delete[] pixels;
 				pixels = new Uint32[ windowWidth * windowHeight ];
 				SDL_DestroyTexture( buffer );
 				buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
@@ -358,7 +361,8 @@ void mainLoop(){
 	//thisTicks = SDL_GetTicks();
 	if( SDL_GetTicks() != lastTicks  ){
 		if( mousePressed ){
-			printf(  "Max potential frame rate:%i\n",  1000 / (SDL_GetTicks() - lastTicks)  );
+			printf( "Frame time: %ims\n", SDL_GetTicks() - lastTicks );
+			//printf(  "Max potential frame rate:%i\n",  1000 / (SDL_GetTicks() - lastTicks)  );
 		}
 	}
 	if( SDL_GetTicks() - lastTicks  <  minFrameTicks ){//if() around delay may not be necessary

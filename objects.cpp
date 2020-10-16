@@ -147,6 +147,7 @@ Tube::Tube( Ray setLine, double setRadius, Color setColor, bool setDoLighting, u
 void Tube::setLine( Ray setLine ){
 	line = setLine;
 	lineVec = line.p2 - line.p1;
+	lineVecUnit = lineVec / lineVec.magnitude();
 	length = lineVec.magnitude();
 	if( length >= INTERSECT_ERR ){
 		lineVec /= length;
@@ -159,19 +160,16 @@ void Tube::setLine( Ray setLine ){
 bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
 	char flipNormals = 1 - isInside*2;
 
-	double lineX1Sq = square(ray.ray.p1.x) + square(ray.ray.p1.y);//b^2
-	double lineX1 = sqrt( lineX1Sq );
-	double distSq = square(ray.ray.p2.x) + square(ray.ray.p2.y);//a^2
-	double rayLength2DSq = square(ray.ray.p2.x - ray.ray.p1.x) + square(ray.ray.p2.y - ray.ray.p1.y);//c^2
-	/*Working out math:
-	x^2 + y^2 = a^2
-	(b-x)^2 + y^2 = c^2
-	b^2 - 2bx + x^2 + y^2 = c^2
-	2bx - b^2 = a^2 - c^2
-	2bx = a^2 - c^2 + b^2
-	x = (a^2 - c^2 + b^2) / 2b   OR   x= (a^2 - c^2)/2b + b/2*/
-	double lineX2 =  ( distSq - rayLength2DSq + lineX1Sq )  /  (lineX1 * 2);//x
-	double lineY2 = sqrt( distSq - lineX2*lineX2 );//y
+	Point p1Vec = line.p1 - ray.ray.p1;
+	Point p2Vec = line.p1 - ray.ray.p2;//vectors pointing from p1 of cylinder to p1 and p2 of ray
+	Point axisY = cross( p1Vec, lineVec ).normalize();
+	Point axisX = cross( lineVec, axisY ).normalize();
+
+	double lineX1 = p1Vec.dot( axisX );
+	double lineX2 = p2Vec.dot( axisX );
+	double lineY2 = abs( p2Vec.dot( axisY ) );
+
+	double rayLength2DSq = square(lineX1 - lineX2) + lineY2*lineY2;
 
 	double num1;//2D slope (delta X / delta Y)
 	double num2;
@@ -194,18 +192,21 @@ bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test versio
 			dist2DSq = square(num1 * num4)  +  num4*num4;
 		}
 
-		if( isShadow ){
-			return  (dist2DSq <= rayLength2DSq)   &&   ( ray.objLastHit != this  ||  lineX2*lineX2 + lineY2*lineY2 >= square(radius + INTERSECT_ERR) );
-		}
-		else{
-			double scale = sqrt(dist2DSq) / sqrt( rayLength2DSq );
-			Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
-			double distance = dist3D( hit, ray.ray.p1 );
-			Point normal = hit;
-			normal.z = 0;
-			normal.normalize();
-			normal *= flipNormals;
-			return ray.intersect(  this,  color,  hit,  distance,  normal  );
+		double scale = sqrt(dist2DSq) / sqrt( rayLength2DSq );
+		Point hit = ray.ray.p1 + ( (ray.ray.p2-ray.ray.p1)*scale );
+		double distanceAlong =  lineVecUnit.dot( hit - line.p1 );
+		if(  distanceAlong > 0  &&  distanceAlong < length  ){
+			if( isShadow ){
+				return  (dist2DSq <= rayLength2DSq)   &&   ( ray.objLastHit != this  ||  lineX2*lineX2 + lineY2*lineY2 >= square(radius + INTERSECT_ERR) );
+			}
+			else{
+				double distance = dist3D( hit, ray.ray.p1 );//Could also be:  distance = ray.ray.getLength() * scale;
+				Point normal = hit - line.p1;
+				normal -=  lineVecUnit  *  normal.dot( lineVecUnit );
+				normal.normalize();
+				normal *= flipNormals;
+				return ray.intersect(  this,  color,  hit,  distance,  normal  );
+			}
 		}
 	}
 	return false;

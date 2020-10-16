@@ -57,6 +57,7 @@ class Ball: public Object{
 
 class Tube: public Object{
 	Point lineVec;//unit vector along the center line of the cylinder
+	Point lineVecUnit;//lineVec normalized
 	double length;
 	public:
 		Ray line;//stores the end points of the cylinder
