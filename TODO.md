@@ -47,6 +47,8 @@
 - Make 2D circle check its own function since it is used for both Ball::cast() and Tube::cast()
 - Fix Tri shapes not rendering sometimes when axis-aligned (uncomment TriCube in main.cpp to see the problem)
 - Add an object that that is a distorted plane, like that visualizing forces from charges in my ChargeGraph program
+- Add a light type that is acts like a completely uniform sky light
+- Add a light type that acts like an infite plane a variable number of units away from the origin emitting light uniformly
 
 ### Partially Done:
 
