@@ -162,7 +162,7 @@ bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test versio
 
 	Point p1Vec = line.p1 - ray.ray.p1;
 	Point p2Vec = line.p1 - ray.ray.p2;//vectors pointing from p1 of cylinder to p1 and p2 of ray
-	Point axisY = cross( p1Vec, lineVec ).normalize();
+	Point axisY = cross( p1Vec, lineVec ).normalize();//There's probably a better way to find a vector perpendicular to lineVec by just manipulating(swappinng, *-1?) some of the components
 	Point axisX = cross( lineVec, axisY ).normalize();
 
 	double lineX1 = p1Vec.dot( axisX );

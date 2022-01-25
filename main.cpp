@@ -27,6 +27,8 @@ Uint32* pixels;
 bool quit = false;
 SDL_Event event;
 
+double* depthTexture;
+
 int windowWidth = 100;//600
 int windowHeight = 100;//420
 int windowSmallDim;//will be set to whichever window dimension is smaller
@@ -34,8 +36,8 @@ double FOVMultiplier = 0.5;//Multiplier for the field of view
 
 int defaultPixelSize = 4;//to store the pixelSize to change back to after releasing [Q] key
 int pixelSize = defaultPixelSize;//size of rendered pixels (number of (real) pixels across for chunky displayed pixels)
-int smallPixelSize = 1;//changed to after pressing [Q] key
-int detail = 1;//grid size of rendered points within each pixel, so the square of this number is the number of rays cast for each pixel — more is much slower, but makes edges smoother
+int smallPixelSize = 2;//changed to after pressing [Q] key
+int detail = 2;//grid size of rendered points within each pixel, so the square of this number is the number of rays cast for each pixel — more is much slower, but makes edges smoother
 
 int frameCount = 0;
 Uint32 lastTicks;
@@ -67,6 +69,8 @@ World world;
 
 //setup function (called once before mainLoop starts being called)
 void setup() {
+
+	depthTexture = new double[ windowWidth * windowHeight ];
 
 	world = World();//Color( 38400, 51200, 65535, 65535 ) for blue background
 
@@ -210,8 +214,8 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 	//world.camList[0]->rotate( M_PI*(15-abs(frameCount-30))/30, -M_PI/20 );
 
 
-	const int xGrid = 3;
-	const int yGrid = 3;
+	const int xGrid = 4;
+	const int yGrid = 2;
 	//WorldDrawArgs* args = new WorldDrawArgs[ xGrid * yGrid ];
 	WorldDrawArgs args;
 	args.world = &world;
@@ -219,6 +223,7 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 	args.texture = pixels;
 	args.textureWidth = windowWidth;
 	args.textureHeight = windowHeight;
+	args.depthTexture = depthTexture;
 	args.pixelSize = pixelSize;
 	args.detail = detail;
 	args.centerView = false;
@@ -243,7 +248,21 @@ void draw( int delta ) {//delta gives the time in milliseconds since the last fr
 		//printf( "Done rendering on thread #%i now\n", i+1 );
 	}
 
-	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, pixelSize, detail, windowWidth, windowHeight, 100000, 0, false );
+	//world.drawExpanded( 0, pixels, windowWidth, windowHeight, depthTexture, pixelSize, detail, windowWidth, windowHeight, 100000, 0, false );
+
+	//Draws an edge detection thing
+	/*for(int y = 0; y < windowHeight; y ++){
+		for(int x = 1; x < windowWidth; x ++){
+			float differenceX =  ( depthTexture[ y * windowWidth + x ] - depthTexture[ y * windowWidth + x-1 ] )  /  depthTexture[ y * windowWidth + x ];
+			float differenceY =  ( depthTexture[ y * windowWidth + x ] - depthTexture[ (y-1) * windowWidth + x ] )  /  depthTexture[ y * windowWidth + x ];
+			float valueX =   (  ( 1  -  1 / pow( M_E, abs(differenceX) ) )  *  ( (differenceX > 0) ? 1 : -1 )  +  1  )  /  2;
+			float valueY =   (  ( 1  -  1 / pow( M_E, abs(differenceY) ) )  *  ( (differenceY > 0) ? 1 : -1 )  +  1  )  /  2;
+			//float value = atan( M_PI * x ) / M_PI / 2 + 0.5;
+			uint8_t brightnessX = (uint8_t)( valueX * 255 );
+			uint8_t brightnessY = (uint8_t)( valueY * 255 );
+			pixels[ y * windowWidth + x ] = (brightnessX << 16) + brightnessY;
+		}
+	}*/
 }
 
 
@@ -333,6 +352,8 @@ void mainLoop(){
 				world.camList[0]->planeDist = (double)windowSmallDim/2 / FOVMultiplier;//   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<THIS SHOULD BE CHANGED TO SOMETHING MORE UNIVERSAL (shouldn't be specific to a particular instance of the Camera object)
 				delete[] pixels;
 				pixels = new Uint32[ windowWidth * windowHeight ];
+				delete[] depthTexture;
+				depthTexture = new double[ windowWidth * windowHeight ];
 				SDL_DestroyTexture( buffer );
 				buffer = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight );
 			}
@@ -438,6 +459,7 @@ int main(/*int argc, char* args[]*/) {
 		}
 	}
 	delete[] pixels;
+	delete[] depthTexture;
 	SDL_DestroyTexture( buffer );//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Program crashed on this line on exit a couple times
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );

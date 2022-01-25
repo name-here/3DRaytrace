@@ -37,7 +37,7 @@ World::World( Color setBackgroundColor, double setAirIOR ){
 	cast(camList[camNum]->getRay( CRay& ray, screenX, screenY ));
 }*/
 
-void World::cast( CRay& ray ){
+double World::cast( CRay& ray ){
 	if( ray.colorMixLeft > 0 ){
 
 		bool refractOut = false;
@@ -59,6 +59,8 @@ void World::cast( CRay& ray ){
 		if( ray.escape ){
 			ray.addColor( backgroundColor );
 			//ray.addColor( ray.castColor, ray.colorMixLeft, FloatColor(0) );
+
+			return F_INFINITY;
 		}
 
 		else if( ray.objLastHit->doLighting ){
@@ -76,13 +78,18 @@ void World::cast( CRay& ray ){
 		else{
 			//ray.addLight(  FloatColor( 1 )  );
 			ray.addColor( ray.castColor );
+			//ray.addColor(   (  65535  -  (uint16_t)( ray.hitDist * 65535 / (UNIT*10) )  )  *  ( ray.hitDist <= UNIT*10 )   );
+			//ray.addColor(  (uint16_t)( UNIT * 65535 / (ray.hitDist + UNIT) )  );
 
+			return ray.hitDist;
 		}
 	}
+
+	return 0;
 }
 
 
-void World::recast( CRay& ray ){
+double World::recast( CRay& ray ){
 	ray.bounceCount ++;
 	//ray.lightColor.r = 0;
 	//ray.lightColor.g = 0;
@@ -91,7 +98,7 @@ void World::recast( CRay& ray ){
 	ray.normalVec = Point();
 	ray.hitDist = F_INFINITY;
 	ray.escape = true;
-	cast( ray );
+	return cast( ray );
 }
 
 
@@ -220,21 +227,25 @@ void World::doReflect( CRay& ray ){ //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void World::draw( WorldDrawArgs args ){
 	unsigned int detailSq = args.detail * args.detail;
 	CRay cRay;
+	double depthTotal;
 	uint32_t rTotal;
 	uint32_t gTotal;
 	uint32_t bTotal;
 	for(   unsigned int pxlX = 0;   pxlX < args.drawWidth  &&  pxlX + args.startX < args.textureWidth;   pxlX += args.pixelSize   ){
 		for(   unsigned int pxlY = 0;   pxlY < args.drawHeight  &&  pxlY + args.startY < args.textureHeight;   pxlY += args.pixelSize   ){
+			depthTotal = 0;
 			rTotal = 0;
 			gTotal = 0;
 			bTotal = 0;
 			for( unsigned int subX = 0; subX < args.detail; subX ++ ){
 				for( unsigned int subY = 0; subY < args.detail; subY ++ ){
 					//camList[args.camNum]->getRay( cRay,  pxlX  -  (double)args.drawWidth/2  +  (double)subX / args.detail,  (double)args.drawHeight/2  -  pxlY  +  (double)subY / args.detail );
-					args.world->camList[args.camNum]->getRay( cRay,  (!args.centerView) * args.startX  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  (double)subX / args.detail,  (double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  (double)subY / args.detail );
+					args.world->camList[args.camNum]->getRay( cRay,
+							(!args.centerView) * args.startX  +  pxlX  -  (double)(args.centerView ? args.drawWidth : args.textureWidth) / 2  +  ((double)subX + 0.5) / args.detail,
+							(double)(args.centerView ? args.drawHeight : args.textureHeight) / 2  -  (args.centerView ? 0 : args.startY)  -  pxlY  +  ((double)subY + 0.5) / args.detail );
 					cRay.currentIOR = args.world->airIOR;
 					cRay.nextIOR = args.world->airIOR;
-					args.world->cast( cRay );
+					depthTotal += args.world->cast( cRay );
 					rTotal += cRay.color.r;
 					gTotal += cRay.color.g;
 					bTotal += cRay.color.b;
@@ -251,8 +262,12 @@ void World::draw( WorldDrawArgs args ){
 
 			for(  unsigned int setSubX = 0;  setSubX < args.pixelSize  &&  pxlX + setSubX < args.drawWidth  &&  args.startX + pxlX + setSubX < args.textureWidth;  setSubX ++  ){
 				for(  unsigned int setSubY = 0;  setSubY < args.pixelSize  &&  pxlY + setSubY < args.drawHeight  &&  args.startY + pxlY + setSubY < args.textureHeight;  setSubY ++  ){
-					args.texture[  (args.startY + pxlY + setSubY) * args.textureWidth  +  args.startX + pxlX + setSubX  ] =
-						( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )   +   ( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +   ( (int)sqrt( (int)(bTotal/detailSq) ) );//Should the inner (int) casts be (uint16_t) instead?
+					int index =  (args.startY + pxlY + setSubY) * args.textureWidth  +  args.startX + pxlX + setSubX;
+					args.depthTexture[ index ] = depthTotal / detailSq;
+					args.texture[ index ] =
+						( ( (int)sqrt( (int)(rTotal/detailSq) ) ) << 16 )  +
+						( ( (int)sqrt( (int)(gTotal/detailSq) ) ) << 8 )   +
+						( (int)sqrt( (int)(bTotal/detailSq) ) );//Should the inner (int) casts be (uint16_t) instead?
 				}
 			}
 		}
@@ -260,13 +275,14 @@ void World::draw( WorldDrawArgs args ){
 }
 
 
-void World::drawExpanded( unsigned int camNum, Uint32* texture, unsigned int textureWidth, unsigned int textureHeight, unsigned int pixelSize, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY, bool centerView ){
+void World::drawExpanded( unsigned int camNum, Uint32* texture, unsigned int textureWidth, unsigned int textureHeight, double* depthTexture, unsigned int pixelSize, unsigned int detail, unsigned int drawWidth, unsigned int drawHeight, unsigned int startX, unsigned int startY, bool centerView ){
 	WorldDrawArgs args;
 	args.world = this;
 	args.camNum = camNum;
 	args.texture = texture;
 	args.textureWidth = textureWidth;
 	args.textureHeight = textureHeight;
+	args.depthTexture = depthTexture;
 	args.pixelSize = pixelSize;
 	args.detail = detail;
 	if( drawWidth == 0 ){ args.drawWidth = textureWidth; }

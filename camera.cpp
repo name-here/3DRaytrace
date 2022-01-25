@@ -44,6 +44,24 @@ void Camera::getRay( CRay& ray, double screenX, double screenY ){
 		ray.colorMixLeft = 0;
 	}
 
+	//Gives a very weird blur/glitch effect:
+	/*ray.ray.p1 = pos  +  right * screenX / 100  +  up * screenY / 100;
+	ray.ray.p2 = pos  +  right * floor( screenX / 10 )  +  up * floor( screenY / 10 )  +  front * planeDist/10;
+	ray.colorMixLeft = 65535;*/
+
+	//Gives a VERY trippy effect when moving
+	/*ray.ray.p1 = pos  +  right * (screenX + (screenX - floor(screenX/4 - 2)*4)*10)  +  up * (screenY + (screenY - floor(screenY/4 - 2)*4)*10);
+	ray.ray.p2 = pos  +  right * screenX / 10  +  up * screenY / 10  +  front * planeDist;
+	ray.colorMixLeft = 65535;*/
+
+	/*ray.ray.p1 = pos  +  right * screenX / 10  +  up * screenY / 10;
+	ray.ray.p2 = pos  +  right * (screenX + (screenX - floor(screenX/4 - 2)*4)*10)  +  up * (screenY + (screenY - floor(screenY/4 - 2)*4)*10)  +  front * planeDist;
+	ray.colorMixLeft = 65535;*/
+
+	//CURRENTLY WORKING ON:
+	//ray.ray.p1 =  pos   +   right  *  (screenX - floor(screenX/4 - 2)*4) / 10   +   up  *  (screenY - floor(screenY/4 - 2)*4) / 10;
+	//ray.ray.p2 =  pos  +  right * screenX  +  up * screenY  +  front * planeDist;
+
 	/*ray.ray.p1 = pos  +  right * screenX  +  up * screenY;
 	ray.ray.p2 = ray.ray.p1  +  front * planeDist;
 
