@@ -157,7 +157,7 @@ void Tube::setLine( Ray setLine ){
 	}
 }
 
-bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){//This is test version of the function, ONLY INTENDED TO TEST MY MATH
+bool Tube::cast( CRay& ray, bool isShadow, bool isInside ){
 	char flipNormals = 1 - isInside*2;
 
 	Point p1Vec = line.p1 - ray.ray.p1;
